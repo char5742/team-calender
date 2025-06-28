@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test'
 
+const TITLE_PATTERN = /Team Calendar/
+
 test('health check', async ({ page }) => {
-  await page.goto('/health')
-  await expect(page).toHaveTitle('Health Check') // Replace 'Health Check' with the actual expected title of the /health page
+  await page.goto('/')
+  await expect(page).toHaveTitle(TITLE_PATTERN)
 })

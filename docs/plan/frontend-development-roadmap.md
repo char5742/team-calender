@@ -16,7 +16,7 @@
 
 | # | タイトル | 概要 | 受け入れ基準 |
 |---|----------|------|-------------|
-| M0-1 | chore: `.bun-version` 追加と Bun 導入 | `.bun-version` に `1.1.x`（最新安定）を記載<br/>README 最上部に "Requires Bun 1.1+" を追記 | `bun -v` が `.bun-version` と一致 |
+| M0-1 | chore: `.bun-version` 追加と Bun 導入 | `.bun-version` に `1.2.x`（最新安定）を記載<br/>README 最上部に "Requires Bun 1.2+" を追記 | `bun -v` が `.bun-version` と一致 |
 | M0-2 | chore: Biome Lint / Format 設定 | `biome.json` にプロジェクト標準ルール（strict, importOrder など）記載 | `bunx biome check .` でエラー 0<br/>`bunx biome format --write` で差分 0 |
 | M0-3 | chore: Playwright インストール & 初期サンプル | `bun add -D @playwright/test`<br/>`bunx playwright install --with-deps`<br/>`tests/e2e/sample.spec.ts` にデフォルトテストを生成 | サンプルテストがPASS |
 | M0-4 | chore: lefthook 設定ファイル作成 | pre-commitフックでlint/unit/e2eを実行する設定を追加 | `lefthook run pre-commit` 実行で３コマンドすべてグリーン |

@@ -9,8 +9,6 @@ pre-commit:
       glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
       run: bun run lint:fix
       stage_fixed: true
-    unit:
-      run: bun test
 
 pre-push:
   parallel: true

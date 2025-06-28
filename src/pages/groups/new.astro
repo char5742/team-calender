@@ -1,4 +1,6 @@
 ---
+import GroupCreateForm from '../../components/GroupCreateForm.astro'
+import Layout from '../../layouts/Layout.astro'
 import { loadMockData } from '../../lib/mockData'
 import { groupsStore, teamMembersStore } from '../../stores/groupStore'
 
@@ -62,13 +64,14 @@ const existingGroups = groupsStore.get()
 <script>
   // グループ作成成功時の処理をカスタマイズ
   document.addEventListener('groupCreated', (event) => {
-    const { group } = event.detail;
+    const customEvent = event as CustomEvent
+    const { group } = customEvent.detail
     
     // トースト通知を表示（実装によって異なる）
-    console.log('グループが作成されました:', group);
+    console.log('グループが作成されました:', group)
     
     // 他の開発者の実装に合わせて、グループ一覧ページやダッシュボードへ遷移
     // event.preventDefault(); // デフォルトの遷移を防ぐ場合
     // window.location.href = `/groups/${group.id}`;
-  });
+  })
 </script> 

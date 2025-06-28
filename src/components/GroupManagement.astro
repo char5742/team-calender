@@ -1,6 +1,10 @@
 ---
 import { mockGroups, mockTeamMembers } from '../lib/mockData'
 import { getAllGroupsWithMembers, groupsStore, teamMembersStore } from '../stores/groupStore'
+import GroupDeleteModal from './GroupDeleteModal.astro'
+import GroupForm from './GroupForm.astro'
+import GroupList from './GroupList.astro'
+import LoadingSpinner from './LoadingSpinner.astro'
 
 // モックデータで初期化（実際の実装ではAPI経由でデータ取得）
 // Note: このコードはサーバーサイドで実行されるため、ページリロード時に毎回実行される
@@ -116,8 +120,8 @@ const teamMembers = teamMembersStore.get()
 
   console.log('GroupManagement script initialized');
   
-  let currentMode = null;
-  let currentGroupId = null;
+  let currentMode: string | null = null;
+  let currentGroupId: string | null = null;
 
   // DOM要素
   const createGroupBtn = document.getElementById('create-group-btn');
@@ -149,7 +153,7 @@ const teamMembers = teamMembersStore.get()
   }
 
   // 編集フォームにデータを設定
-  function setupEditForm(group) {
+  function setupEditForm(group: any) {
     const nameInput = document.getElementById('edit-name') as HTMLInputElement;
     if (nameInput) {
       nameInput.value = group.name;
@@ -214,26 +218,34 @@ const teamMembers = teamMembersStore.get()
             </div>
           `;
           
-          const errorMessage = errorElement.firstElementChild;
-          const closeBtn = errorMessage.querySelector('.close-btn');
+          const errorMessage = errorElement.firstElementChild as HTMLElement;
+          const closeBtn = errorMessage?.querySelector('.close-btn');
           
           if (closeBtn) {
             closeBtn.addEventListener('click', () => {
               clearError();
-              errorMessage.remove();
+              if (errorMessage) {
+                errorMessage.remove();
+              }
             });
           }
           
           // 5秒後に自動的にエラーメッセージを非表示にする
           setTimeout(() => {
-            errorMessage.classList.add('fade-out');
-            setTimeout(() => {
-              clearError();
-              errorMessage.remove();
-            }, 300);
+            if (errorMessage) {
+              errorMessage.classList.add('fade-out');
+              setTimeout(() => {
+                clearError();
+                if (errorMessage) {
+                  errorMessage.remove();
+                }
+              }, 300);
+            }
           }, 5000);
           
-          errorContainer.appendChild(errorMessage);
+          if (errorMessage) {
+            errorContainer.appendChild(errorMessage);
+          }
         }
       }
     });
@@ -247,8 +259,9 @@ const teamMembers = teamMembersStore.get()
 
     // 編集ボタンのイベント
     window.addEventListener('group-edit', (e) => {
-      console.log('GroupManagement: group-edit event received', e.detail);
-      const groupId = e.detail.groupId;
+      const customEvent = e as CustomEvent;
+      console.log('GroupManagement: group-edit event received', customEvent.detail);
+      const groupId = customEvent.detail.groupId;
       if (groupId) {
         currentMode = 'edit';
         currentGroupId = groupId;
@@ -265,8 +278,9 @@ const teamMembers = teamMembersStore.get()
 
     // 削除ボタンのイベント
     window.addEventListener('group-delete', (e) => {
-      console.log('GroupManagement: group-delete event received', e.detail);
-      const groupId = e.detail.groupId;
+      const customEvent = e as CustomEvent;
+      console.log('GroupManagement: group-delete event received', customEvent.detail);
+      const groupId = customEvent.detail.groupId;
       if (groupId) {
         currentGroupId = groupId;
         // モーダルを表示

@@ -1,10 +1,5 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true
-  },
   "organizeImports": {
     "enabled": true
   },
@@ -19,8 +14,7 @@
       "correctness": {
         "all": true,
         "noNodejsModules": "off",
-        "useImportExtensions": "off",
-        "noUnusedVariables": "warn"
+        "useImportExtensions": "off"
       },
       "performance": {
         "all": true
@@ -36,6 +30,11 @@
             "requireAscii": true,
             "filenameCases": ["camelCase", "kebab-case", "PascalCase"]
           }
+        },
+        "useNamingConvention": {
+          "options": {
+            "strictCase": false
+          }
         }
       },
       "suspicious": {
@@ -48,17 +47,14 @@
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100,
-    "formatWithErrors": false,
-    "ignore": []
+    "lineWidth": 100
   },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
-      "trailingCommas": "es5",
+      "trailingCommas": "all",
       "semicolons": "asNeeded"
-    },
-    "linter": {}
+    }
   },
   "files": {
     "ignore": [
@@ -73,13 +69,19 @@
       "test-results/**"
     ]
   },
+
   "overrides": [
     {
-      "include": ["*.astro"],
+      "include": ["**/*.astro"],
       "linter": {
         "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
           "correctness": {
-            "noUnusedVariables": "off"
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
           }
         }
       }

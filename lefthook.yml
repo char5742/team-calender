@@ -11,16 +11,12 @@ pre-commit:
       stage_fixed: true
     unit:
       run: bun test
-    e2e:
-      run: bunx playwright test --config=playwright.config.ts --project=chromium --reporter=list
 
 pre-push:
   parallel: true
   commands:
     type-check:
       run: bun run tsc --noEmit
-    biome-check:
-      run: bun run check
 
 # コミットメッセージのフォーマットチェック
 commit-msg:

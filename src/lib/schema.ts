@@ -18,8 +18,6 @@ export interface TeamMember {
   name: string
   /** Google アカウントのメールアドレス */
   email: string
-  /** プロフィール画像 URL – 任意 */
-  avatarUrl?: string
 }
 
 /**

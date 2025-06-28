@@ -34,7 +34,7 @@
       },
       "suspicious": {
         "all": true,
-        "noExplicitAny": "warn"
+        "noExplicitAny": "error"
       }
     }
   },
@@ -52,6 +52,15 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "dist", "coverage", ".nuxt", ".output", "*.min.js", "bun.lockb"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      "coverage",
+      ".nuxt",
+      ".output",
+      "*.min.js",
+      "bun.lockb",
+      ".astro"
+    ]
   }
 }

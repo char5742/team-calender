@@ -7,11 +7,11 @@ pre-commit:
   commands:
     lint:
       glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
-      run: bun run lint:fix
-      stage_fixed: true
-    test:
-      glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
+      run: bun run check
+    unit:
       run: bun test
+    e2e:
+      run: bunx playwright test --config=playwright.config.ts --project=chromium --reporter=list
 
 pre-push:
   parallel: true

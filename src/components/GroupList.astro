@@ -7,7 +7,7 @@ export interface Props {
   onGroupClick?: (groupId: string) => void
 }
 
-const { groups, selectedGroupId, onGroupClick } = Astro.props
+const { groups, selectedGroupId } = Astro.props
 ---
 
 <div class="group-list">
@@ -76,33 +76,35 @@ const { groups, selectedGroupId, onGroupClick } = Astro.props
 </div>
 
 <script>
-  // 編集・削除ボタンのイベントハンドリング
-  document.addEventListener('DOMContentLoaded', () => {
-    // 編集ボタン
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const groupId = btn.getAttribute('data-group-id');
-        if (groupId) {
-          window.dispatchEvent(new CustomEvent('group-edit', { 
-            detail: { groupId } 
-          }));
-        }
-      });
-    });
-
-    // 削除ボタン
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const groupId = btn.getAttribute('data-group-id');
-        if (groupId) {
-          window.dispatchEvent(new CustomEvent('group-delete', { 
-            detail: { groupId } 
-          }));
-        }
-      });
-    });
+  // イベント委譲を使用して編集・削除ボタンのイベントハンドリング
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    
+    // 編集ボタンのクリック処理
+    const editBtn = target.closest('.edit-btn');
+    if (editBtn) {
+      e.stopPropagation();
+      const groupId = editBtn.getAttribute('data-group-id');
+      console.log('Edit button clicked, groupId:', groupId);
+      if (groupId) {
+        window.dispatchEvent(new CustomEvent('group-edit', { 
+          detail: { groupId } 
+        }));
+      }
+    }
+    
+    // 削除ボタンのクリック処理
+    const deleteBtn = target.closest('.delete-btn');
+    if (deleteBtn) {
+      e.stopPropagation();
+      const groupId = deleteBtn.getAttribute('data-group-id');
+      console.log('Delete button clicked, groupId:', groupId);
+      if (groupId) {
+        window.dispatchEvent(new CustomEvent('group-delete', { 
+          detail: { groupId } 
+        }));
+      }
+    }
   });
 </script>
 

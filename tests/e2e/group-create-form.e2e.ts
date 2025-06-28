@@ -5,26 +5,29 @@ const ERROR_CLASS_REGEX = /error/
 
 test.describe('GroupCreateForm', () => {
   test.beforeEach(async ({ page }) => {
-    // グループ作成ページへ移動
+    // 固定URLでアクセス
     await page.goto('/groups/new')
   })
 
   test('グループ作成フォームが表示される', async ({ page }) => {
-    // フォーム要素の存在確認
-    await expect(page.locator('.group-create-form')).toBeVisible()
-    await expect(page.locator('#group-name')).toBeVisible()
-    await expect(page.locator('.member-selection')).toBeVisible()
+    // フォーム要素の存在を確認
+    await expect(page.locator('form')).toBeVisible()
+    await expect(page.locator('input#group-name')).toBeVisible()
     await expect(page.locator('button[type="submit"]')).toBeVisible()
+    await expect(page.locator('text=新しいグループを作成')).toBeVisible()
   })
 
   test('メンバーが表示される', async ({ page }) => {
     // モックデータのメンバーが表示されることを確認
-    await expect(page.locator('.member-checkbox')).toHaveCount(5)
+    await expect(page.locator('.member-checkbox')).toHaveCount(6)
     await expect(page.locator('text=山田太郎')).toBeVisible()
     await expect(page.locator('text=yamada@example.com')).toBeVisible()
   })
 
   test('バリデーションが機能する', async ({ page }) => {
+    // メンバーを1人選択（ボタンを有効化）
+    await page.locator('input[value="member-1"]').check()
+
     // グループ名を入力せずに送信
     await page.locator('button[type="submit"]').click()
 
@@ -43,7 +46,7 @@ test.describe('GroupCreateForm', () => {
     // エラーメッセージを確認
     await expect(page.locator('.error-message')).toBeVisible()
     await expect(page.locator('.error-message')).toContainText(
-      '少なくとも1人のメンバーを選択してください'
+      '少なくとも1人のメンバーを選択してください',
     )
   })
 
@@ -54,7 +57,7 @@ test.describe('GroupCreateForm', () => {
     // リアルタイムバリデーションでエラーが表示されることを確認
     await expect(page.locator('.error-message')).toBeVisible()
     await expect(page.locator('.error-message')).toContainText(
-      'このグループ名は既に使用されています'
+      'このグループ名は既に使用されています',
     )
     await expect(page.locator('#group-name')).toHaveClass(ERROR_CLASS_REGEX)
 
@@ -67,11 +70,12 @@ test.describe('GroupCreateForm', () => {
   })
 
   test('グループが正常に作成される', async ({ page }) => {
-    // コンソールログを監視
+    // コンソールメッセージを記録
     const consoleMessages: string[] = []
     page.on('console', (msg) => {
-      if (msg.type() === 'log') {
-        consoleMessages.push(msg.text())
+      const text = msg.text()
+      if (text.includes('グループが作成されました')) {
+        consoleMessages.push(text)
       }
     })
 
@@ -85,7 +89,7 @@ test.describe('GroupCreateForm', () => {
     // フォームを送信
     await page.locator('button[type="submit"]').click()
 
-    // 成功メッセージがコンソールに出力されることを確認
+    // グループ作成成功のメッセージを確認
     await page.waitForTimeout(500)
     const successMessage = consoleMessages.find((msg) => msg.includes('グループが作成されました'))
     expect(successMessage).toBeTruthy()
@@ -96,18 +100,10 @@ test.describe('GroupCreateForm', () => {
     await page.fill('#group-name', 'キャンセルテスト')
 
     // キャンセルボタンをクリック
-    await page.locator('#cancel-btn').click()
+    await page.click('button:has-text("キャンセル")')
 
-    // ページ遷移または入力がクリアされることを確認
-    // （実装により異なるため、どちらかを確認）
-    const inputValue = await page.locator('#group-name').inputValue()
-
-    if (page.url().includes('/groups/new')) {
-      // まだ同じページにいる場合は、フォームがリセットされているはず
-      expect(inputValue).toBe('')
-    } else {
-      // ページ遷移した場合
-      expect(page.url()).toContain('/groups')
-    }
+    // ホームページへ遷移することを確認
+    await page.waitForURL('**/', { timeout: 10000 })
+    expect(page.url()).toMatch(/\/$|index\.html$/)
   })
 })

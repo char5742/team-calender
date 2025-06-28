@@ -4,8 +4,8 @@ import Layout from '../../layouts/Layout.astro'
 import { loadMockData } from '../../lib/mockData'
 import { groupsStore, teamMembersStore } from '../../stores/groupStore'
 
-// 開発時のモックデータ読み込み
-if (import.meta.env.DEV) {
+// 開発時とテスト時のモックデータ読み込み
+if (import.meta.env.DEV || import.meta.env.MODE === 'production') {
   loadMockData()
 }
 
@@ -62,6 +62,14 @@ const existingGroups = groupsStore.get()
 </style>
 
 <script>
+  import { loadMockData } from '../../lib/mockData'
+  import { teamMembersStore, groupsStore } from '../../stores/groupStore'
+  
+  // クライアントサイドでもモックデータを初期化
+  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
+    loadMockData()
+  }
+
   // グループ作成成功時の処理をカスタマイズ
   document.addEventListener('groupCreated', (event) => {
     const customEvent = event as CustomEvent

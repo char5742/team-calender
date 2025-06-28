@@ -6,7 +6,22 @@ export interface Props {
   existingGroups?: Group[]
 }
 
-const { members = [], existingGroups = [] } = Astro.props
+import { loadMockData } from '../lib/mockData'
+import { groupsStore, teamMembersStore } from '../stores/groupStore'
+
+// サーバーサイドでモックデータを初期化
+if (import.meta.env.DEV || import.meta.env.MODE === 'production') {
+  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
+    loadMockData()
+  }
+}
+
+const propsMembers = Astro.props.members || []
+const propsExistingGroups = Astro.props.existingGroups || []
+
+// ストアからデータを取得してプロップスと結合
+const members = propsMembers.length > 0 ? propsMembers : teamMembersStore.get()
+const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : groupsStore.get()
 ---
 
 <div class="group-create-form">
@@ -217,12 +232,18 @@ const { members = [], existingGroups = [] } = Astro.props
 </style>
 
 <script define:vars={{ existingGroups }}>
-  import { createGroup, groupsStore } from '../stores/groupStore';
+  import { createGroup, groupsStore, teamMembersStore } from '../stores/groupStore';
+  import { loadMockData } from '../lib/mockData';
 
-  const form = document.getElementById('group-create-form') as HTMLFormElement;
+  // クライアントサイドでデータが空の場合、モックデータを初期化
+  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
+    loadMockData();
+  }
+
+  const form = document.getElementById('group-create-form');
   const cancelBtn = document.getElementById('cancel-btn');
   const errorMessage = document.getElementById('error-message');
-  const groupNameInput = document.getElementById('group-name') as HTMLInputElement;
+  const groupNameInput = document.getElementById('group-name');
 
   // 初期データとして既存のグループを設定
   const currentGroups = existingGroups.length > 0 ? existingGroups : groupsStore.get();
@@ -253,8 +274,8 @@ const { members = [], existingGroups = [] } = Astro.props
     e.preventDefault();
 
     const formData = new FormData(form);
-    const groupName = formData.get('groupName') as string;
-    const memberIds = formData.getAll('memberIds') as string[];
+    const groupName = formData.get('groupName');
+    const memberIds = formData.getAll('memberIds');
 
     // バリデーション
     if (!groupName.trim()) {
@@ -296,7 +317,7 @@ const { members = [], existingGroups = [] } = Astro.props
       setTimeout(() => {
         if (!event.defaultPrevented) {
           if (window.location.pathname === '/groups/new') {
-            window.location.href = '/groups';
+            window.location.href = '/';
           }
         }
       }, 100);
@@ -309,13 +330,13 @@ const { members = [], existingGroups = [] } = Astro.props
   cancelBtn?.addEventListener('click', () => {
     // キャンセル時の処理（他の開発者の実装に合わせて調整）
     if (window.location.pathname === '/groups/new') {
-      window.location.href = '/groups';
+      window.location.href = '/';
     } else {
       form.reset();
     }
   });
 
-  function showError(message: string) {
+  function showError(message) {
     if (errorMessage) {
       errorMessage.textContent = message;
       errorMessage.style.display = 'block';

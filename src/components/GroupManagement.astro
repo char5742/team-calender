@@ -180,9 +180,18 @@ const teamMembers = teamMembersStore.get()
     }
   }
 
-  // イベントリスナーをDOMContentLoaded内に移動
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log('GroupManagement: DOMContentLoaded');
+  // イベントリスナーを即座に登録
+  console.log('GroupManagement: Registering event listeners');
+  
+  // DOMContentLoadedまたは即座に実行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
+  } else {
+    setupEventListeners();
+  }
+  
+  function setupEventListeners() {
+    console.log('GroupManagement: Setting up event listeners');
 
     // ローディング状態の購読
     isLoadingStore.subscribe(isLoading => {
@@ -342,7 +351,7 @@ const teamMembers = teamMembersStore.get()
       modal?.classList.remove('open');
       currentGroupId = null;
     });
-  });
+  }
 
   // 編集フォームのイベントリスナー
   const editForm = document.getElementById('edit-form');

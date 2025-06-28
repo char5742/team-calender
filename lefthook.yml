@@ -1,25 +1,23 @@
 # Lefthook設定 - 二段階CI
-# commit時: 軽量なチェック（フォーマット、リント）
-# push時: 重いチェック（テスト、型チェック）
+# commit時: 軽量なチェック（フォーマット、リント、型チェック）
+# push時: 重いチェック（テスト）
 
 pre-commit:
   parallel: true
   commands:
-    lint:
-      glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
-      run: bun run lint:fix
+    type-check:
+      run: bun run tsc
+    biome-check:
+      run: bunx biome check --write --files-ignore-unknown=true --no-errors-on-unmatched {staged_files}
       stage_fixed: true
-    test:
-      glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
-      run: bun test
 
 pre-push:
   parallel: true
   commands:
-    type-check:
-      run: bun run tsc --noEmit
-    biome-check:
-      run: bun run check
+    test:
+      run: bun run test
+    test-e2e:
+      run: bun run test:e2e
 
 # コミットメッセージのフォーマットチェック
 commit-msg:

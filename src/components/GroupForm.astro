@@ -1,0 +1,306 @@
+---
+import type { Group, TeamMember } from '../lib/schema'
+
+export interface Props {
+  group?: Group
+  teamMembers: TeamMember[]
+  mode: 'create' | 'edit'
+  onSubmit?: (data: { name: string; memberIds: string[] }) => void
+  onCancel?: () => void
+  existingGroups?: Group[]
+}
+
+const { group, teamMembers, mode, onSubmit, onCancel, existingGroups = [] } = Astro.props
+const isEdit = mode === 'edit'
+const formId = `group-form-${Date.now()}`
+---
+
+<div class="group-form" data-existing-groups={JSON.stringify(existingGroups || [])} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
+  <h3>{isEdit ? 'グループを編集' : '新しいグループを作成'}</h3>
+  <form id={formId}>
+    <div class="form-group">
+      <label for={`${formId}-name`}>グループ名</label>
+      <input
+        type="text"
+        id={`${formId}-name`}
+        name="name"
+        value={group?.name || ''}
+        placeholder="グループ名を入力"
+        required
+      />
+      <div class="error-message" id={`${formId}-name-error`} style="display: none;">
+        このグループ名は既に使用されています
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>メンバーを選択</label>
+      <div class="members-selection">
+        {teamMembers.map((member) => (
+          <label class="member-checkbox">
+            <input
+              type="checkbox"
+              name="memberIds"
+              value={member.id}
+              checked={group?.memberIds.includes(member.id)}
+            />
+            <span class="member-info">
+              <span class="member-name">{member.name}</span>
+              <span class="member-email">{member.email}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      <div class="error-message" id={`${formId}-members-error`} style="display: none;">
+        少なくとも1人のメンバーを選択してください
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {isEdit ? '更新' : '作成'}
+      </button>
+      <button type="button" class="btn btn-secondary" data-action="cancel">
+        キャンセル
+      </button>
+    </div>
+  </form>
+</div>
+
+<script define:vars={{ formId }}>
+  const form = document.getElementById(formId);
+  
+  if (form) {
+    // 親要素からデータ属性を取得
+    const formContainer = form.closest('.group-form');
+    const existingGroupsData = formContainer?.getAttribute('data-existing-groups');
+    const groupData = formContainer?.getAttribute('data-group');
+    const isEdit = formContainer?.getAttribute('data-is-edit') === 'true';
+    
+    // データをパース
+    const existingGroups = existingGroupsData ? JSON.parse(existingGroupsData) : [];
+    const group = groupData ? JSON.parse(groupData) : null;
+    
+    console.log('GroupForm データ:', {
+      formId,
+      existingGroups,
+      group,
+      isEdit,
+      existingGroupsCount: existingGroups.length
+    });
+    
+    // グループ名の入力フィールドとエラーメッセージの要素を取得
+    const nameInput = document.getElementById(`${formId}-name`);
+    const nameError = document.getElementById(`${formId}-name-error`);
+    const membersError = document.getElementById(`${formId}-members-error`);
+    
+    // グループ名の重複チェック関数
+    function checkDuplicateName(name) {
+      const trimmedName = name.trim();
+      if (!trimmedName) return false;
+      
+      console.log('Checking duplicate for:', trimmedName, 'in', existingGroups);
+      
+      return existingGroups.some(g => {
+        // 編集モードの場合、自分自身は除外
+        if (isEdit && group && g.id === group.id) return false;
+        return g.name.toLowerCase() === trimmedName.toLowerCase();
+      });
+    }
+    
+    // グループ名の入力時にリアルタイムでチェック
+    if (nameInput) {
+      nameInput.addEventListener('input', (e) => {
+        const isDuplicate = checkDuplicateName(e.target.value);
+        if (isDuplicate) {
+          nameError.style.display = 'block';
+          nameInput.classList.add('error');
+        } else {
+          nameError.style.display = 'none';
+          nameInput.classList.remove('error');
+        }
+      });
+    }
+    
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      const name = formData.get('name')?.trim();
+      const memberIds = formData.getAll('memberIds');
+      
+      let hasError = false;
+      
+      // グループ名のバリデーション
+      if (!name) {
+        hasError = true;
+      } else if (checkDuplicateName(name)) {
+        nameError.style.display = 'block';
+        nameInput.classList.add('error');
+        hasError = true;
+      } else {
+        nameError.style.display = 'none';
+        nameInput.classList.remove('error');
+      }
+      
+      // メンバー数のバリデーション
+      if (memberIds.length === 0) {
+        membersError.style.display = 'block';
+        hasError = true;
+      } else {
+        membersError.style.display = 'none';
+      }
+      
+      // エラーがなければ送信
+      if (!hasError) {
+        console.log('Dispatching group-form-submit event:', { name, memberIds });
+        window.dispatchEvent(new CustomEvent('group-form-submit', {
+          detail: { name, memberIds }
+        }));
+      }
+    });
+
+    const cancelButton = form.querySelector('[data-action="cancel"]');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('group-form-cancel'));
+      });
+    }
+  }
+</script>
+
+<style>
+  .group-form {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    max-width: 500px;
+  }
+
+  h3 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  .members-selection {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .member-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  .member-checkbox:hover {
+    background-color: #f8f9fa;
+  }
+
+  .member-checkbox input[type="checkbox"] {
+    margin-right: 0.75rem;
+    cursor: pointer;
+  }
+
+  .member-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .member-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .member-email {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .btn {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: #545b62;
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  input.error {
+    border-color: #dc3545;
+  }
+
+  input.error:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+</style> 

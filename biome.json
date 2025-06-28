@@ -30,6 +30,11 @@
             "requireAscii": true,
             "filenameCases": ["camelCase", "kebab-case", "PascalCase"]
           }
+        },
+        "useNamingConvention": {
+          "options": {
+            "strictCase": false
+          }
         }
       },
       "suspicious": {
@@ -63,5 +68,23 @@
       ".astro",
       "test-results/**"
     ]
-  }
+  },
+
+  "overrides": [
+    {
+      "include": ["**/*.astro"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useConst": "off",
+            "useImportType": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    }
+  ]
 }

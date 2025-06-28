@@ -1,0 +1,694 @@
+---
+import { mockGroups, mockTeamMembers } from '../lib/mockData'
+import { getAllGroupsWithMembers, groupsStore, teamMembersStore } from '../stores/groupStore'
+import GroupDeleteModal from './GroupDeleteModal.astro'
+import GroupForm from './GroupForm.astro'
+import GroupList from './GroupList.astro'
+import LoadingSpinner from './LoadingSpinner.astro'
+
+// モックデータで初期化（実際の実装ではAPI経由でデータ取得）
+// Note: このコードはサーバーサイドで実行されるため、ページリロード時に毎回実行される
+// 実際のアプリケーションでは、データの永続化（localStorage、データベースなど）が必要
+//
+// 現在の実装の制限事項：
+// 1. グループを作成してもページリロードでリセットされる
+// 2. 編集・削除も同様に永続化されない
+// 3. 本番環境では以下の対応が必要：
+//    - APIサーバーとの連携
+//    - データベースへの保存
+//    - または最低限localStorageでの一時保存
+if (teamMembersStore.get().length === 0) {
+  teamMembersStore.set(mockTeamMembers)
+}
+// グループデータの初期化も同様
+if (groupsStore.get().length === 0) {
+  groupsStore.set(mockGroups)
+}
+
+const groups = getAllGroupsWithMembers()
+const teamMembers = teamMembersStore.get()
+---
+
+<div class="group-management">
+  <div class="header">
+    <h1>グループ管理</h1>
+    <button id="create-group-btn" class="btn btn-primary">
+      <span class="icon">+</span>
+      新しいグループを作成
+    </button>
+  </div>
+
+  <!-- エラーメッセージ表示エリア -->
+  <div id="error-container"></div>
+
+  <!-- ローディングスピナー -->
+  <div id="loading-overlay" class="hidden">
+    <LoadingSpinner isLoading={true} fullScreen={true} message="処理中..." />
+  </div>
+
+  <!-- グループ一覧 -->
+  <div id="group-list-container">
+    <GroupList groups={groups} />
+  </div>
+
+  <!-- グループ作成フォーム -->
+  <div id="create-form-container" class="form-container hidden">
+    <GroupForm 
+      teamMembers={teamMembers}
+      mode="create"
+      existingGroups={groups.map(g => ({ id: g.id, name: g.name, memberIds: g.memberIds }))}
+    />
+  </div>
+
+  <!-- グループ編集フォーム -->
+  <div id="edit-form-container" class="form-container hidden">
+    <div class="group-form">
+      <h3>グループを編集</h3>
+      <form id="edit-form">
+        <div class="form-group">
+          <label for="edit-name">グループ名</label>
+          <input
+            type="text"
+            id="edit-name"
+            name="name"
+            placeholder="グループ名を入力"
+            required
+          />
+          <div class="error-message" id="edit-name-error" style="display: none;">
+            このグループ名は既に使用されています
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>メンバーを選択</label>
+          <div class="members-selection" id="edit-members-selection">
+            <!-- メンバーチェックボックスは動的に生成 -->
+          </div>
+          <div class="error-message" id="edit-members-error" style="display: none;">
+            少なくとも1人のメンバーを選択してください
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            更新
+          </button>
+          <button type="button" class="btn btn-secondary" data-action="cancel">
+            キャンセル
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 削除確認モーダル -->
+  <GroupDeleteModal />
+</div>
+
+<script>
+  import { 
+    createGroup, 
+    updateGroup, 
+    deleteGroup, 
+    groupsStore,
+    teamMembersStore,
+    getAllGroupsWithMembers,
+    isLoadingStore,
+    errorStore,
+    clearError
+  } from '../stores/groupStore';
+
+  console.log('GroupManagement script initialized');
+  
+  let currentMode: string | null = null;
+  let currentGroupId: string | null = null;
+
+  // DOM要素
+  const createGroupBtn = document.getElementById('create-group-btn');
+  const createFormContainer = document.getElementById('create-form-container');
+  const editFormContainer = document.getElementById('edit-form-container');
+  const listContainer = document.getElementById('group-list-container');
+  const errorContainer = document.getElementById('error-container');
+  const loadingOverlay = document.getElementById('loading-overlay');
+  
+
+
+  // フォーム表示/非表示関数を先に定義
+  function showCreateForm() {
+    createFormContainer?.classList.remove('hidden');
+    editFormContainer?.classList.add('hidden');
+    listContainer?.classList.add('fade');
+  }
+
+  function showEditForm() {
+    editFormContainer?.classList.remove('hidden');
+    createFormContainer?.classList.add('hidden');
+    listContainer?.classList.add('fade');
+  }
+
+  function hideForms() {
+    createFormContainer?.classList.add('hidden');
+    editFormContainer?.classList.add('hidden');
+    listContainer?.classList.remove('fade');
+  }
+
+  // 編集フォームにデータを設定
+  function setupEditForm(group: any) {
+    const nameInput = document.getElementById('edit-name') as HTMLInputElement;
+    if (nameInput) {
+      nameInput.value = group.name;
+    }
+
+    // メンバー選択を更新
+    const membersContainer = document.getElementById('edit-members-selection');
+    if (membersContainer) {
+      const teamMembers = teamMembersStore.get();
+      membersContainer.innerHTML = teamMembers.map(member => `
+        <label class="member-checkbox">
+          <input
+            type="checkbox"
+            name="memberIds"
+            value="${member.id}"
+            ${group.memberIds.includes(member.id) ? 'checked' : ''}
+          />
+          <span class="member-info">
+            <span class="member-name">${member.name}</span>
+            <span class="member-email">${member.email}</span>
+          </span>
+        </label>
+      `).join('');
+    }
+  }
+
+  // イベントリスナーを即座に登録
+  console.log('GroupManagement: Registering event listeners');
+  
+  // DOMContentLoadedまたは即座に実行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
+  } else {
+    setupEventListeners();
+  }
+  
+  function setupEventListeners() {
+    console.log('GroupManagement: Setting up event listeners');
+
+    // ローディング状態の購読
+    isLoadingStore.subscribe(isLoading => {
+      if (loadingOverlay) {
+        if (isLoading) {
+          loadingOverlay.classList.remove('hidden');
+        } else {
+          loadingOverlay.classList.add('hidden');
+        }
+      }
+    });
+
+    // エラー状態の購読
+    errorStore.subscribe(error => {
+      if (errorContainer) {
+        if (error) {
+          // エラーメッセージを動的に追加
+          const errorElement = document.createElement('div');
+          errorElement.innerHTML = `
+            <div class="error-message" role="alert">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <span class="error-text">${error}</span>
+              <button type="button" class="close-btn" aria-label="エラーを閉じる">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          `;
+          
+          const errorMessage = errorElement.firstElementChild as HTMLElement;
+          const closeBtn = errorMessage?.querySelector('.close-btn');
+          
+          if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+              clearError();
+              if (errorMessage) {
+                errorMessage.remove();
+              }
+            });
+          }
+          
+          // 5秒後に自動的にエラーメッセージを非表示にする
+          setTimeout(() => {
+            if (errorMessage) {
+              errorMessage.classList.add('fade-out');
+              setTimeout(() => {
+                clearError();
+                if (errorMessage) {
+                  errorMessage.remove();
+                }
+              }, 300);
+            }
+          }, 5000);
+          
+          if (errorMessage) {
+            errorContainer.appendChild(errorMessage);
+          }
+        }
+      }
+    });
+
+    // グループ作成ボタン
+    createGroupBtn?.addEventListener('click', () => {
+      currentMode = 'create';
+      currentGroupId = null;
+      showCreateForm();
+    });
+
+    // 編集ボタンのイベント
+    window.addEventListener('group-edit', (e) => {
+      const customEvent = e as CustomEvent;
+      console.log('GroupManagement: group-edit event received', customEvent.detail);
+      const groupId = customEvent.detail.groupId;
+      if (groupId) {
+        currentMode = 'edit';
+        currentGroupId = groupId;
+        
+        // 編集対象のグループを取得
+        const allGroups = getAllGroupsWithMembers();
+        const group = allGroups.find(g => g.id === groupId);
+        if (group) {
+          setupEditForm(group);
+          showEditForm();
+        }
+      }
+    });
+
+    // 削除ボタンのイベント
+    window.addEventListener('group-delete', (e) => {
+      const customEvent = e as CustomEvent;
+      console.log('GroupManagement: group-delete event received', customEvent.detail);
+      const groupId = customEvent.detail.groupId;
+      if (groupId) {
+        currentGroupId = groupId;
+        // モーダルを表示
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.classList.add('open');
+          // グループ名を設定
+          const group = groupsStore.get().find(g => g.id === groupId);
+          if (group) {
+            const modalGroupName = modal.querySelector('.modal-body strong');
+            if (modalGroupName) {
+              modalGroupName.textContent = group.name;
+            }
+          }
+        }
+      }
+    });
+
+    // 作成フォームイベント
+    window.addEventListener('group-form-submit', (e: Event) => {
+      console.log('group-form-submit event received:', e);
+      const customEvent = e as CustomEvent<{ name: string; memberIds: string[] }>;
+      const { name, memberIds } = customEvent.detail;
+      console.log('Event detail:', customEvent.detail);
+      
+      if (currentMode === 'create') {
+        console.log('Creating group:', name, memberIds);
+        const newGroup = createGroup(name, memberIds);
+        console.log('New group created:', newGroup);
+        
+        if (newGroup) {
+          hideForms();
+          window.location.reload();
+        } else {
+          console.error('Failed to create group');
+        }
+      }
+    });
+
+    window.addEventListener('group-form-cancel', () => {
+      hideForms();
+    });
+
+    // 削除モーダルイベント
+    window.addEventListener('group-delete-confirm', () => {
+      if (currentGroupId) {
+        deleteGroup(currentGroupId);
+        // モーダルを閉じる
+        const modal = document.querySelector('.modal-overlay');
+        modal?.classList.remove('open');
+        // ページをリロードして更新を反映
+        window.location.reload();
+      }
+    });
+
+    window.addEventListener('group-delete-cancel', () => {
+      // モーダルを閉じる
+      const modal = document.querySelector('.modal-overlay');
+      modal?.classList.remove('open');
+      currentGroupId = null;
+    });
+  }
+
+  // 編集フォームのイベントリスナー
+  const editForm = document.getElementById('edit-form');
+  if (editForm) {
+    const nameInput = document.getElementById('edit-name') as HTMLInputElement;
+    const nameError = document.getElementById('edit-name-error');
+    const membersError = document.getElementById('edit-members-error');
+    
+    // グループ名の重複チェック関数
+    function checkDuplicateName(name: string): boolean {
+      const trimmedName = name.trim();
+      if (!trimmedName) return false;
+      
+      const allGroups = groupsStore.get();
+      return allGroups.some(g => {
+        // 編集中のグループ自身は除外
+        if (g.id === currentGroupId) return false;
+        return g.name.toLowerCase() === trimmedName.toLowerCase();
+      });
+    }
+    
+    // グループ名の入力時にリアルタイムでチェック
+    if (nameInput) {
+      nameInput.addEventListener('input', (e) => {
+        const target = e.target as HTMLInputElement;
+        const isDuplicate = checkDuplicateName(target.value);
+        if (isDuplicate) {
+          nameError!.style.display = 'block';
+          nameInput.classList.add('error');
+        } else {
+          nameError!.style.display = 'none';
+          nameInput.classList.remove('error');
+        }
+      });
+    }
+    
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(editForm as HTMLFormElement);
+      const name = formData.get('name') as string;
+      const memberIds = formData.getAll('memberIds') as string[];
+      
+      let hasError = false;
+      
+      // グループ名のバリデーション
+      const trimmedName = name?.trim();
+      if (!trimmedName) {
+        hasError = true;
+      } else if (checkDuplicateName(trimmedName)) {
+        nameError!.style.display = 'block';
+        nameInput!.classList.add('error');
+        hasError = true;
+      } else {
+        nameError!.style.display = 'none';
+        nameInput!.classList.remove('error');
+      }
+      
+      // メンバー数のバリデーション
+      if (memberIds.length === 0) {
+        membersError!.style.display = 'block';
+        hasError = true;
+      } else {
+        membersError!.style.display = 'none';
+      }
+      
+      // エラーがなければ送信
+      if (!hasError && currentGroupId) {
+        updateGroup(currentGroupId, { name: trimmedName, memberIds });
+        hideForms();
+        window.location.reload();
+      }
+    });
+    
+    const cancelButton = editForm.querySelector('[data-action="cancel"]');
+    if (cancelButton) {
+      cancelButton.addEventListener('click', () => {
+        hideForms();
+      });
+    }
+  }
+</script>
+
+<style>
+  .group-management {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #0056b3;
+  }
+
+  .icon {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+
+  .form-container {
+    margin-bottom: 2rem;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .fade {
+    opacity: 0.5;
+  }
+
+  /* グループフォームのスタイル */
+  .group-form {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    max-width: 500px;
+  }
+
+  .group-form h3 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    color: #333;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+
+  .form-group input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+  }
+
+  .form-group input[type="text"]:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+
+  .members-selection {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .member-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  .member-checkbox:hover {
+    background-color: #f8f9fa;
+  }
+
+  .member-checkbox input[type="checkbox"] {
+    margin-right: 0.75rem;
+    cursor: pointer;
+  }
+
+  .member-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .member-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .member-email {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background-color: #545b62;
+  }
+
+  /* バリデーションエラーのスタイル */
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
+  input.error {
+    border-color: #dc3545;
+  }
+
+  input.error:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+
+  /* エラーメッセージのスタイル（動的に追加される要素用） */
+  :global(.error-message) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    color: #d8000c;
+    margin-bottom: 1rem;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  :global(.error-message svg) {
+    flex-shrink: 0;
+  }
+  
+  :global(.error-text) {
+    flex-grow: 1;
+    font-weight: 500;
+  }
+  
+  :global(.error-message .close-btn) {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: #d8000c;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+  
+  :global(.error-message .close-btn:hover) {
+    background-color: rgba(216, 0, 12, 0.1);
+  }
+  
+  :global(.fade-out) {
+    animation: fadeOut 0.3s ease-out forwards;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+  }
+
+  #error-container {
+    position: relative;
+    z-index: 100;
+  }
+
+  #loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+  }
+
+  #loading-overlay.hidden {
+    display: none;
+  }
+</style> 

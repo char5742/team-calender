@@ -19,7 +19,7 @@
 | M0-1 | chore: `.bun-version` 追加と Bun 導入 | `.bun-version` に `1.2.x`（最新安定）を記載<br/>README 最上部に "Requires Bun 1.2+" を追記 | `bun -v` が `.bun-version` と一致 |
 | M0-2 | chore: Biome Lint / Format 設定 | `biome.json` にプロジェクト標準ルール（strict, importOrder など）記載 | `bunx biome check .` でエラー 0<br/>`bunx biome format --write` で差分 0 |
 | M0-3 | chore: Playwright インストール & 初期サンプル | `bun add -D @playwright/test`<br/>`bunx playwright install --with-deps`<br/>`tests/e2e/sample.spec.ts` にデフォルトテストを生成 | サンプルテストがPASS |
-| M0-4 | chore: lefthook 設定ファイル作成 | pre-commitフックでlint/unit/e2eを実行する設定を追加 | `lefthook run pre-commit` 実行で３コマンドすべてグリーン |
+| M0-4 | chore: lefthook 設定ファイル作成 | pre-commitフックで lint / type-check / biome-check (静的解析) を実行する設定を追加 | `lefthook run pre-commit` 実行で全コマンド（lint, type-check, biome）グリーン |
 | M0-5 | docs: ADR 追加 ― Context7 利用方針 | `docs/adr/008-context7-docs.md` に外部ライブラリ参照方針を記載 | ADRレビュー完了 |
 
 ### lefthook設定例
@@ -27,11 +27,11 @@
 pre-commit:
   commands:
     lint:
-      run: bunx biome check .
-    unit:
-      run: bun test
-    e2e:
-      run: bunx playwright test --config=playwright.config.ts --project=chromium --reporter=list
+      run: bun run lint:fix
+    type-check:
+      run: bun run tsc
+    biome-check:
+      run: bunx biome check --write --files-ignore-unknown=true --no-errors-on-unmatched {staged_files}
 ```
 
 ---
@@ -91,7 +91,7 @@ type Event = {
 ## 運用方針
 
 1. **lefthook** がすべての品質ゲート
-   - commit 前に lint → unit → playwright の順で即時フィードバック
+   - commit 前に lint → type-check → biome-check の順で即時フィードバック（テストは実行しない）
 
 2. **Context7** で公式ドキュメントを常に参照
    - 例: "Vue 3 Transition Group" を実装前に `context7` で検索し URL をコメントに添付

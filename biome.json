@@ -61,7 +61,7 @@
       "*.min.js",
       "bun.lockb",
       ".astro",
-      "test-results"
+      "test-results/**"
     ]
   }
 }

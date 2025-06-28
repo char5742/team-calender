@@ -1,0 +1,74 @@
+---
+import { loadMockData } from '../../lib/mockData'
+import { groupsStore, teamMembersStore } from '../../stores/groupStore'
+
+// 開発時のモックデータ読み込み
+if (import.meta.env.DEV) {
+  loadMockData()
+}
+
+const members = teamMembersStore.get()
+const existingGroups = groupsStore.get()
+---
+
+<Layout title="新しいグループを作成">
+  <main>
+    <div class="container">
+      <nav class="breadcrumb">
+        <a href="/">ホーム</a>
+        <span>/</span>
+        <a href="/groups">グループ一覧</a>
+        <span>/</span>
+        <span>新規作成</span>
+      </nav>
+      
+      <GroupCreateForm members={members} existingGroups={existingGroups} />
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    padding: 2rem 1rem;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    margin-bottom: 2rem;
+    font-size: 0.875rem;
+  }
+
+  .breadcrumb a {
+    color: #4a90e2;
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumb span {
+    color: #666;
+    margin: 0 0.5rem;
+  }
+</style>
+
+<script>
+  // グループ作成成功時の処理をカスタマイズ
+  document.addEventListener('groupCreated', (event) => {
+    const { group } = event.detail;
+    
+    // トースト通知を表示（実装によって異なる）
+    console.log('グループが作成されました:', group);
+    
+    // 他の開発者の実装に合わせて、グループ一覧ページやダッシュボードへ遷移
+    // event.preventDefault(); // デフォルトの遷移を防ぐ場合
+    // window.location.href = `/groups/${group.id}`;
+  });
+</script> 

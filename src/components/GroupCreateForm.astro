@@ -1,0 +1,333 @@
+---
+import type { Group, TeamMember } from '../lib/schema'
+
+export interface Props {
+  members?: TeamMember[]
+  existingGroups?: Group[]
+}
+
+const { members = [], existingGroups = [] } = Astro.props
+---
+
+<div class="group-create-form">
+  <h2>新しいグループを作成</h2>
+  <form id="group-create-form">
+    <div class="form-group">
+      <label for="group-name">
+        グループ名 <span class="required">*</span>
+      </label>
+      <input
+        type="text"
+        id="group-name"
+        name="groupName"
+        required
+        placeholder="例: 開発チーム"
+        autocomplete="off"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="member-select">
+        メンバーを選択 <span class="required">*</span>
+      </label>
+      <div class="member-selection">
+        {members.map((member) => (
+          <label class="member-checkbox">
+            <input
+              type="checkbox"
+              name="memberIds"
+              value={member.id}
+              data-member-name={member.name}
+            />
+            <span class="member-info">
+              <span class="member-name">{member.name}</span>
+              <span class="member-email">{member.email}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+      {members.length === 0 && (
+        <p class="no-members">
+          メンバーが登録されていません。先にメンバーを追加してください。
+        </p>
+      )}
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" disabled={members.length === 0}>
+        グループを作成
+      </button>
+      <button type="button" id="cancel-btn">
+        キャンセル
+      </button>
+    </div>
+  </form>
+
+  <div id="error-message" class="error-message" style="display: none;"></div>
+</div>
+
+<style>
+  .group-create-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  h2 {
+    margin-bottom: 1.5rem;
+    color: #333;
+    font-size: 1.5rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #555;
+  }
+
+  .required {
+    color: #e74c3c;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #4a90e2;
+  }
+
+  .member-selection {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+  }
+
+  .member-checkbox {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .member-checkbox:hover {
+    background-color: #f5f5f5;
+  }
+
+  .member-checkbox input[type="checkbox"] {
+    margin-right: 0.75rem;
+    cursor: pointer;
+  }
+
+  .member-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .member-name {
+    font-weight: 500;
+    color: #333;
+  }
+
+  .member-email {
+    font-size: 0.875rem;
+    color: #666;
+  }
+
+  .no-members {
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  button[type="submit"] {
+    background-color: #4a90e2;
+    color: white;
+  }
+
+  button[type="submit"]:hover:not(:disabled) {
+    background-color: #357abd;
+  }
+
+  button[type="submit"]:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  button#cancel-btn {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  button#cancel-btn:hover {
+    background-color: #e0e0e0;
+  }
+
+  .error-message {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    color: #c00;
+  }
+
+  input.error {
+    border-color: #dc3545;
+  }
+
+  input.error:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+</style>
+
+<script define:vars={{ existingGroups }}>
+  import { createGroup, groupsStore } from '../stores/groupStore';
+
+  const form = document.getElementById('group-create-form') as HTMLFormElement;
+  const cancelBtn = document.getElementById('cancel-btn');
+  const errorMessage = document.getElementById('error-message');
+  const groupNameInput = document.getElementById('group-name') as HTMLInputElement;
+
+  // 初期データとして既存のグループを設定
+  const currentGroups = existingGroups.length > 0 ? existingGroups : groupsStore.get();
+
+  // グループ名の重複チェック関数
+  function checkDuplicateName(name) {
+    const trimmedName = name.trim();
+    if (!trimmedName) return false;
+    
+    return currentGroups.some(g => 
+      g.name.toLowerCase() === trimmedName.toLowerCase()
+    );
+  }
+
+  // グループ名の入力時にリアルタイムでチェック
+  groupNameInput?.addEventListener('input', (e) => {
+    const isDuplicate = checkDuplicateName(e.target.value);
+    if (isDuplicate) {
+      showError('このグループ名は既に使用されています。');
+      groupNameInput.classList.add('error');
+    } else {
+      hideError();
+      groupNameInput.classList.remove('error');
+    }
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const groupName = formData.get('groupName') as string;
+    const memberIds = formData.getAll('memberIds') as string[];
+
+    // バリデーション
+    if (!groupName.trim()) {
+      showError('グループ名を入力してください。');
+      return;
+    }
+
+    // グループ名の重複チェック
+    if (checkDuplicateName(groupName)) {
+      showError('このグループ名は既に使用されています。');
+      groupNameInput.classList.add('error');
+      return;
+    }
+
+    if (memberIds.length === 0) {
+      showError('少なくとも1人のメンバーを選択してください。');
+      return;
+    }
+
+    try {
+      // グループを作成
+      const newGroup = createGroup(groupName.trim(), memberIds);
+      
+      // 成功メッセージを表示（実装により異なる）
+      console.log('グループが作成されました:', newGroup);
+      
+      // フォームをリセット
+      form.reset();
+      
+      // カスタムイベントを発火（他の開発者が利用できるように）
+      const event = new CustomEvent('groupCreated', {
+        detail: { group: newGroup },
+        bubbles: true
+      });
+      form.dispatchEvent(event);
+      
+      // デフォルトの成功時の処理（ページ遷移やモーダルを閉じるなど）
+      // カスタムイベントがpreventDefaultされない場合のみ実行
+      setTimeout(() => {
+        if (!event.defaultPrevented) {
+          if (window.location.pathname === '/groups/new') {
+            window.location.href = '/groups';
+          }
+        }
+      }, 100);
+    } catch (error) {
+      showError('グループの作成中にエラーが発生しました。');
+      console.error(error);
+    }
+  });
+
+  cancelBtn?.addEventListener('click', () => {
+    // キャンセル時の処理（他の開発者の実装に合わせて調整）
+    if (window.location.pathname === '/groups/new') {
+      window.location.href = '/groups';
+    } else {
+      form.reset();
+    }
+  });
+
+  function showError(message: string) {
+    if (errorMessage) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+      setTimeout(() => {
+        errorMessage.style.display = 'none';
+      }, 5000);
+    }
+  }
+
+  function hideError() {
+    if (errorMessage) {
+      errorMessage.style.display = 'none';
+    }
+  }
+</script> 

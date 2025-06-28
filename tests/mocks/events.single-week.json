@@ -1,0 +1,58 @@
+[
+  {
+    "id": "event-001",
+    "title": "Sprint Planning",
+    "start": "2025-07-07T09:00:00.000Z",
+    "end": "2025-07-07T10:00:00.000Z",
+    "allDay": false,
+    "colorId": 1
+  },
+  {
+    "id": "event-002",
+    "title": "Workshop",
+    "start": "2025-07-08T13:00:00.000Z",
+    "end": "2025-07-08T17:30:00.000Z",
+    "allDay": false,
+    "colorId": 2
+  },
+  {
+    "id": "event-003",
+    "title": "Company Holiday",
+    "start": "2025-07-09T00:00:00.000Z",
+    "end": "2025-07-09T23:59:59.000Z",
+    "allDay": true,
+    "colorId": 3
+  },
+  {
+    "id": "event-004",
+    "title": "Evening Workout",
+    "start": "2025-07-10T18:00:00.000Z",
+    "end": "2025-07-10T19:30:00.000Z",
+    "allDay": false,
+    "colorId": 4
+  },
+  {
+    "id": "event-005",
+    "title": "Hackathon Day",
+    "start": "2025-07-11T09:00:00.000Z",
+    "end": "2025-07-11T17:00:00.000Z",
+    "allDay": false,
+    "colorId": 5
+  },
+  {
+    "id": "event-006",
+    "title": "Family Trip",
+    "start": "2025-07-12T00:00:00.000Z",
+    "end": "2025-07-12T23:59:59.000Z",
+    "allDay": true,
+    "colorId": 6
+  },
+  {
+    "id": "event-007",
+    "title": "Tech Conference",
+    "start": "2025-07-11T12:00:00.000Z",
+    "end": "2025-07-13T15:00:00.000Z",
+    "allDay": false,
+    "colorId": 7
+  }
+]

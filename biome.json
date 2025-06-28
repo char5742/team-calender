@@ -1,0 +1,57 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "all": true,
+        "noBannedTypes": "off"
+      },
+      "correctness": {
+        "all": true,
+        "noNodejsModules": "off",
+        "useImportExtensions": "off"
+      },
+      "performance": {
+        "all": true
+      },
+      "style": {
+        "all": true,
+        "noDefaultExport": "off",
+        "noParameterProperties": "off",
+        "useNodejsImportProtocol": "off",
+        "useFilenamingConvention": {
+          "level": "warn",
+          "options": {
+            "requireAscii": true,
+            "filenameCases": ["camelCase", "kebab-case", "PascalCase"]
+          }
+        }
+      },
+      "suspicious": {
+        "all": true,
+        "noExplicitAny": "warn"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "trailingCommas": "all",
+      "semicolons": "asNeeded"
+    }
+  },
+  "files": {
+    "ignore": ["node_modules", "dist", "coverage", ".nuxt", ".output", "*.min.js", "bun.lockb"]
+  }
+}

@@ -1,0 +1,47 @@
+# Lefthook設定 - 二段階CI
+# commit時: 軽量なチェック（フォーマット、リント）
+# push時: 重いチェック（テスト、型チェック）
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
+      run: bun run lint:fix
+      stage_fixed: true
+    test:
+      glob: "**/*.{ts,tsx,js,jsx,json,md,yml,yaml,yml.lock,yaml.lock}"
+      run: bun test
+
+pre-push:
+  parallel: true
+  commands:
+    type-check:
+      run: bun run tsc --noEmit
+    biome-check:
+      run: bun run check
+
+# コミットメッセージのフォーマットチェック
+commit-msg:
+  commands:
+    check-commit-msg:
+      run: |
+        commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|build|ci)(\(.+\))?: .{1,100}$'
+        if ! grep -qE "$commit_regex" {1}; then
+          echo "❌ コミットメッセージが規約に従っていません"
+          echo "📝 形式: <type>(<scope>): <subject>"
+          echo "   例: feat(calendar): Googleカレンダー連携機能を追加"
+          echo ""
+          echo "使用可能なtype:"
+          echo "  feat:     新機能"
+          echo "  fix:      バグ修正"
+          echo "  docs:     ドキュメントのみの変更"
+          echo "  style:    コードの意味に影響しない変更（空白、フォーマット等）"
+          echo "  refactor: バグ修正や機能追加を伴わないコード変更"
+          echo "  test:     テストの追加・修正"
+          echo "  chore:    ビルドプロセスやツールの変更"
+          echo "  perf:     パフォーマンス改善"
+          echo "  build:    ビルドシステムや外部依存の変更"
+          echo "  ci:       CI設定ファイルやスクリプトの変更"
+          exit 1
+        fi 

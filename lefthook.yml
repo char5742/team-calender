@@ -8,7 +8,7 @@ pre-commit:
     type-check:
       run: bun run tsc
     biome-check:
-      run: bunx biome check --write --files-ignore-unknown=true --no-errors-on-unmatched {staged_files}
+      run: bunx biome check --write --files-ignore-unknown=true --no-errors-on-unmatched --error-on-warnings {staged_files}
       stage_fixed: true
 
 pre-push:

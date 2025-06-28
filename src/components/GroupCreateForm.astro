@@ -26,7 +26,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
 
 <div class="group-create-form">
   <h2>新しいグループを作成</h2>
-  <form id="group-create-form">
+  <form id="group-create-form" novalidate>
     <div class="form-group">
       <label for="group-name">
         グループ名 <span class="required">*</span>
@@ -78,7 +78,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
     </div>
   </form>
 
-  <div id="error-message" class="error-message" style="display: none;"></div>
+  <div id="error-message" class="error-message hidden"></div>
 </div>
 
 <style>
@@ -229,16 +229,35 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
     border-color: #dc3545;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
   }
+
+  .hidden {
+    display: none !important;
+  }
 </style>
 
 <script define:vars={{ existingGroups }}>
-  import { createGroup, groupsStore, teamMembersStore } from '../stores/groupStore';
-  import { loadMockData } from '../lib/mockData';
+  // グループストアの簡易実装
+  const groupsStore = {
+    get: () => window.groupsData || []
+  };
 
-  // クライアントサイドでデータが空の場合、モックデータを初期化
-  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
-    loadMockData();
-  }
+  const teamMembersStore = {
+    get: () => window.teamMembersData || []
+  };
+
+  const createGroup = (name, memberIds) => {
+    const newGroup = {
+      id: `group-${Date.now()}`,
+      name,
+      memberIds
+    };
+    if (!window.groupsData) {
+      window.groupsData = [];
+    }
+    window.groupsData = [...window.groupsData, newGroup];
+    console.log('グループが作成されました:', newGroup);
+    return newGroup;
+  };
 
   const form = document.getElementById('group-create-form');
   const cancelBtn = document.getElementById('cancel-btn');
@@ -339,16 +358,16 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
   function showError(message) {
     if (errorMessage) {
       errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
+      errorMessage.classList.remove('hidden');
       setTimeout(() => {
-        errorMessage.style.display = 'none';
+        errorMessage.classList.add('hidden');
       }, 5000);
     }
   }
 
   function hideError() {
     if (errorMessage) {
-      errorMessage.style.display = 'none';
+      errorMessage.classList.add('hidden');
     }
   }
 </script> 

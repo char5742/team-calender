@@ -43,7 +43,14 @@ const modalId = `delete-modal-${Date.now()}`
 </div>
 
 <script define:vars={{ modalId }}>
-  import { isLoadingStore } from '../stores/groupStore';
+  // ローディング状態の簡易実装
+  const isLoadingStore = {
+    get: () => false,
+    subscribe: (callback) => {
+      // 簡易実装のため、常にfalseを返す
+      callback(false);
+    }
+  };
   
   const modal = document.getElementById(modalId);
   

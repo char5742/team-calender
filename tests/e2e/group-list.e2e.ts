@@ -55,31 +55,43 @@ test.describe('グループ一覧表示', () => {
     expect(hoverBoxShadow).toContain('rgba(0, 123, 255')
   })
 
-  test.skip('グループクリック時にイベントが発火する', async ({ page }) => {
+  test('グループクリック時にイベントが発火する', async ({ page }) => {
     await page.goto('/')
 
-    // グループクリックイベントをリッスンする
-    await page.addInitScript(() => {
-      window.addEventListener('group-click', (event) => {
-        const customEvent = event as CustomEvent
-        ;(window as Window & { lastClickedGroupId?: string }).lastClickedGroupId =
-          customEvent.detail?.groupId
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle')
+
+    // イベントリスナーを設定して、グループをクリック
+    const clickResult = await page.evaluate(() => {
+      return new Promise((resolve) => {
+        let clickedId: string | undefined
+
+        // イベントリスナーを設定
+        const handler = (event: Event) => {
+          const customEvent = event as CustomEvent
+          clickedId = customEvent.detail?.groupId
+          console.log('Group clicked:', clickedId)
+          window.removeEventListener('group-click', handler)
+          resolve(clickedId)
+        }
+
+        window.addEventListener('group-click', handler)
+
+        // 最初のグループボタンをクリック
+        const firstButton = document.querySelector('.group-item .group-button') as HTMLButtonElement
+        if (firstButton) {
+          firstButton.click()
+        } else {
+          resolve(undefined)
+        }
+
+        // タイムアウト設定
+        setTimeout(() => resolve(clickedId), 1000)
       })
     })
 
-    // 最初のグループをクリック
-    const firstGroup = await page.locator('.group-item').first()
-    await firstGroup.locator('.group-button').click()
-
-    // スタイルの変更を待つ
-    await page.waitForTimeout(100)
-
-    // イベントが発火したことを確認
-    const clickedGroupId = await page.evaluate(
-      () => (window as Window & { lastClickedGroupId?: string }).lastClickedGroupId,
-    )
-    expect(clickedGroupId).toBeDefined()
-    expect(typeof clickedGroupId).toBe('string')
+    expect(clickResult).toBeDefined()
+    expect(typeof clickResult).toBe('string')
   })
 
   test('メンバーが多いグループで「他◯人」表示が機能する', async ({ page }) => {
@@ -108,7 +120,7 @@ test.describe('グループ一覧表示', () => {
   })
 
   // TODO: クライアントサイドJavaScriptの実行環境を改善後に有効化
-  test.skip('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
+  test('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
     await page.goto('/')
 
     // ページが完全に読み込まれるまで待機

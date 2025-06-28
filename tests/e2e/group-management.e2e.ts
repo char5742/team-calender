@@ -9,7 +9,7 @@ test.describe('GroupManagement', () => {
     await page.goto('/')
   })
 
-  test.skip('グループ作成フォームが表示される', async ({ page }) => {
+  test('グループ作成フォームが表示される', async ({ page }) => {
     await page.goto('/')
 
     await page.click('#create-group-btn')
@@ -23,7 +23,7 @@ test.describe('GroupManagement', () => {
     await expect(createFormContainer.locator('button[type="submit"]')).toBeVisible()
   })
 
-  test.skip('メンバー未選択でエラーが表示される', async ({ page }) => {
+  test('メンバー未選択でエラーが表示される', async ({ page }) => {
     await page.goto('/')
     await page.click('#create-group-btn')
 
@@ -35,14 +35,14 @@ test.describe('GroupManagement', () => {
     // メンバーを選択せずに送信
     await createFormContainer.locator('button[type="submit"]').click()
 
-    // エラーメッセージを確認
-    await expect(createFormContainer.locator('.error-message')).toBeVisible()
-    await expect(createFormContainer.locator('.error-message')).toContainText(
-      '少なくとも1人のメンバーを選択してください',
-    )
+    // エラーメッセージを確認 - メンバー選択エラーのみを特定
+    const membersError = createFormContainer.locator('.error-message').filter({
+      hasText: '少なくとも1人のメンバーを選択してください',
+    })
+    await expect(membersError).toBeVisible()
   })
 
-  test.skip('グループ名の重複チェックが機能する', async ({ page }) => {
+  test('グループ名の重複チェックが機能する', async ({ page }) => {
     await page.goto('/')
     const createFormContainer = page.locator('#create-form-container')
     const createButton = page.locator('#create-group-btn')
@@ -61,21 +61,12 @@ test.describe('GroupManagement', () => {
     await expect(createFormContainer.locator('input[name="name"]')).toHaveClass(ERROR_CLASS_REGEX)
   })
 
-  test.skip('グループ作成のイベントが正しく発火する', async ({ page }) => {
+  test('グループ作成のイベントが正しく発火する', async ({ page }) => {
     await page.goto('/')
+    await page.waitForLoadState('networkidle')
+
     await page.click('#create-group-btn')
-
     const createFormContainer = page.locator('#create-form-container')
-
-    // イベントリスナーを設定
-    await page.evaluate(() => {
-      ;(window as Window & { lastCreatedGroup?: string }).lastCreatedGroup = undefined
-      window.addEventListener('group-form-submit', (event: Event) => {
-        const customEvent = event as CustomEvent
-        ;(window as Window & { lastCreatedGroup?: string }).lastCreatedGroup =
-          customEvent.detail.name
-      })
-    })
 
     // グループ名を入力
     await createFormContainer.locator('input[name="name"]').fill('新しいテストグループ')
@@ -83,14 +74,36 @@ test.describe('GroupManagement', () => {
     // メンバーを選択（最初のメンバーをチェック）
     await createFormContainer.locator('.member-checkbox input[type="checkbox"]').first().check()
 
-    // フォームを送信
-    await createFormContainer.locator('button[type="submit"]').click()
+    // イベントリスナーを設定してフォームを送信
+    const submitResult = await page.evaluate(() => {
+      return new Promise((resolve) => {
+        let createdName: string | undefined
 
-    // イベントが発火したことを確認
-    await page.waitForTimeout(500)
-    const createdGroupName = await page.evaluate(
-      () => (window as Window & { lastCreatedGroup?: string }).lastCreatedGroup,
-    )
-    expect(createdGroupName).toBe('新しいテストグループ')
+        const handler = (event: Event) => {
+          const customEvent = event as CustomEvent
+          console.log('group-form-submit event received:', customEvent.detail)
+          createdName = customEvent.detail.name
+          window.removeEventListener('group-form-submit', handler)
+          resolve(createdName)
+        }
+
+        window.addEventListener('group-form-submit', handler)
+
+        // フォームを送信
+        const submitButton = document.querySelector(
+          '#create-form-container button[type="submit"]',
+        ) as HTMLButtonElement
+        if (submitButton) {
+          submitButton.click()
+        } else {
+          resolve(undefined)
+        }
+
+        // タイムアウト設定
+        setTimeout(() => resolve(createdName), 1000)
+      })
+    })
+
+    expect(submitResult).toBe('新しいテストグループ')
   })
 })

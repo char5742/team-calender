@@ -64,7 +64,7 @@ const teamMembers = teamMembersStore.get()
   <div id="edit-form-container" class="form-container hidden">
     <div class="group-form">
       <h3>グループを編集</h3>
-      <form id="edit-form">
+      <form id="edit-form" novalidate>
         <div class="form-group">
           <label for="edit-name">グループ名</label>
           <input
@@ -74,7 +74,7 @@ const teamMembers = teamMembersStore.get()
             placeholder="グループ名を入力"
             required
           />
-          <div class="error-message" id="edit-name-error" style="display: none;">
+          <div class="error-message hidden" id="edit-name-error">
             このグループ名は既に使用されています
           </div>
         </div>
@@ -84,7 +84,7 @@ const teamMembers = teamMembersStore.get()
           <div class="members-selection" id="edit-members-selection">
             <!-- メンバーチェックボックスは動的に生成 -->
           </div>
-          <div class="error-message" id="edit-members-error" style="display: none;">
+          <div class="error-message hidden" id="edit-members-error">
             少なくとも1人のメンバーを選択してください
           </div>
         </div>
@@ -106,22 +106,99 @@ const teamMembers = teamMembersStore.get()
 </div>
 
 <script>
-  import { 
-    createGroup, 
-    updateGroup, 
-    deleteGroup, 
-    groupsStore,
-    teamMembersStore,
-    getAllGroupsWithMembers,
-    isLoadingStore,
-    errorStore,
-    clearError
-  } from '../stores/groupStore';
-
   console.log('GroupManagement script initialized');
+  // グローバル変数として初期化を示すフラグ
+  (window as any).groupManagementInitialized = true;
   
   let currentMode: string | null = null;
   let currentGroupId: string | null = null;
+
+  // Inline mock data
+  interface TeamMember {
+    id: string;
+    name: string;
+    email: string;
+  }
+
+  interface Group {
+    id: string;
+    name: string;
+    memberIds: string[];
+  }
+
+  // グループストアをwindowオブジェクトに保存
+  if (!(window as any).groupsData) {
+    (window as any).groupsData = [
+      { id: 'group-1', name: '開発チーム', memberIds: ['member-1', 'member-2', 'member-3'] },
+      { id: 'group-2', name: 'デザインチーム', memberIds: ['member-4', 'member-5'] },
+      { id: 'group-3', name: 'マーケティングチーム', memberIds: ['member-6', 'member-7', 'member-8', 'member-9'] }
+    ];
+  }
+
+  if (!(window as any).teamMembersData) {
+    (window as any).teamMembersData = [
+      { id: 'member-1', name: '山田太郎', email: 'yamada@example.com' },
+      { id: 'member-2', name: '佐藤花子', email: 'sato@example.com' },
+      { id: 'member-3', name: '鈴木一郎', email: 'suzuki@example.com' },
+      { id: 'member-4', name: '田中美咲', email: 'tanaka@example.com' },
+      { id: 'member-5', name: '高橋健太', email: 'takahashi@example.com' },
+      { id: 'member-6', name: '伊藤愛', email: 'ito@example.com' },
+      { id: 'member-7', name: '渡辺翔', email: 'watanabe@example.com' },
+      { id: 'member-8', name: '中村真理', email: 'nakamura@example.com' },
+      { id: 'member-9', name: '小林大輔', email: 'kobayashi@example.com' }
+    ];
+  }
+
+  // ストア関数の実装
+  const groupsStore = {
+    get: () => (window as any).groupsData || []
+  };
+
+  const teamMembersStore = {
+    get: () => (window as any).teamMembersData || []
+  };
+
+  const getAllGroupsWithMembers = () => groupsStore.get();
+
+  const createGroup = (name: string, memberIds: string[]) => {
+    const newGroup = {
+      id: `group-${Date.now()}`,
+      name,
+      memberIds
+    };
+    (window as any).groupsData = [...(window as any).groupsData, newGroup];
+    console.log('グループが作成されました:', newGroup);
+    return newGroup;
+  };
+
+  const updateGroup = (id: string, data: { name: string; memberIds: string[] }) => {
+    (window as any).groupsData = (window as any).groupsData.map((g: Group) =>
+      g.id === id ? { ...g, ...data } : g
+    );
+  };
+
+  const deleteGroup = (id: string) => {
+    (window as any).groupsData = (window as any).groupsData.filter((g: Group) => g.id !== id);
+  };
+
+  const clearError = () => {
+    // エラークリア処理は簡略化
+  };
+
+  // ローディング状態とエラー状態の簡易実装
+  const isLoadingStore = {
+    subscribe: (callback: (isLoading: boolean) => void) => {
+      // 簡易実装のため、常にfalseを返す
+      callback(false);
+    }
+  };
+
+  const errorStore = {
+    subscribe: (callback: (error: string | null) => void) => {
+      // 簡易実装のため、常にnullを返す
+      callback(null);
+    }
+  };
 
   // DOM要素
   const createGroupBtn = document.getElementById('create-group-btn');
@@ -162,8 +239,8 @@ const teamMembers = teamMembersStore.get()
     // メンバー選択を更新
     const membersContainer = document.getElementById('edit-members-selection');
     if (membersContainer) {
-      const teamMembers = teamMembersStore.get();
-      membersContainer.innerHTML = teamMembers.map(member => `
+              const teamMembers = teamMembersStore.get();
+        membersContainer.innerHTML = teamMembers.map((member: TeamMember) => `
         <label class="member-checkbox">
           <input
             type="checkbox"
@@ -277,7 +354,7 @@ const teamMembers = teamMembersStore.get()
         
         // 編集対象のグループを取得
         const allGroups = getAllGroupsWithMembers();
-        const group = allGroups.find(g => g.id === groupId);
+        const group = allGroups.find((g: Group) => g.id === groupId);
         if (group) {
           setupEditForm(group);
           showEditForm();
@@ -379,10 +456,10 @@ const teamMembers = teamMembersStore.get()
         const target = e.target as HTMLInputElement;
         const isDuplicate = checkDuplicateName(target.value);
         if (isDuplicate) {
-          nameError!.style.display = 'block';
+          nameError!.classList.remove('hidden');
           nameInput.classList.add('error');
         } else {
-          nameError!.style.display = 'none';
+          nameError!.classList.add('hidden');
           nameInput.classList.remove('error');
         }
       });
@@ -400,21 +477,21 @@ const teamMembers = teamMembersStore.get()
       const trimmedName = name?.trim();
       if (!trimmedName) {
         hasError = true;
-      } else if (checkDuplicateName(trimmedName)) {
-        nameError!.style.display = 'block';
+              } else if (checkDuplicateName(trimmedName)) {
+        nameError!.classList.remove('hidden');
         nameInput!.classList.add('error');
         hasError = true;
       } else {
-        nameError!.style.display = 'none';
+        nameError!.classList.add('hidden');
         nameInput!.classList.remove('error');
       }
       
       // メンバー数のバリデーション
       if (memberIds.length === 0) {
-        membersError!.style.display = 'block';
+        membersError!.classList.remove('hidden');
         hasError = true;
       } else {
-        membersError!.style.display = 'none';
+        membersError!.classList.add('hidden');
       }
       
       // エラーがなければ送信

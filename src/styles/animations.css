@@ -1,0 +1,315 @@
+/* Arc Browser風マイクロアニメーション */
+
+/* ===== 基本的なアニメーション定義 ===== */
+
+/* フェードイン効果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* フェードインスケール */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* スライドイン（上から） */
+@keyframes slideInTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* スライドイン（下から） */
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* リップルエフェクト */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* パルス */
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* シェイク（エラー時） */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* チェックマーク（成功時） */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* スケルトンローディング */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* スタガーアニメーション用の遅延 */
+@keyframes stagger-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== ユーティリティクラス ===== */
+
+/* フェードインアニメーション */
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--easing-out) both;
+}
+
+/* ページ遷移時のフェードイン */
+.page-transition {
+  animation: fadeInScale var(--duration-slow) var(--easing-spring) both;
+}
+
+/* カード出現アニメーション */
+.card-appear {
+  animation: stagger-fade-in var(--duration-normal) var(--easing-spring) both;
+}
+
+/* スタガー遅延クラス */
+.stagger-1 {
+  animation-delay: 50ms;
+}
+.stagger-2 {
+  animation-delay: 100ms;
+}
+.stagger-3 {
+  animation-delay: 150ms;
+}
+.stagger-4 {
+  animation-delay: 200ms;
+}
+.stagger-5 {
+  animation-delay: 250ms;
+}
+.stagger-6 {
+  animation-delay: 300ms;
+}
+
+/* リップルエフェクトコンテナ */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-container::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.ripple-container:active::after {
+  width: 100px;
+  height: 100px;
+  animation: ripple var(--duration-slower) ease-out;
+}
+
+/* スケルトンローディング */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-gray-200);
+  border-radius: var(--radius-md);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background-color: var(--color-gray-800);
+  }
+
+  .skeleton::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  }
+}
+
+/* ===== インタラクション強化 ===== */
+
+/* ホバー時の浮き上がり効果 */
+.hover-lift {
+  transition: transform var(--duration-fast) var(--easing-spring), box-shadow var(--duration-fast)
+    var(--easing-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ボタンホバー効果 */
+.button-hover {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-fast) var(--easing-out);
+}
+
+.button-hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left var(--duration-normal) var(--easing-out);
+}
+
+.button-hover:hover::before {
+  left: 100%;
+}
+
+/* フォーカス時のグロー効果 */
+.focus-glow {
+  transition: box-shadow var(--duration-fast) var(--easing-out);
+}
+
+.focus-glow:focus {
+  box-shadow: 0 0 0 3px rgba(90, 122, 255, 0.2);
+}
+
+/* ===== フィードバックアニメーション ===== */
+
+/* 成功アニメーション */
+.success-feedback {
+  animation: fadeInScale var(--duration-normal) var(--easing-spring), pulse var(--duration-slow)
+    var(--easing-out) var(--duration-normal);
+}
+
+/* エラーアニメーション */
+.error-feedback {
+  animation: shake var(--duration-normal) var(--easing-out);
+}
+
+/* ===== アクセシビリティ対応 ===== */
+
+/* reduced-motionが有効な場合はアニメーションを無効化 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .skeleton::after {
+    animation: none !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* ===== グローバルトランジション設定 ===== */
+
+/* すべてのインタラクティブ要素にスムーズなトランジションを適用 */
+button,
+a,
+input,
+textarea,
+select,
+.card,
+.interactive {
+  transition: all var(--duration-fast) var(--easing-out);
+}
+
+/* アクティブ時のスケール効果 */
+button:active,
+a:active,
+.interactive:active {
+  transform: scale(0.98);
+}

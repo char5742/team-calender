@@ -65,14 +65,10 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
         <a href="/" class="back-link">← グループ一覧に戻る</a>
         <div class="week-navigation">
           <button id="prev-week" class="week-btn" title="前週">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6"></polyline>
-            </svg>
+            <span class="arrow-badge">‹</span>
           </button>
           <button id="next-week" class="week-btn" title="次週">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+            <span class="arrow-badge">›</span>
           </button>
         </div>
       </div>
@@ -127,7 +123,7 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
   h1 {
     margin: 0 0 1rem 0;
     font-size: 2rem;
-    color: #333;
+    color: var(--color-text-primary);
   }
 
   .navigation {
@@ -146,10 +142,10 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
     width: 36px;
     height: 36px;
     padding: 0;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     background-color: white;
-    color: #333;
+    color: var(--color-text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -158,17 +154,23 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
   }
 
   .week-btn:hover {
-    background-color: #f0f0f0;
-    border-color: #007bff;
-    color: #007bff;
+    background-color: var(--color-background-tertiary);
+    border-color: var(--color-primary-500);
+    color: var(--color-primary-500);
   }
 
   .week-btn:active {
     transform: scale(0.95);
   }
 
+  .arrow-badge {
+    font-size: 1.5rem;
+    line-height: 1;
+    font-weight: 300;
+  }
+
   .back-link {
-    color: #007bff;
+    color: var(--color-primary-500);
     text-decoration: none;
     font-size: 0.875rem;
   }
@@ -180,12 +182,12 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
   .no-schedule {
     text-align: center;
     padding: 3rem;
-    background-color: #f8f9fa;
+    background-color: var(--color-background-secondary);
     border-radius: 8px;
   }
 
   .no-schedule p {
-    color: #6c757d;
+    color: var(--color-text-tertiary);
     margin: 0;
   }
 </style> 

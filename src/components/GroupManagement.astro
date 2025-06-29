@@ -32,8 +32,8 @@ const teamMembers = teamMembersStore.get()
 <div class="group-management">
   <div class="header">
     <h1>グループ管理</h1>
-    <button id="create-group-btn" class="btn btn-primary">
-      <span class="icon">+</span>
+    <button id="create-group-btn" class="btn btn-primary ripple-container button-hover focus-glow">
+      <span class="btn-badge">新</span>
       新しいグループを作成
     </button>
   </div>
@@ -47,12 +47,12 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ一覧 -->
-  <div id="group-list-container">
+  <div id="group-list-container" class="animate-fade-in">
     <GroupList groups={groups} />
   </div>
 
   <!-- グループ作成フォーム -->
-  <div id="create-form-container" class="form-container hidden">
+  <div id="create-form-container" class="form-container hidden animate-fade-in">
     <GroupForm 
       teamMembers={teamMembers}
       mode="create"
@@ -61,7 +61,7 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ編集フォーム -->
-  <div id="edit-form-container" class="form-container hidden">
+  <div id="edit-form-container" class="form-container hidden animate-fade-in">
     <div class="group-form">
       <h3>グループを編集</h3>
       <form id="edit-form" novalidate>
@@ -90,10 +90,10 @@ const teamMembers = teamMembersStore.get()
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary ripple-container button-hover focus-glow">
             更新
           </button>
-          <button type="button" class="btn btn-secondary" data-action="cancel">
+          <button type="button" class="btn btn-secondary ripple-container button-hover focus-glow" data-action="cancel">
             キャンセル
           </button>
         </div>
@@ -109,16 +109,16 @@ const teamMembers = teamMembersStore.get()
   console.log('GroupManagement script initialized');
   
   // グローバル変数として初期化を示すフラグ
-  window.groupManagementInitialized = true;
+  (window as any).groupManagementInitialized = true;
   
-  let currentMode = null;
-  let currentGroupId = null;
+  let currentMode: string | null = null;
+  let currentGroupId: string | null = null;
   
   // イベントリスナーを管理するための配列
-  const eventHandlers = [];
+  const eventHandlers: Array<{ element: EventTarget, event: string, handler: EventListener }> = [];
   
   // 同期的な初期データの設定
-  let dataAdapter = null;
+  let dataAdapter: any = null;
   
   // ストア関数の実装
   const groupsStore = {
@@ -135,15 +135,15 @@ const teamMembers = teamMembersStore.get()
   
   const getAllGroupsWithMembers = () => groupsStore.get();
   
-  const createGroup = (name, memberIds) => {
+  const createGroup = (name: string, memberIds: string[]) => {
     return dataAdapter?.createGroup(name, memberIds);
   };
   
-  const updateGroup = (id, data) => {
+  const updateGroup = (id: string, data: { name: string, memberIds: string[] }) => {
     dataAdapter?.updateGroup(id, data);
   };
   
-  const deleteGroup = (id) => {
+  const deleteGroup = (id: string) => {
     dataAdapter?.deleteGroup(id);
   };
   
@@ -174,14 +174,14 @@ const teamMembers = teamMembersStore.get()
     
     // ローディング状態とエラー状態の簡易実装
     const isLoadingStore = {
-      subscribe: (callback) => {
+      subscribe: (callback: (loading: boolean) => void) => {
         // 簡易実装のため、常にfalseを返す
         callback(false);
       }
     };
     
     const errorStore = {
-      subscribe: (callback) => {
+      subscribe: (callback: (error: string | null) => void) => {
         // 簡易実装のため、常にnullを返す
         callback(null);
       }
@@ -215,8 +215,8 @@ const teamMembers = teamMembersStore.get()
     }
     
     // 編集フォームにデータを設定
-    function setupEditForm(group) {
-      const nameInput = document.getElementById('edit-name');
+    function setupEditForm(group: any) {
+      const nameInput = document.getElementById('edit-name') as HTMLInputElement;
       if (nameInput) {
         nameInput.value = group.name;
       }
@@ -225,7 +225,7 @@ const teamMembers = teamMembersStore.get()
       const membersContainer = document.getElementById('edit-members-selection');
       if (membersContainer) {
         const teamMembers = teamMembersStore.get();
-        membersContainer.innerHTML = teamMembers.map((member) => `
+        membersContainer.innerHTML = teamMembers.map((member: any) => `
           <label class="member-checkbox">
             <input
               type="checkbox"
@@ -274,22 +274,15 @@ const teamMembers = teamMembersStore.get()
             const errorElement = document.createElement('div');
             errorElement.innerHTML = `
               <div class="error-message" role="alert">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="8" x2="12" y2="12"></line>
-                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
+                <span class="error-badge">!</span>
                 <span class="error-text">${error}</span>
                 <button type="button" class="close-btn" aria-label="エラーを閉じる">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  <span class="close-badge">×</span>
                 </button>
               </div>
             `;
             
-            const errorMessage = errorElement.firstElementChild;
+            const errorMessage = errorElement.firstElementChild as HTMLElement;
             const closeBtn = errorMessage?.querySelector('.close-btn');
             
             if (closeBtn) {
@@ -329,8 +322,8 @@ const teamMembers = teamMembersStore.get()
       });
       
       // 編集ボタンのイベント
-      const editHandler = (e) => {
-        const customEvent = e;
+      const editHandler = (e: Event) => {
+        const customEvent = e as CustomEvent;
         console.log('GroupManagement: group-edit event received', customEvent.detail);
         const groupId = customEvent.detail.groupId;
         if (groupId) {
@@ -339,7 +332,7 @@ const teamMembers = teamMembersStore.get()
           
           // 編集対象のグループを取得
           const allGroups = getAllGroupsWithMembers();
-          const group = allGroups.find((g) => g.id === groupId);
+          const group = allGroups.find((g: any) => g.id === groupId);
           if (group) {
             setupEditForm(group);
             showEditForm();
@@ -350,8 +343,8 @@ const teamMembers = teamMembersStore.get()
       eventHandlers.push({ element: window, event: 'group-edit', handler: editHandler });
       
       // 削除ボタンのイベント
-      const deleteHandler = (e) => {
-        const customEvent = e;
+      const deleteHandler = (e: Event) => {
+        const customEvent = e as CustomEvent;
         console.log('GroupManagement: group-delete event received', customEvent.detail);
         const groupId = customEvent.detail.groupId;
         if (groupId) {
@@ -361,7 +354,7 @@ const teamMembers = teamMembersStore.get()
           if (modal) {
             modal.classList.add('open');
             // グループ名を設定
-            const group = groupsStore.get().find((g) => g.id === groupId);
+            const group = groupsStore.get().find((g: any) => g.id === groupId);
             if (group) {
               const modalGroupName = modal.querySelector('.modal-body strong');
               if (modalGroupName) {
@@ -375,9 +368,9 @@ const teamMembers = teamMembersStore.get()
       eventHandlers.push({ element: window, event: 'group-delete', handler: deleteHandler });
       
       // 作成フォームイベント
-      const formSubmitHandler = (e) => {
+      const formSubmitHandler = (e: Event) => {
         console.log('group-form-submit event received:', e);
-        const customEvent = e;
+        const customEvent = e as CustomEvent;
         const { name, memberIds } = customEvent.detail;
         console.log('Event detail:', customEvent.detail);
         
@@ -428,19 +421,19 @@ const teamMembers = teamMembersStore.get()
     }
     
     // 編集フォームのイベントリスナー
-    const editForm = document.getElementById('edit-form');
+    const editForm = document.getElementById('edit-form') as HTMLFormElement;
     if (editForm) {
-      const nameInput = document.getElementById('edit-name');
+      const nameInput = document.getElementById('edit-name') as HTMLInputElement;
       const nameError = document.getElementById('edit-name-error');
       const membersError = document.getElementById('edit-members-error');
       
       // グループ名の重複チェック関数
-      function checkDuplicateName(name) {
+      function checkDuplicateName(name: string) {
         const trimmedName = name.trim();
         if (!trimmedName) return false;
         
         const allGroups = groupsStore.get();
-        return allGroups.some((g) => {
+        return allGroups.some((g: any) => {
           // 編集中のグループ自身は除外
           if (g.id === currentGroupId) return false;
           return g.name.toLowerCase() === trimmedName.toLowerCase();
@@ -450,12 +443,12 @@ const teamMembers = teamMembersStore.get()
       // グループ名の入力時にリアルタイムでチェック
       if (nameInput) {
         nameInput.addEventListener('input', (e) => {
-          const target = e.target;
+          const target = e.target as HTMLInputElement;
           const isDuplicate = checkDuplicateName(target.value);
-          if (isDuplicate) {
+          if (isDuplicate && nameError) {
             nameError.classList.remove('hidden');
             nameInput.classList.add('error');
-          } else {
+          } else if (nameError) {
             nameError.classList.add('hidden');
             nameInput.classList.remove('error');
           }
@@ -465,8 +458,8 @@ const teamMembers = teamMembersStore.get()
       editForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(editForm);
-        const name = formData.get('name');
-        const memberIds = formData.getAll('memberIds');
+        const name = formData.get('name') as string;
+        const memberIds = formData.getAll('memberIds') as string[];
         
         let hasError = false;
         
@@ -474,25 +467,25 @@ const teamMembers = teamMembersStore.get()
         const trimmedName = name?.trim();
         if (!trimmedName) {
           hasError = true;
-        } else if (checkDuplicateName(trimmedName)) {
+        } else if (checkDuplicateName(trimmedName) && nameError) {
           nameError.classList.remove('hidden');
-          nameInput.classList.add('error');
+          if (nameInput) nameInput.classList.add('error');
           hasError = true;
-        } else {
+        } else if (nameError) {
           nameError.classList.add('hidden');
-          nameInput.classList.remove('error');
+          if (nameInput) nameInput.classList.remove('error');
         }
         
         // メンバー数のバリデーション
-        if (memberIds.length === 0) {
+        if (memberIds.length === 0 && membersError) {
           membersError.classList.remove('hidden');
           hasError = true;
-        } else {
+        } else if (membersError) {
           membersError.classList.add('hidden');
         }
         
         // エラーがなければ送信
-        if (!hasError && currentGroupId) {
+        if (!hasError && currentGroupId && trimmedName) {
           updateGroup(currentGroupId, { name: trimmedName, memberIds });
           hideForms();
           window.location.reload();
@@ -512,51 +505,91 @@ const teamMembers = teamMembersStore.get()
   .group-management {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: var(--spacing-8);
   }
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--spacing-8);
+    flex-wrap: wrap;
+    gap: var(--spacing-4);
   }
 
   h1 {
     margin: 0;
-    font-size: 2rem;
-    color: #333;
+    font-size: var(--font-size-3xl);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
+    padding: var(--spacing-3) var(--spacing-6);
+    font-size: var(--font-size-base);
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
+    transition: all var(--duration-fast) var(--easing-spring);
+    font-weight: var(--font-weight-medium);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
+    min-height: 44px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--easing-in-out);
+  }
+
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn:hover::before {
+    opacity: 1;
+  }
+
+  .btn:active {
+    transform: translateY(0) scale(0.98);
   }
 
   .btn-primary {
-    background-color: #007bff;
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
     color: white;
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-primary::before {
+    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
   }
 
   .btn-primary:hover {
-    background-color: #0056b3;
+    box-shadow: var(--shadow-lg);
   }
 
-  .icon {
-    font-size: 1.25rem;
-    font-weight: bold;
+  .btn-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: white;
+    color: var(--color-primary-500);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
   }
 
   .form-container {
-    margin-bottom: 2rem;
+    margin-bottom: var(--spacing-8);
   }
 
   .hidden {
@@ -565,165 +598,227 @@ const teamMembers = teamMembersStore.get()
 
   .fade {
     opacity: 0.5;
+    pointer-events: none;
   }
 
   /* グループフォームのスタイル */
   .group-form {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    background-color: var(--color-surface);
+    padding: var(--spacing-8);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
     max-width: 500px;
+    box-shadow: var(--shadow-lg);
   }
 
   .group-form h3 {
-    margin: 0 0 1.5rem 0;
-    font-size: 1.25rem;
-    color: #333;
+    margin: 0 0 var(--spacing-8) 0;
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .form-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--spacing-6);
   }
 
   .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: #555;
+    margin-bottom: var(--spacing-3);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
   }
 
   .form-group input[type="text"] {
     width: 100%;
-    padding: 0.75rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.2s;
+    padding: var(--spacing-4);
+    font-size: var(--font-size-base);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--easing-in-out);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
   }
 
   .form-group input[type="text"]:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: var(--color-primary-500);
+    background-color: var(--color-surface);
   }
 
   .members-selection {
-    max-height: 300px;
+    max-height: 320px;
     overflow-y: auto;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-3);
+    background-color: var(--color-background);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-gray-400) transparent;
+  }
+
+  .members-selection::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .members-selection::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .members-selection::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray-400);
+    border-radius: var(--radius-full);
   }
 
   .member-checkbox {
     display: flex;
     align-items: center;
-    padding: 0.5rem;
-    margin: 0.25rem 0;
+    padding: var(--spacing-3);
+    margin: var(--spacing-1) 0;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--easing-in-out);
+    min-height: 44px;
   }
 
   .member-checkbox:hover {
-    background-color: #f8f9fa;
+    background-color: var(--color-surface-hover);
+    transform: translateX(2px);
   }
 
   .member-checkbox input[type="checkbox"] {
-    margin-right: 0.75rem;
+    margin-right: var(--spacing-3);
     cursor: pointer;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-primary-500);
   }
 
   .member-info {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    gap: var(--spacing-1);
   }
 
   .member-name {
-    font-weight: 500;
-    color: #333;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-base);
   }
 
   .member-email {
-    font-size: 0.875rem;
-    color: #6c757d;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
   }
 
   .form-actions {
     display: flex;
-    gap: 1rem;
+    gap: var(--spacing-4);
     justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #e0e0e0;
+    margin-top: var(--spacing-8);
+    padding-top: var(--spacing-6);
+    border-top: 1px solid var(--color-border);
   }
 
   .btn-secondary {
-    background-color: #6c757d;
-    color: white;
+    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
+    color: var(--color-text-primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-secondary::before {
+    background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
   }
 
   .btn-secondary:hover {
-    background-color: #545b62;
+    box-shadow: var(--shadow-md);
   }
 
   /* バリデーションエラーのスタイル */
   .error-message {
-    color: #dc3545;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+    background-color: rgba(239, 68, 68, 0.05);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(239, 68, 68, 0.2);
   }
 
   input.error {
-    border-color: #dc3545;
+    border-color: var(--color-error);
+    background-color: rgba(239, 68, 68, 0.02);
   }
 
   input.error:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    border-color: var(--color-error);
   }
 
   /* エラーメッセージのスタイル（動的に追加される要素用） */
-  :global(.error-message) {
+  :global(.error-message[role="alert"]) {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 1rem;
-    background-color: #fee;
-    border: 1px solid #fcc;
-    border-radius: 4px;
-    color: #d8000c;
-    margin-bottom: 1rem;
-    animation: slideIn 0.3s ease-out;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background-color: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: var(--radius-md);
+    color: var(--color-error);
+    margin-bottom: var(--spacing-4);
+    animation: slideIn var(--duration-fast) var(--easing-in-out);
+    box-shadow: var(--shadow-sm);
   }
   
-  :global(.error-message svg) {
+  :global(.error-badge) {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--color-error);
+    color: white;
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
+  }
+  
+  :global(.close-badge) {
+    font-size: var(--font-size-xl);
+    line-height: 1;
+    font-weight: var(--font-weight-normal);
   }
   
   :global(.error-text) {
     flex-grow: 1;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
   }
   
   :global(.error-message .close-btn) {
     flex-shrink: 0;
     background: none;
     border: none;
-    color: #d8000c;
+    color: var(--color-error);
     cursor: pointer;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s;
+    padding: var(--spacing-2);
+    border-radius: var(--radius-md);
+    transition: all var(--duration-fast) var(--easing-in-out);
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   
   :global(.error-message .close-btn:hover) {
-    background-color: rgba(216, 0, 12, 0.1);
+    background-color: rgba(239, 68, 68, 0.1);
   }
   
   :global(.fade-out) {
-    animation: fadeOut 0.3s ease-out forwards;
+    animation: fadeOut var(--duration-normal) var(--easing-in-out) forwards;
   }
   
   @keyframes slideIn {
@@ -759,10 +854,171 @@ const teamMembers = teamMembersStore.get()
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 9999;
+    z-index: var(--z-index-modal);
   }
 
   #loading-overlay.hidden {
     display: none;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .group-management {
+      padding: var(--spacing-4);
+    }
+
+    .header {
+      margin-bottom: var(--spacing-6);
+    }
+
+    h1 {
+      font-size: var(--font-size-2xl);
+      flex: 1 1 100%;
+    }
+
+    .btn {
+      padding: var(--spacing-3) var(--spacing-5);
+      min-height: 48px;
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      width: 100%;
+    }
+
+    .form-container {
+      margin-bottom: var(--spacing-6);
+    }
+
+    .group-form {
+      padding: var(--spacing-6);
+      max-width: 100%;
+      border-radius: var(--radius-lg);
+    }
+
+    .group-form h3 {
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-6);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-5);
+    }
+
+    .form-group label {
+      font-size: var(--font-size-base);
+    }
+
+    .form-group input[type="text"] {
+      min-height: 48px;
+    }
+
+    .members-selection {
+      max-height: 280px;
+      padding: var(--spacing-2);
+    }
+
+    .member-checkbox {
+      padding: var(--spacing-3) var(--spacing-2);
+      min-height: 48px;
+    }
+
+    .member-checkbox input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+    }
+
+    .form-actions {
+      margin-top: var(--spacing-6);
+      padding-top: var(--spacing-4);
+      gap: var(--spacing-3);
+      flex-wrap: wrap;
+    }
+
+    .form-actions .btn {
+      flex: 1 1 calc(50% - var(--spacing-2));
+      min-width: 120px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .group-management {
+      padding: var(--spacing-3);
+    }
+
+    h1 {
+      font-size: var(--font-size-xl);
+    }
+
+    .group-form {
+      padding: var(--spacing-4);
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      box-shadow: none;
+    }
+
+    .members-selection {
+      max-height: 240px;
+    }
+
+    .form-actions {
+      gap: var(--spacing-2);
+    }
+
+    .form-actions .btn {
+      flex: 1 1 100%;
+    }
+
+    .btn-primary {
+      order: -1;
+    }
+  }
+
+  /* タッチデバイスでのホバー効果の調整 */
+  @media (hover: none) and (pointer: coarse) {
+    .member-checkbox:hover {
+      background-color: transparent;
+      transform: none;
+    }
+
+    .btn:hover {
+      transform: none;
+    }
+
+    .member-checkbox:active {
+      background-color: var(--color-surface-active);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+  }
+
+  /* アクセシビリティ: モーション設定 */
+  @media (prefers-reduced-motion: reduce) {
+    .member-checkbox,
+    .btn {
+      transition: none;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .btn-badge {
+      background: var(--color-primary-800);
+      color: white;
+    }
   }
 </style> 

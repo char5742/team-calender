@@ -17,6 +17,7 @@ const { title } = Astro.props
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/src/styles/design-system.css" />
+    <link rel="stylesheet" href="/src/styles/animations.css" />
     <title>{title} - チームカレンダー</title>
     <!-- テーマ初期化スクリプト（フラッシュ防止） -->
     <script>
@@ -37,7 +38,7 @@ const { title } = Astro.props
   </head>
   <body>
     <Header currentPath={Astro.url.pathname} />
-    <main class="main-content">
+    <main class="main-content page-transition">
       <slot />
     </main>
     <script>
@@ -101,6 +102,7 @@ const { title } = Astro.props
 <style is:global>
   /* デザインシステムのインポート */
   @import '/src/styles/design-system.css';
+  @import '/src/styles/animations.css';
 
   html {
     font-family: var(--font-family-sans);

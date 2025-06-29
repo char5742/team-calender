@@ -9,17 +9,28 @@ export interface Props {
 
 const { groups, selectedGroupId } = Astro.props
 
-// グループのアイコンをランダムに選択するための絵文字セット
-const groupIcons = ['👥', '🎯', '🚀', '💡', '🌟', '🎨', '🏆', '🌈', '💼', '🔥']
-const getGroupIcon = (groupId: string) => {
-  // グループID全体を使用してより多様なアイコンを選択
+// グループの色を決定するための関数
+const getGroupColor = (groupId: string) => {
+  const semanticColors = [
+    'var(--color-primary-500)',
+    'var(--color-info)',
+    'var(--color-success)',
+    'var(--color-warning)',
+    'var(--color-gray-500)',
+  ]
+  // グループID全体を使用してより多様な色を選択
   let hash = 0
   for (let i = 0; i < groupId.length; i++) {
     hash = (hash << 5) - hash + groupId.charCodeAt(i)
     hash &= hash // Convert to 32bit integer
   }
-  const index = Math.abs(hash) % groupIcons.length
-  return groupIcons[index]
+  const index = Math.abs(hash) % semanticColors.length
+  return semanticColors[index]
+}
+
+// グループの頭文字を取得
+const getGroupInitials = (name: string) => {
+  return name.slice(0, 2).toUpperCase()
 }
 ---
 
@@ -27,39 +38,37 @@ const getGroupIcon = (groupId: string) => {
   <h2>グループ一覧</h2>
   {groups.length === 0 ? (
     <div class="empty-state">
-      <svg class="empty-icon" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-        <circle cx="9" cy="7" r="4"></circle>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-      </svg>
+      <div class="empty-visual">
+        <div class="empty-circle"></div>
+        <div class="empty-circle"></div>
+        <div class="empty-circle"></div>
+      </div>
       <p class="empty-message">まだグループがありません</p>
       <p class="empty-description">新しいグループを作成して、チームメンバーを管理しましょう</p>
     </div>
   ) : (
     <ul class="groups">
-      {groups.map((group) => (
+      {groups.map((group, index) => (
         <li 
-          class={`group-item ${selectedGroupId === group.id ? 'selected' : ''}`}
+          class={`group-item card-appear stagger-${Math.min(index + 1, 6)} hover-lift ${
+            group.id === selectedGroupId ? 'selected' : ''
+          }`}
           data-group-id={group.id}
         >
           <button
             class="group-button"
             onclick={`window.dispatchEvent(new CustomEvent('group-click', { detail: { groupId: '${group.id}' } }))`}
+            aria-label={`${group.name}グループを選択`}
           >
             <div class="group-content">
-              <div class="group-icon">{getGroupIcon(group.id)}</div>
+              <div class="group-badge" style={`background-color: ${getGroupColor(group.id)}`}>
+                {getGroupInitials(group.name)}
+              </div>
               <div class="group-info">
                 <div class="group-header">
                   <h3 class="group-name">{group.name}</h3>
                   <span class="member-count">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="9" cy="7" r="4"></circle>
-                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                    {group.members.length}
+                    {group.members.length}名
                   </span>
                 </div>
                 <div class="member-list">
@@ -78,33 +87,28 @@ const getGroupIcon = (groupId: string) => {
               href={`/groups/${group.id}/weekly-schedule`}
               class="action-btn schedule-btn"
               title="スケジュール表示"
+              aria-label={`${group.name}のスケジュールを表示`}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
+              <span class="action-icon">📅</span>
+              <span class="action-text">週</span>
             </a>
             <button 
-              class="action-btn edit-btn" 
+              class="action-btn edit-btn button-hover focus-glow" 
               data-group-id={group.id} 
               title="編集"
+              aria-label={`${group.name}を編集`}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
+              <span class="action-icon">✏️</span>
+              <span class="action-text">編</span>
             </button>
             <button 
-              class="action-btn delete-btn" 
+              class="action-btn delete-btn button-hover focus-glow" 
               data-group-id={group.id} 
               title="削除"
+              aria-label={`${group.name}を削除`}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
+              <span class="action-icon">🗑️</span>
+              <span class="action-text">削</span>
             </button>
           </div>
         </li>
@@ -144,6 +148,62 @@ const getGroupIcon = (groupId: string) => {
       }
     }
   });
+  
+  // タッチデバイスでのスワイプジェスチャー対応
+  const groupItems = document.querySelectorAll('.group-item');
+  
+  groupItems.forEach((item) => {
+    let startX = 0;
+    let currentX = 0;
+    let diff = 0;
+    let isSwipe = false;
+    
+    const actions = item.querySelector('.group-actions') as HTMLElement;
+    if (!actions) return;
+    
+    item.addEventListener('touchstart', (e) => {
+      const touchEvent = e as TouchEvent;
+      startX = touchEvent.touches[0].clientX;
+      isSwipe = false;
+    });
+    
+    item.addEventListener('touchmove', (e) => {
+      const touchEvent = e as TouchEvent;
+      currentX = touchEvent.touches[0].clientX;
+      diff = startX - currentX;
+      
+      // 左スワイプでアクションを表示
+      if (diff > 50 && !isSwipe) {
+        isSwipe = true;
+        item.classList.add('show-actions');
+      }
+      // 右スワイプでアクションを隠す
+      else if (diff < -50 && isSwipe) {
+        isSwipe = false;
+        item.classList.remove('show-actions');
+      }
+    });
+    
+    item.addEventListener('touchend', () => {
+      // スワイプが不完全な場合は元に戻す
+      if (Math.abs(diff) < 50) {
+        item.classList.remove('show-actions');
+      }
+      diff = 0;
+    });
+  });
+  
+  // 他のアイテムをタップした時にアクションを閉じる
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const clickedItem = target.closest('.group-item');
+    
+    groupItems.forEach((item) => {
+      if (item !== clickedItem) {
+        item.classList.remove('show-actions');
+      }
+    });
+  });
 </script>
 
 <style>
@@ -171,10 +231,29 @@ const getGroupIcon = (groupId: string) => {
     box-shadow: var(--shadow-sm);
   }
 
-  .empty-icon {
-    color: var(--color-gray-300);
-    margin-bottom: var(--spacing-4);
-    opacity: 0.8;
+  .empty-visual {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-6);
+  }
+
+  .empty-circle {
+    width: 48px;
+    height: 48px;
+    background: var(--color-background-tertiary);
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  .empty-circle:nth-child(2) {
+    transform: scale(0.8);
+    opacity: 0.4;
+  }
+
+  .empty-circle:nth-child(3) {
+    transform: scale(0.6);
+    opacity: 0.3;
   }
 
   .empty-message {
@@ -234,6 +313,7 @@ const getGroupIcon = (groupId: string) => {
     font-family: inherit;
     position: relative;
     z-index: 1;
+    min-height: 80px; /* タッチターゲット */
   }
 
   .group-content {
@@ -242,27 +322,25 @@ const getGroupIcon = (groupId: string) => {
     gap: var(--spacing-4);
   }
 
-  .group-icon {
+  .group-badge {
     width: 48px;
     height: 48px;
-    background: var(--color-background-tertiary);
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: white;
     flex-shrink: 0;
     box-shadow: var(--shadow-sm);
     transition: all var(--duration-normal) var(--easing-in-out);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
-  .group-item:hover .group-icon {
+  .group-item:hover .group-badge {
     transform: scale(1.05);
     box-shadow: var(--shadow-md);
-  }
-
-  .group-item.selected .group-icon {
-    background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-primary-200) 100%);
   }
 
   .group-info {
@@ -294,18 +372,11 @@ const getGroupIcon = (groupId: string) => {
     font-size: var(--font-size-sm);
     color: var(--color-text-secondary);
     background: var(--color-background-tertiary);
-    padding: var(--spacing-1) var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-3);
     border-radius: var(--radius-full);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-1);
     font-weight: var(--font-weight-medium);
     white-space: nowrap;
     box-shadow: var(--shadow-xs);
-  }
-
-  .member-count svg {
-    opacity: 0.7;
   }
 
   .member-list {
@@ -351,14 +422,15 @@ const getGroupIcon = (groupId: string) => {
     transition: all var(--duration-normal) var(--easing-in-out);
   }
 
-  .group-item:hover .group-actions {
+  .group-item:hover .group-actions,
+  .group-item.show-actions .group-actions {
     opacity: 1;
     transform: translateX(0);
   }
 
   .action-btn {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     border: none;
     background: var(--color-glass-bg);
@@ -373,11 +445,33 @@ const getGroupIcon = (groupId: string) => {
     position: relative;
     z-index: 10;
     box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .action-icon {
+    font-size: var(--font-size-lg);
+    line-height: 1;
+    display: none;
+  }
+
+  .action-text {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .action-btn:hover {
     transform: scale(1.1);
     box-shadow: var(--shadow-md);
+  }
+
+  /* タッチデバイスでのホバー無効化 */
+  @media (hover: none) and (pointer: coarse) {
+    .action-btn:hover {
+      transform: none;
+    }
   }
 
   .edit-btn:hover {
@@ -400,16 +494,134 @@ const getGroupIcon = (groupId: string) => {
     .group-list {
       max-width: 100%;
       padding: var(--spacing-4);
+      border-radius: 0;
+    }
+
+    h2 {
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-4);
+    }
+
+    .groups {
+      gap: var(--spacing-2);
+    }
+
+    .group-item {
+      border-radius: var(--radius-md);
+      margin: 0 calc(-1 * var(--spacing-4));
+      border-left: none;
+      border-right: none;
+    }
+
+    .group-item:first-child {
+      border-top-left-radius: var(--radius-md);
+      border-top-right-radius: var(--radius-md);
+    }
+
+    .group-item:last-child {
+      border-bottom-left-radius: var(--radius-md);
+      border-bottom-right-radius: var(--radius-md);
+    }
+
+    .group-button {
+      padding: var(--spacing-3);
+      min-height: 72px;
+      padding-right: calc(var(--spacing-20) + var(--spacing-4));
     }
 
     .group-actions {
       opacity: 1;
       transform: translateX(0);
+      right: var(--spacing-3);
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--color-surface);
+      padding: var(--spacing-2);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--color-border);
+    }
+
+    /* スワイプ時のアクション表示 */
+    .group-item {
+      transition: transform var(--duration-normal) var(--easing-in-out);
+    }
+
+    .group-item.show-actions {
+      transform: translateX(-120px);
+    }
+
+    .group-item.show-actions .group-actions {
+      transform: translateY(-50%) translateX(120px);
     }
 
     .action-btn {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
+    }
+
+    .action-icon {
+      display: block;
+    }
+
+    .action-text {
+      display: none;
+    }
+
+    .empty-state {
+      padding: var(--spacing-8) var(--spacing-4);
+    }
+
+    .empty-visual {
+      gap: var(--spacing-2);
+      margin-bottom: var(--spacing-4);
+    }
+
+    .empty-circle {
+      width: 40px;
+      height: 40px;
+    }
+
+    .empty-message {
+      font-size: var(--font-size-base);
+    }
+  }
+
+  /* 小画面向けの追加対応 */
+  @media (max-width: 480px) {
+    .group-badge {
+      width: 40px;
+      height: 40px;
+      font-size: var(--font-size-base);
+    }
+
+    .group-name {
+      font-size: var(--font-size-base);
+    }
+
+    .member-count {
+      font-size: var(--font-size-xs);
+      padding: 0 var(--spacing-2);
+    }
+
+    .member-list {
+      gap: var(--spacing-1);
+    }
+
+    .member-name {
+      font-size: var(--font-size-xs);
+      padding: 0 var(--spacing-2);
+    }
+
+    .group-content {
+      gap: var(--spacing-3);
+    }
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .group-actions {
+      background: var(--color-surface);
     }
   }
 </style> 

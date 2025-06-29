@@ -1,0 +1,260 @@
+---
+import type { CalendarEvent } from '../lib/schema'
+import { generateModalId } from '../utils/id'
+
+export interface Props {
+  event?: CalendarEvent
+  isOpen?: boolean
+}
+
+const { event, isOpen = false } = Astro.props
+const popoverId = generateModalId()
+---
+
+<div id={popoverId} class={`popover-overlay ${isOpen ? 'open' : ''}`}>
+  <div class="popover glass">
+    <div class="popover-header">
+      <span class="event-badge-large" data-type={event?.label === 'Meeting' || event?.title?.includes('会議') || event?.title?.includes('ミーティング') ? 'meeting' : 'work'}>
+        {event?.label === 'Meeting' || event?.title?.includes('会議') || event?.title?.includes('ミーティング') ? 'M' : 'W'}
+      </span>
+      <h3>{event?.title || ''}</h3>
+    </div>
+    <div class="popover-body">
+      <div class="info-row">
+        <span class="info-label">時間</span>
+        <span class="info-value">
+          {event ? (
+            <>
+              {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+              {' - '}
+              {new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+            </>
+          ) : ''}
+        </span>
+      </div>
+      {event?.description && (
+        <div class="info-row">
+          <span class="info-label">詳細</span>
+          <span class="info-value">{event.description}</span>
+        </div>
+      )}
+    </div>
+    <div class="popover-actions">
+      <button type="button" class="btn btn-primary" data-action="close">
+        閉じる
+      </button>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ popoverId }}>
+  const popover = document.getElementById(popoverId);
+  
+  if (popover) {
+    const closeButton = popover.querySelector('[data-action="close"]');
+    
+    // 閉じるボタンのクリックイベント
+    if (closeButton) {
+      closeButton.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('event-popover-close'));
+      });
+    }
+
+    // オーバーレイクリックでポップオーバーを閉じる
+    popover.addEventListener('click', (e) => {
+      if (e.target === popover) {
+        window.dispatchEvent(new CustomEvent('event-popover-close'));
+      }
+    });
+
+    // ESCキーでポップオーバーを閉じる
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && popover.classList.contains('open')) {
+        window.dispatchEvent(new CustomEvent('event-popover-close'));
+      }
+    });
+  }
+</script>
+
+<style>
+  .popover-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-index-modal-backdrop);
+    animation: overlayFadeIn var(--duration-fast) var(--easing-out);
+  }
+
+  .popover-overlay.open {
+    display: flex;
+  }
+
+  @keyframes overlayFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .popover {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    max-width: 450px;
+    width: 90%;
+    animation: popoverSlideIn var(--duration-normal) var(--easing-spring);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+  }
+
+  /* ガラスモーフィズム効果を適用 */
+  .popover.glass {
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(var(--blur-xl));
+    -webkit-backdrop-filter: blur(var(--blur-xl));
+    border: 1px solid var(--color-glass-border);
+    box-shadow: var(--shadow-glass);
+  }
+
+  @keyframes popoverSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .popover-header {
+    padding: var(--spacing-6);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    background: linear-gradient(to right, var(--color-background-secondary), var(--color-background-tertiary));
+  }
+
+  .event-badge-large {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .event-badge-large[data-type="meeting"] {
+    background: linear-gradient(135deg, var(--color-info), var(--color-primary-600));
+  }
+  
+  .event-badge-large[data-type="work"] {
+    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
+  }
+
+  .popover-header h3 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+    flex: 1;
+  }
+
+  .popover-body {
+    padding: var(--spacing-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+  }
+
+  .info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+  }
+
+  .info-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
+    min-width: 60px;
+    flex-shrink: 0;
+  }
+
+  .info-value {
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .popover-actions {
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+    background: var(--color-background-tertiary);
+  }
+
+  .btn {
+    padding: var(--spacing-2) var(--spacing-6);
+    font-size: var(--font-size-base);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-in-out);
+    font-weight: var(--font-weight-medium);
+    position: relative;
+    min-width: 100px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary-500);
+    color: white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-primary-600);
+  }
+
+  /* モバイル対応 */
+  @media (max-width: 768px) {
+    .popover {
+      max-width: calc(100vw - 32px);
+    }
+
+    .popover-header {
+      padding: var(--spacing-4);
+    }
+
+    .popover-body {
+      padding: var(--spacing-4);
+    }
+
+    .event-badge-large {
+      width: 40px;
+      height: 40px;
+      font-size: var(--font-size-lg);
+    }
+  }
+</style> 

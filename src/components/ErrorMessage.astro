@@ -8,18 +8,11 @@ const { error, className = '' } = Astro.props
 ---
 
 {error && (
-  <div class={`error-message ${className}`} role="alert">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"></circle>
-      <line x1="12" y1="8" x2="12" y2="12"></line>
-      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-    </svg>
+  <div class={`error-message error-feedback ${className}`} role="alert">
+    <span class="error-badge">!</span>
     <span class="error-text">{error}</span>
-    <button type="button" class="close-btn" aria-label="エラーを閉じる">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
+    <button type="button" class="close-btn ripple-container" aria-label="エラーを閉じる">
+      <span class="close-badge">×</span>
     </button>
   </div>
 )}
@@ -67,8 +60,18 @@ const { error, className = '' } = Astro.props
     box-shadow: var(--shadow-sm);
   }
   
-  .error-message svg {
+  .error-badge {
     flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--color-error);
+    color: white;
+    border-radius: 50%;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
   }
   
   .error-text {
@@ -86,10 +89,21 @@ const { error, className = '' } = Astro.props
     padding: var(--spacing-1);
     border-radius: var(--radius-sm);
     transition: all var(--duration-fast) var(--easing-in-out);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
   }
   
   .close-btn:hover {
     background-color: rgba(239, 68, 68, 0.1);
+  }
+  
+  .close-badge {
+    font-size: var(--font-size-lg);
+    line-height: 1;
+    font-weight: var(--font-weight-normal);
   }
   
   .fade-out {

@@ -6,9 +6,9 @@ export interface Props {
 const { currentPath = '/' } = Astro.props
 
 const navItems = [
-  { label: 'ホーム', href: '/', icon: '🏠' },
-  { label: 'グループ管理', href: '/groups/new', icon: '👥' },
-  { label: 'カレンダー', href: '#', icon: '📅' },
+  { label: 'ホーム', href: '/', shortLabel: 'H' },
+  { label: 'グループ管理', href: '/groups/new', shortLabel: 'G' },
+  { label: 'カレンダー', href: '#', shortLabel: 'C' },
 ]
 
 const isActive = (href: string) => currentPath === href
@@ -18,7 +18,7 @@ const isActive = (href: string) => currentPath === href
   <div class="header-container">
     <!-- Logo/Brand -->
     <div class="brand">
-      <span class="brand-icon">📆</span>
+      <span class="brand-badge">TC</span>
       <span class="brand-text">Team Calendar</span>
     </div>
 
@@ -30,7 +30,7 @@ const isActive = (href: string) => currentPath === href
           class={`nav-link ${isActive(item.href) ? 'active' : ''}`}
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
-          <span class="nav-icon">{item.icon}</span>
+          <span class="nav-badge">{item.shortLabel}</span>
           <span class="nav-text">{item.label}</span>
         </a>
       ))}
@@ -40,37 +40,25 @@ const isActive = (href: string) => currentPath === href
     <div class="header-actions">
       <button 
         id="theme-toggle" 
-        class="icon-button"
+        class="theme-button ripple-container button-hover focus-glow"
         aria-label="テーマを切り替える"
         title="テーマを切り替える"
       >
-        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
+        <span class="theme-light-label">明</span>
+        <span class="theme-dark-label">暗</span>
       </button>
 
       <button 
         id="mobile-menu-toggle" 
-        class="icon-button mobile-only"
+        class="menu-button mobile-only ripple-container button-hover focus-glow"
         aria-label="メニューを開く"
         aria-expanded="false"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
+        <span class="menu-bars">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
       </button>
     </div>
   </div>
@@ -82,7 +70,7 @@ const isActive = (href: string) => currentPath === href
         href={item.href} 
         class={`mobile-nav-link ${isActive(item.href) ? 'active' : ''}`}
       >
-        <span class="nav-icon">{item.icon}</span>
+        <span class="nav-badge">{item.shortLabel}</span>
         <span class="nav-text">{item.label}</span>
       </a>
     ))}
@@ -133,8 +121,17 @@ const isActive = (href: string) => currentPath === href
     transform: scale(1.05);
   }
 
-  .brand-icon {
-    font-size: var(--font-size-2xl);
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--color-primary-500);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
     line-height: 1;
   }
 
@@ -191,9 +188,25 @@ const isActive = (href: string) => currentPath === href
     background: rgba(90, 122, 255, 0.15);
   }
 
-  .nav-icon {
-    font-size: var(--font-size-base);
+  .nav-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: var(--color-text-secondary);
+    color: var(--color-background);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
     line-height: 1;
+    transition: all var(--duration-fast) var(--easing-in-out);
+  }
+
+  .nav-link:hover .nav-badge,
+  .nav-link.active .nav-badge {
+    background: var(--color-primary-600);
+    color: white;
   }
 
   .nav-text {
@@ -207,35 +220,68 @@ const isActive = (href: string) => currentPath === href
     gap: var(--spacing-3);
   }
 
-  .icon-button {
+  .theme-button,
+  .menu-button {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
+    min-width: 40px;
     height: 40px;
-    padding: 0;
+    padding: 0 var(--spacing-3);
     border: none;
     border-radius: var(--radius-lg);
     background: transparent;
     color: var(--color-text-secondary);
     cursor: pointer;
     transition: all var(--duration-fast) var(--easing-spring);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
   }
 
-  .icon-button:hover {
+  .theme-button:hover,
+  .menu-button:hover {
     background: var(--color-surface-hover);
     color: var(--color-text-primary);
     transform: scale(1.05);
   }
 
-  .icon-button:active {
+  .theme-button:active,
+  .menu-button:active {
     transform: scale(0.95);
   }
 
-  /* Theme toggle icons */
-  html:not(.dark) .icon-moon,
-  html.dark .icon-sun {
+  /* Theme toggle labels */
+  html:not(.dark) .theme-dark-label,
+  html.dark .theme-light-label {
     display: none;
+  }
+
+  /* Mobile Menu Button */
+  .menu-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 18px;
+  }
+
+  .menu-bars span {
+    display: block;
+    height: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: all var(--duration-fast) var(--easing-in-out);
+  }
+
+  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(1) {
+    transform: translateY(5px) rotate(45deg);
+  }
+
+  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(3) {
+    transform: translateY(-5px) rotate(-45deg);
   }
 
   /* Mobile Menu */
@@ -279,6 +325,12 @@ const isActive = (href: string) => currentPath === href
     color: var(--color-primary-600);
   }
 
+  .mobile-nav-link .nav-badge {
+    width: 24px;
+    height: 24px;
+    font-size: var(--font-size-sm);
+  }
+
   /* Responsive */
   @media (max-width: 768px) {
     .header-container {
@@ -296,13 +348,19 @@ const isActive = (href: string) => currentPath === href
     .brand-text {
       font-size: var(--font-size-base);
     }
+
+    .menu-button {
+      min-width: 40px;
+      padding: 0;
+    }
   }
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
     .header,
     .nav-link,
-    .icon-button,
+    .theme-button,
+    .menu-button,
     .brand {
       transition: none;
     }

@@ -8,7 +8,6 @@ const { currentPath = '/' } = Astro.props
 const navItems = [
   { label: 'ホーム', href: '/', shortLabel: 'H' },
   { label: 'グループ管理', href: '/groups/new', shortLabel: 'G' },
-  { label: 'カレンダー', href: '#', shortLabel: 'C' },
 ]
 
 const isActive = (href: string) => currentPath === href

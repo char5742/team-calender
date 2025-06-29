@@ -16,17 +16,17 @@ const isEdit = mode === 'edit'
 const formId = generateFormId()
 ---
 
-<div class="group-form minimal-card" data-existing-groups={JSON.stringify(existingGroups)} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
-  <h3 class="heading-tertiary">{mode === 'create' ? '新しいグループを作成' : 'グループを編集'}</h3>
+<div class="group-form card" data-existing-groups={JSON.stringify(existingGroups)} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
+  <h3 class="form-title">{mode === 'create' ? '新しいグループを作成' : 'グループを編集'}</h3>
   
   <form id={formId} novalidate>
     <div class="form-group">
-      <label for={`${formId}-name`} class="visual-secondary">グループ名</label>
+      <label for={`${formId}-name`} class="form-label">グループ名</label>
       <input
         type="text"
         id={`${formId}-name`}
         name="name"
-        class="minimal-input"
+        class="form-input"
         placeholder="グループ名を入力"
         value={group?.name || ''}
         required
@@ -37,10 +37,10 @@ const formId = generateFormId()
     </div>
 
     <div class="form-group">
-      <label class="visual-secondary">メンバーを選択</label>
+      <label class="form-label">メンバーを選択</label>
       <div class="members-selection">
         {teamMembers.map(member => (
-          <label class="member-checkbox minimal-card interactive">
+          <label class="member-checkbox">
             <input
               type="checkbox"
               name="memberIds"
@@ -48,8 +48,8 @@ const formId = generateFormId()
               checked={group?.memberIds.includes(member.id)}
             />
             <span class="member-info">
-              <span class="member-name visual-primary">{member.name}</span>
-              <span class="member-email visual-tertiary">{member.email}</span>
+              <span class="member-name">{member.name}</span>
+              <span class="member-email">{member.email}</span>
             </span>
           </label>
         ))}
@@ -60,10 +60,10 @@ const formId = generateFormId()
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary interactive">
+      <button type="submit" class="btn btn-primary">
         {mode === 'create' ? '作成' : '更新'}
       </button>
-      <button type="button" class="btn btn-subtle" data-action="cancel">
+      <button type="button" class="btn btn-secondary" data-action="cancel">
         キャンセル
       </button>
     </div>
@@ -165,46 +165,45 @@ const formId = generateFormId()
 
 <style>
   .group-form {
-    padding: var(--spacing-6);
-    border-radius: var(--radius-lg);
+    max-width: 500px;
   }
 
-  .form-group {
-    margin-bottom: var(--spacing-6);
+  .form-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-6) 0;
   }
 
-  .form-group label {
-    display: block;
-    margin-bottom: var(--spacing-2);
-  }
-
-  /* Members selection - シンプル化 */
+  /* Members selection */
   .members-selection {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2);
+    gap: var(--spacing-3);
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
   }
 
   .member-checkbox {
     display: flex;
-    align-items: center;
-    padding: var(--spacing-3) var(--spacing-4);
-    border-radius: var(--radius-md);
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-2);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-in-out);
+    transition: background-color var(--duration-fast) var(--easing-out);
+    border-radius: var(--radius-sm);
   }
 
   .member-checkbox:hover {
-    background: var(--color-surface-hover);
+    background-color: var(--color-surface-hover);
   }
 
   .member-checkbox input[type="checkbox"] {
-    margin-right: var(--spacing-3);
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
+    margin-top: 2px;
     cursor: pointer;
-    accent-color: var(--color-primary-500);
   }
 
   .member-info {
@@ -213,21 +212,29 @@ const formId = generateFormId()
     gap: var(--spacing-1);
   }
 
-  /* Form actions - シンプル化 */
+  .member-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  .member-email {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  /* Form actions */
   .form-actions {
     display: flex;
     gap: var(--spacing-3);
     margin-top: var(--spacing-8);
   }
 
-  /* Error messages - minimal style */
+  /* Error messages */
   .error-message {
     margin-top: var(--spacing-2);
     color: var(--color-error);
     font-size: var(--font-size-sm);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
   }
 
   .error-message.hidden {
@@ -236,15 +243,15 @@ const formId = generateFormId()
 
   /* Input error state */
   input.error {
-    border-bottom-color: var(--color-error);
+    border-color: var(--color-error);
+  }
+
+  input.error:focus {
+    border-color: var(--color-error);
   }
 
   /* Responsive */
   @media (max-width: 768px) {
-    .group-form {
-      padding: var(--spacing-4);
-    }
-
     .form-actions {
       flex-direction: column;
     }

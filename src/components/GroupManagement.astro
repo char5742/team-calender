@@ -29,11 +29,10 @@ const groups = getAllGroupsWithMembers()
 const teamMembers = teamMembersStore.get()
 ---
 
-<div class="group-management content-container">
-  <div class="header content-section">
-    <h1 class="heading-primary">グループ管理</h1>
-    <button id="create-group-btn" class="btn btn-primary interactive">
-      <span class="badge badge-sm badge-square">新</span>
+<div class="group-management">
+  <div class="management-header">
+    <h2 class="section-title">グループ管理</h2>
+    <button id="create-group-btn" class="btn btn-primary">
       新しいグループを作成
     </button>
   </div>
@@ -47,12 +46,12 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ一覧 -->
-  <div id="group-list-container" class="content-section animate-fade-in">
+  <div id="group-list-container" class="group-list-container">
     <GroupList groups={groups} />
   </div>
 
   <!-- グループ作成フォーム -->
-  <div id="create-form-container" class="form-container content-section hidden animate-fade-in">
+  <div id="create-form-container" class="form-container hidden">
     <GroupForm 
       teamMembers={teamMembers}
       mode="create"
@@ -61,17 +60,17 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ編集フォーム -->
-  <div id="edit-form-container" class="form-container content-section hidden animate-fade-in">
-    <div class="group-form minimal-card">
-      <h3 class="heading-tertiary">グループを編集</h3>
+  <div id="edit-form-container" class="form-container hidden">
+    <div class="form-card">
+      <h3 class="form-title">グループを編集</h3>
       <form id="edit-form" novalidate>
         <div class="form-group">
-          <label for="edit-name" class="visual-secondary">グループ名</label>
+          <label for="edit-name" class="form-label">グループ名</label>
           <input
             type="text"
             id="edit-name"
             name="name"
-            class="minimal-input"
+            class="form-input"
             placeholder="グループ名を入力"
             required
           />
@@ -81,7 +80,7 @@ const teamMembers = teamMembersStore.get()
         </div>
 
         <div class="form-group">
-          <label class="visual-secondary">メンバーを選択</label>
+          <label class="form-label">メンバーを選択</label>
           <div class="members-selection" id="edit-members-selection">
             <!-- メンバーチェックボックスは動的に生成 -->
           </div>
@@ -91,10 +90,10 @@ const teamMembers = teamMembersStore.get()
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary interactive">
+          <button type="submit" class="btn btn-primary">
             更新
           </button>
-          <button type="button" class="btn btn-subtle" data-action="cancel">
+          <button type="button" class="btn btn-secondary" data-action="cancel">
             キャンセル
           </button>
         </div>
@@ -105,6 +104,153 @@ const teamMembers = teamMembersStore.get()
   <!-- 削除確認モーダル -->
   <GroupDeleteModal />
 </div>
+
+<style>
+  .group-management {
+    width: 100%;
+  }
+
+  .management-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-8);
+  }
+
+  .section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .group-list-container {
+    transition: opacity var(--duration-fast) var(--easing-out);
+  }
+
+  .group-list-container.fade {
+    opacity: 0.5;
+  }
+
+  .form-container {
+    margin-top: var(--spacing-8);
+  }
+
+  .form-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+  }
+
+  .form-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-6) 0;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-8);
+  }
+
+  .members-selection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    max-height: 300px;
+    overflow-y: auto;
+    padding: var(--spacing-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .member-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-2);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-out);
+    border-radius: var(--radius-sm);
+  }
+
+  .member-checkbox:hover {
+    background-color: var(--color-surface-hover);
+  }
+
+  .member-checkbox input[type="checkbox"] {
+    margin-top: 2px;
+  }
+
+  .member-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+  }
+
+  .member-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  .member-email {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+  }
+
+  .error-message {
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    margin-top: var(--spacing-2);
+  }
+
+  /* Error container */
+  #error-container {
+    margin-bottom: var(--spacing-4);
+  }
+
+  /* Loading overlay */
+  #loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-index-modal);
+  }
+  
+  #loading-overlay.hidden {
+    display: none !important;
+  }
+
+  @media (max-width: 768px) {
+    .management-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--spacing-4);
+    }
+
+    .section-title {
+      font-size: var(--font-size-xl);
+    }
+
+    .form-actions {
+      flex-direction: column;
+    }
+
+    .form-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
 
 <script>
   console.log('GroupManagement script initialized');
@@ -176,8 +322,9 @@ const teamMembers = teamMembersStore.get()
     // ローディング状態とエラー状態の簡易実装
     const isLoadingStore = {
       subscribe: (callback: (loading: boolean) => void) => {
-        // 簡易実装のため、常にfalseを返す
+        // 初期状態でローディングを非表示にする
         callback(false);
+        return () => {}; // unsubscribe function
       }
     };
     
@@ -185,6 +332,7 @@ const teamMembers = teamMembersStore.get()
       subscribe: (callback: (error: string | null) => void) => {
         // 簡易実装のため、常にnullを返す
         callback(null);
+        return () => {}; // unsubscribe function
       }
     };
     
@@ -255,6 +403,11 @@ const teamMembers = teamMembersStore.get()
     
     function setupEventListeners() {
       console.log('GroupManagement: Setting up event listeners');
+      
+      // 初期状態でローディングオーバーレイを確実に非表示にする
+      if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+      }
       
       // ローディング状態の購読
       isLoadingStore.subscribe(isLoading => {
@@ -500,513 +653,4 @@ const teamMembers = teamMembersStore.get()
         });
       }
     }
-</script>
-
-<style>
-  .group-management {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-8);
-  }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-8);
-    flex-wrap: wrap;
-    gap: var(--spacing-4);
-  }
-
-  h1 {
-    margin: 0;
-    font-size: var(--font-size-3xl);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--letter-spacing-tight);
-  }
-
-  .btn {
-    padding: var(--spacing-3) var(--spacing-6);
-    font-size: var(--font-size-base);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-spring);
-    font-weight: var(--font-weight-medium);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
-    min-height: 44px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--easing-in-out);
-  }
-
-  .btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .btn:hover::before {
-    opacity: 1;
-  }
-
-  .btn:active {
-    transform: translateY(0) scale(0.98);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
-    color: white;
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn-primary::before {
-    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
-  }
-
-  .btn-primary:hover {
-    box-shadow: var(--shadow-lg);
-  }
-
-  /* 作成ボタンのバッジ */
-  .create-btn-badge {
-    background: white;
-    color: var(--color-primary-500);
-  }
-
-  .form-container {
-    margin-bottom: var(--spacing-8);
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  .fade {
-    opacity: 0.5;
-    pointer-events: none;
-  }
-
-  /* グループフォームのスタイル */
-  .group-form {
-    background-color: var(--color-surface);
-    padding: var(--spacing-8);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
-    max-width: 500px;
-    box-shadow: var(--shadow-lg);
-  }
-
-  .group-form h3 {
-    margin: 0 0 var(--spacing-8) 0;
-    font-size: var(--font-size-2xl);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: var(--letter-spacing-tight);
-  }
-
-  .form-group {
-    margin-bottom: var(--spacing-6);
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: var(--spacing-3);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
-  }
-
-  .form-group input[type="text"] {
-    width: 100%;
-    padding: var(--spacing-4);
-    font-size: var(--font-size-base);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    background-color: var(--color-background);
-    color: var(--color-text-primary);
-  }
-
-  .form-group input[type="text"]:focus {
-    outline: none;
-    border-color: var(--color-primary-500);
-    background-color: var(--color-surface);
-  }
-
-  .members-selection {
-    max-height: 320px;
-    overflow-y: auto;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-3);
-    background-color: var(--color-background);
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-gray-400) transparent;
-  }
-
-  .members-selection::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .members-selection::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .members-selection::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray-400);
-    border-radius: var(--radius-full);
-  }
-
-  .member-checkbox {
-    display: flex;
-    align-items: center;
-    padding: var(--spacing-3);
-    margin: var(--spacing-1) 0;
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    min-height: 44px;
-  }
-
-  .member-checkbox:hover {
-    background-color: var(--color-surface-hover);
-    transform: translateX(2px);
-  }
-
-  .member-checkbox input[type="checkbox"] {
-    margin-right: var(--spacing-3);
-    cursor: pointer;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--color-primary-500);
-  }
-
-  .member-info {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: var(--spacing-1);
-  }
-
-  .member-name {
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-base);
-  }
-
-  .member-email {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-  }
-
-  .form-actions {
-    display: flex;
-    gap: var(--spacing-4);
-    justify-content: flex-end;
-    margin-top: var(--spacing-8);
-    padding-top: var(--spacing-6);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
-    color: var(--color-text-primary);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .btn-secondary::before {
-    background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
-  }
-
-  .btn-secondary:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  /* バリデーションエラーのスタイル */
-  .error-message {
-    color: var(--color-error);
-    font-size: var(--font-size-sm);
-    margin-top: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
-    background-color: rgba(239, 68, 68, 0.05);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-  }
-
-  input.error {
-    border-color: var(--color-error);
-    background-color: rgba(239, 68, 68, 0.02);
-  }
-
-  input.error:focus {
-    border-color: var(--color-error);
-  }
-
-  /* エラーメッセージのスタイル（動的に追加される要素用） */
-  :global(.error-message[role="alert"]) {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
-    padding: var(--spacing-4);
-    background-color: rgba(239, 68, 68, 0.05);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    border-radius: var(--radius-md);
-    color: var(--color-error);
-    margin-bottom: var(--spacing-4);
-    animation: slideIn var(--duration-fast) var(--easing-in-out);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  /* エラーメッセージ内のバッジサイズ調整 */
-  :global(.error-message[role="alert"] .badge) {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
-  }
-  
-  :global(.error-text) {
-    flex-grow: 1;
-    font-weight: var(--font-weight-medium);
-  }
-  
-  :global(.error-message .close-btn) {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    color: var(--color-error);
-    cursor: pointer;
-    padding: var(--spacing-2);
-    border-radius: var(--radius-md);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    min-width: 32px;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  :global(.error-message .close-btn .badge) {
-    font-size: var(--font-size-xl);
-    line-height: 1;
-    font-weight: var(--font-weight-normal);
-  }
-  
-  :global(.error-message .close-btn:hover) {
-    background-color: rgba(239, 68, 68, 0.1);
-  }
-  
-  :global(.fade-out) {
-    animation: fadeOut var(--duration-normal) var(--easing-in-out) forwards;
-  }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-  }
-
-  #error-container {
-    position: relative;
-    z-index: 100;
-  }
-
-  #loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: var(--z-index-modal);
-  }
-
-  #loading-overlay.hidden {
-    display: none;
-  }
-
-  /* レスポンシブ対応 */
-  @media (max-width: 768px) {
-    .group-management {
-      padding: var(--spacing-4);
-    }
-
-    .header {
-      margin-bottom: var(--spacing-6);
-    }
-
-    h1 {
-      font-size: var(--font-size-2xl);
-      flex: 1 1 100%;
-    }
-
-    .btn {
-      padding: var(--spacing-3) var(--spacing-5);
-      min-height: 48px;
-      flex: 1 1 auto;
-      justify-content: center;
-    }
-
-    .btn-primary {
-      width: 100%;
-    }
-
-    .form-container {
-      margin-bottom: var(--spacing-6);
-    }
-
-    .group-form {
-      padding: var(--spacing-6);
-      max-width: 100%;
-      border-radius: var(--radius-lg);
-    }
-
-    .group-form h3 {
-      font-size: var(--font-size-xl);
-      margin-bottom: var(--spacing-6);
-    }
-
-    .form-group {
-      margin-bottom: var(--spacing-5);
-    }
-
-    .form-group label {
-      font-size: var(--font-size-base);
-    }
-
-    .form-group input[type="text"] {
-      min-height: 48px;
-    }
-
-    .members-selection {
-      max-height: 280px;
-      padding: var(--spacing-2);
-    }
-
-    .member-checkbox {
-      padding: var(--spacing-3) var(--spacing-2);
-      min-height: 48px;
-    }
-
-    .member-checkbox input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-    }
-
-    .form-actions {
-      margin-top: var(--spacing-6);
-      padding-top: var(--spacing-4);
-      gap: var(--spacing-3);
-      flex-wrap: wrap;
-    }
-
-    .form-actions .btn {
-      flex: 1 1 calc(50% - var(--spacing-2));
-      min-width: 120px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .group-management {
-      padding: var(--spacing-3);
-    }
-
-    h1 {
-      font-size: var(--font-size-xl);
-    }
-
-    .group-form {
-      padding: var(--spacing-4);
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-      box-shadow: none;
-    }
-
-    .members-selection {
-      max-height: 240px;
-    }
-
-    .form-actions {
-      gap: var(--spacing-2);
-    }
-
-    .form-actions .btn {
-      flex: 1 1 100%;
-    }
-
-    .btn-primary {
-      order: -1;
-    }
-  }
-
-  /* タッチデバイスでのホバー効果の調整 */
-  @media (hover: none) and (pointer: coarse) {
-    .member-checkbox:hover {
-      background-color: transparent;
-      transform: none;
-    }
-
-    .btn:hover {
-      transform: none;
-    }
-
-    .member-checkbox:active {
-      background-color: var(--color-surface-active);
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-  }
-
-  /* アクセシビリティ: モーション設定 */
-  @media (prefers-reduced-motion: reduce) {
-    .member-checkbox,
-    .btn {
-      transition: none;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
-  }
-
-  /* ダークモード対応 */
-  @media (prefers-color-scheme: dark) {
-    .create-btn-badge {
-      background: var(--color-primary-800);
-      color: white;
-    }
-  }
-</style> 
+</script> 

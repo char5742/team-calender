@@ -1,93 +1,81 @@
 ---
+import { loadMockData } from '../lib/mockData'
+import { groupsStore } from '../stores/groupStore'
+
 export interface Props {
-  currentPath?: string
+  currentGroupId?: string
 }
 
-const { currentPath = '/' } = Astro.props
+const { currentGroupId } = Astro.props
 
-const navItems = [
-  { label: 'ホーム', href: '/', shortLabel: 'H' },
-  { label: 'グループ管理', href: '/groups/new', shortLabel: 'G' },
-]
+// モックデータを読み込む
+loadMockData()
 
-const isActive = (href: string) => currentPath === href
+// グループ一覧を取得
+const groups = groupsStore.get()
 ---
 
-<header id="main-header" class="header glass-adaptive fade-on-scroll">
+<header class="header">
   <div class="header-container">
     <!-- Logo/Brand -->
-    <div class="brand">
-      <span class="badge badge-primary badge-square brand-logo-badge">TC</span>
-      <span class="brand-text">Team Calendar</span>
-    </div>
+    <a href="/" class="brand">
+      Team Calendar
+    </a>
 
-    <!-- Desktop Navigation -->
-    <nav class="nav-desktop">
-      {navItems.map(item => (
-        <a 
-          href={item.href} 
-          class={`nav-link ${isActive(item.href) ? 'active' : ''}`}
-          aria-current={isActive(item.href) ? 'page' : undefined}
-        >
-          <span class="badge badge-sm badge-square nav-badge-custom">{item.shortLabel}</span>
-          <span class="nav-text">{item.label}</span>
+    <!-- Tabs Container -->
+    <div class="tabs-container">
+      <div class="tabs-scroll">
+        {groups.map(group => (
+          <a 
+            href={`/groups/${group.id}/weekly-schedule`}
+            class={`tab ${currentGroupId === group.id ? 'active' : ''}`}
+            data-group-id={group.id}
+          >
+            <span class="tab-label">{group.name}</span>
+            <button 
+              class="tab-close"
+              aria-label={`${group.name}を閉じる`}
+              onclick="event.preventDefault(); event.stopPropagation();"
+            >
+              ×
+            </button>
+          </a>
+        ))}
+        
+        <!-- 新規グループ追加ボタン -->
+        <a href="/groups/new" class="tab tab-add" aria-label="新しいグループを追加">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
         </a>
-      ))}
-    </nav>
-
-    <!-- Theme Toggle & Mobile Menu -->
-    <div class="header-actions">
-      <button 
-        id="theme-toggle" 
-        class="theme-button btn-subtle focus-glow"
-        aria-label="テーマを切り替える"
-        title="テーマを切り替える"
-      >
-        <!-- ライトモード時は月アイコンを表示 -->
-        <svg class="theme-icon theme-light-label" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <!-- ダークモード時は太陽アイコンを表示 -->
-        <svg class="theme-icon theme-dark-label" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-      </button>
-
-      <button 
-        id="mobile-menu-toggle" 
-        class="menu-button mobile-only btn-subtle focus-glow"
-        aria-label="メニューを開く"
-        aria-expanded="false"
-      >
-        <span class="menu-bars">
-          <span></span>
-          <span></span>
-          <span></span>
-        </span>
-      </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Mobile Navigation -->
-  <nav id="mobile-nav" class="nav-mobile">
-    {navItems.map(item => (
-      <a 
-        href={item.href} 
-        class={`mobile-nav-link ${isActive(item.href) ? 'active' : ''}`}
-      >
-        <span class="badge badge-sm badge-square nav-badge-custom">{item.shortLabel}</span>
-        <span class="nav-text">{item.label}</span>
-      </a>
-    ))}
-  </nav>
+    <!-- Theme Toggle -->
+    <button 
+      id="theme-toggle" 
+      class="theme-toggle"
+      aria-label="テーマを切り替える"
+      title="テーマを切り替える"
+    >
+      <!-- ライトモード時は月アイコンを表示 -->
+      <svg class="icon theme-light-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <!-- ダークモード時は太陽アイコンを表示 -->
+      <svg class="icon theme-dark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </button>
+  </div>
 </header>
 
 <style>
@@ -95,329 +83,225 @@ const isActive = (href: string) => currentPath === href
     position: sticky;
     top: 0;
     z-index: var(--z-index-sticky);
-    width: 100%;
-    transition: all var(--duration-normal) var(--easing-in-out);
-    border-bottom: 1px solid transparent;
-  }
-
-  .header.scrolled {
-    backdrop-filter: blur(var(--blur-xl));
-    -webkit-backdrop-filter: blur(var(--blur-xl));
-    border-bottom-color: var(--color-border);
-    padding: var(--spacing-2) 0;
+    background-color: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .header-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-4) var(--spacing-6);
+    height: 48px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    transition: padding var(--duration-normal) var(--easing-in-out);
+    padding: 0 var(--spacing-4);
+    gap: var(--spacing-4);
   }
 
-  .header.scrolled .header-container {
-    padding: var(--spacing-2) var(--spacing-6);
-  }
-
-  /* Brand - シンプル化 */
+  /* Brand */
   .brand {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
+    font-size: var(--font-size-base);
     font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-lg);
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: opacity var(--duration-fast) var(--easing-in-out);
-  }
-
-  .brand:hover {
-    opacity: 0.8;
-  }
-
-  /* Brand logo badge - minimal style */
-  .brand-logo-badge {
-    width: 36px;
-    height: 36px;
-    font-size: var(--font-size-base);
-    min-width: 36px;
-    min-height: 36px;
-  }
-
-  .brand-text {
     letter-spacing: var(--letter-spacing-tight);
+    flex-shrink: 0;
+    padding-right: var(--spacing-4);
+    border-right: 1px solid var(--color-border);
   }
 
-  /* Navigation - 簡素化 */
-  .nav-desktop {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-2);
+  /* Tabs Container */
+  .tabs-container {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
   }
 
-  .nav-link {
+  .tabs-scroll {
     display: flex;
     align-items: center;
-    gap: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-4);
-    border-radius: var(--radius-lg);
+    height: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 2px;
+  }
+
+  /* Tab Styles */
+  .tab {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 var(--spacing-3);
     color: var(--color-text-secondary);
     text-decoration: none;
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    position: relative;
-  }
-
-  .nav-link:hover {
-    color: var(--color-primary-600);
-    background: var(--color-surface-hover);
-  }
-
-  .nav-link.active {
-    color: var(--color-primary-600);
-    background: var(--color-primary-50);
-  }
-
-  html.dark .nav-link.active {
-    background: rgba(90, 122, 255, 0.1);
-  }
-
-  /* Nav badge - minimal style */
-  .nav-badge-custom {
-    background: transparent;
-    color: var(--color-text-secondary);
-    border: 1px solid currentColor;
-    transition: all var(--duration-fast) var(--easing-in-out);
-  }
-
-  .nav-link:hover .nav-badge-custom,
-  .nav-link.active .nav-badge-custom {
-    background: var(--color-primary-600);
-    color: white;
-    border-color: transparent;
-  }
-
-  .nav-text {
     white-space: nowrap;
+    border-right: 1px solid var(--color-border);
+    transition: all var(--duration-fast) var(--easing-out);
+    position: relative;
+    min-width: 120px;
+    max-width: 200px;
   }
 
-  /* Header Actions */
-  .header-actions {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
+  .tab:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
   }
 
-  .theme-button,
-  .menu-button {
+  .tab.active {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+  }
+
+  .tab-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: var(--spacing-2);
+  }
+
+  .tab-close {
+    display: none;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--easing-out);
+    flex-shrink: 0;
+  }
+
+  .tab:hover .tab-close {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    padding: 0 var(--spacing-3);
-    border: none;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-semibold);
   }
 
-  /* Theme toggle labels */
-  html:not(.dark) .theme-dark-label,
-  html.dark .theme-light-label {
-    display: none;
+  .tab-close:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
   }
 
-  /* Theme icons */
-  .theme-icon {
-    width: 18px;
-    height: 18px;
-    transition: transform var(--duration-fast) var(--easing-in-out);
+  /* 新規追加タブ */
+  .tab-add {
+    min-width: 48px;
+    max-width: 48px;
+    justify-content: center;
+    border-right: none;
   }
 
-  .theme-button:hover .theme-icon {
-    transform: rotate(30deg);
+  .tab-add svg {
+    width: 16px;
+    height: 16px;
   }
 
-  .theme-button:active .theme-icon {
-    transform: scale(0.9);
-  }
-
-  /* Mobile Menu Button */
-  .menu-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    width: 18px;
-  }
-
-  .menu-bars span {
-    display: block;
-    height: 2px;
-    background: currentColor;
-    border-radius: 1px;
-    transition: all var(--duration-fast) var(--easing-in-out);
-  }
-
-  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(1) {
-    transform: translateY(5px) rotate(45deg);
-  }
-
-  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(2) {
-    opacity: 0;
-  }
-
-  .menu-button[aria-expanded="true"] .menu-bars span:nth-child(3) {
-    transform: translateY(-5px) rotate(-45deg);
-  }
-
-  /* Mobile Menu */
-  .mobile-only {
-    display: none;
-  }
-
-  .nav-mobile {
-    display: none;
-    padding: var(--spacing-4) var(--spacing-6);
-    border-top: 1px solid var(--color-border);
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-lg));
-    -webkit-backdrop-filter: blur(var(--blur-lg));
-  }
-
-  .nav-mobile.open {
-    display: block;
-  }
-
-  .mobile-nav-link {
+  /* Theme Toggle */
+  .theme-toggle {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
-    padding: var(--spacing-3) var(--spacing-4);
-    margin: var(--spacing-1) 0;
-    border-radius: var(--radius-lg);
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-out);
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--color-surface-hover);
     color: var(--color-text-primary);
-    text-decoration: none;
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--duration-fast) var(--easing-in-out);
   }
 
-  .mobile-nav-link:hover {
-    background: var(--color-surface-hover);
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
-  .mobile-nav-link.active {
-    background: var(--color-primary-50);
-    color: var(--color-primary-600);
+  /* Icons */
+  .icon {
+    width: 20px;
+    height: 20px;
   }
 
-  .mobile-nav-link .nav-badge-custom {
-    width: 24px;
-    height: 24px;
-    min-width: 24px;
-    min-height: 24px;
-    font-size: var(--font-size-xs);
+  /* Theme icons visibility */
+  html:not(.dark) .theme-dark-icon,
+  html.dark .theme-light-icon {
+    display: none;
   }
 
-  /* Responsive */
+  /* Mobile responsive */
   @media (max-width: 768px) {
     .header-container {
-      padding: var(--spacing-3) var(--spacing-4);
+      padding: 0 var(--spacing-2);
+      gap: var(--spacing-2);
     }
 
-    .nav-desktop {
-      display: none;
-    }
-
-    .mobile-only {
-      display: flex;
-    }
-
-    .brand-text {
-      font-size: var(--font-size-base);
-    }
-
-    .menu-button {
-      min-width: 40px;
-      padding: 0;
-    }
-  }
-
-  /* Reduced motion */
-  @media (prefers-reduced-motion: reduce) {
-    .header,
-    .nav-link,
-    .theme-button,
-    .menu-button,
     .brand {
-      transition: none;
+      font-size: var(--font-size-sm);
+      padding-right: var(--spacing-2);
+    }
+
+    .tab {
+      min-width: 80px;
+      padding: 0 var(--spacing-2);
+      font-size: var(--font-size-xs);
     }
   }
 </style>
 
 <script>
-  // スクロール時のヘッダー縮小と動的UI
-  const header = document.getElementById('main-header');
-  let scrollTimer: number | null = null;
-
-  function updateHeaderOnScroll() {
-    const currentScroll = window.pageYOffset;
-    
-    if (currentScroll > 50) {
-      header?.classList.add('scrolled');
-      document.body.classList.add('scrolling');
-    } else {
-      header?.classList.remove('scrolled');
-      document.body.classList.remove('scrolling');
-    }
-
-    // スクロール停止時の処理
-    if (scrollTimer !== null) {
-      clearTimeout(scrollTimer);
-    }
-    
-    scrollTimer = window.setTimeout(() => {
-      document.body.classList.remove('scrolling');
-    }, 150);
-  }
-
-  window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });
-
-  // モバイルメニューの開閉
-  const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-  const mobileNav = document.getElementById('mobile-nav');
-
-  mobileMenuToggle?.addEventListener('click', () => {
-    const isOpen = mobileNav?.classList.contains('open');
-    
-    if (isOpen) {
-      mobileNav?.classList.remove('open');
-      mobileMenuToggle.setAttribute('aria-expanded', 'false');
-      mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
-    } else {
-      mobileNav?.classList.add('open');
-      mobileMenuToggle.setAttribute('aria-expanded', 'true');
-      mobileMenuToggle.setAttribute('aria-label', 'メニューを閉じる');
-    }
-  });
-
   // テーマトグル
   const themeToggle = document.getElementById('theme-toggle');
   
   themeToggle?.addEventListener('click', () => {
-    (window as any).themeManager?.toggle();
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+    
+    if (isDark) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
   });
 
-  // ページ遷移時にモバイルメニューを閉じる
-  document.addEventListener('astro:page-load', () => {
-    if (mobileNav) {
-      mobileNav.classList.remove('open');
-    }
-    mobileMenuToggle?.setAttribute('aria-expanded', 'false');
-  });
+  // 保存されたテーマを適用
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+
+  // タブの削除機能（今回は実装しない）
+  // 将来的にグループ削除機能を追加する場合は、ここに実装
 </script> 

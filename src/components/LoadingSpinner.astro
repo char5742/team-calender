@@ -11,8 +11,8 @@ const { isLoading = false, fullScreen = false, message = '読み込み中...' } 
 {isLoading && (
   <div class={`loading-container ${fullScreen ? 'full-screen' : ''}`}>
     <div class="loading-content">
-      <div class="spinner-minimal"></div>
-      <p class="loading-message visual-secondary">{message}</p>
+      <div class="spinner"></div>
+      <p class="loading-message">{message}</p>
     </div>
   </div>
 )}
@@ -31,9 +31,7 @@ const { isLoading = false, fullScreen = false, message = '読み込み中...' } 
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(var(--blur-sm));
-    -webkit-backdrop-filter: blur(var(--blur-sm));
+    background: rgba(255, 255, 255, 0.8);
     z-index: var(--z-index-modal);
   }
 
@@ -44,14 +42,14 @@ const { isLoading = false, fullScreen = false, message = '読み込み中...' } 
     gap: var(--spacing-4);
   }
 
-  /* Minimal spinner */
-  .spinner-minimal {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--color-gray-200);
-    border-top-color: var(--color-primary-500);
+  /* Simple spinner */
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--color-gray-200);
+    border-top-color: var(--color-primary);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
   }
 
   @keyframes spin {
@@ -63,29 +61,30 @@ const { isLoading = false, fullScreen = false, message = '読み込み中...' } 
   .loading-message {
     margin: 0;
     font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     text-align: center;
   }
 
   /* Dark mode */
   @media (prefers-color-scheme: dark) {
     .loading-container.full-screen {
-      background: rgba(0, 0, 0, 0.9);
+      background: rgba(0, 0, 0, 0.8);
     }
 
-    .spinner-minimal {
+    .spinner {
       border-color: var(--color-gray-700);
-      border-top-color: var(--color-primary-400);
+      border-top-color: var(--color-primary);
     }
   }
 
   /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .spinner-minimal {
+    .spinner {
       animation: none;
       border-top-color: transparent;
       background: conic-gradient(
         from 0deg,
-        var(--color-primary-500) 0deg,
+        var(--color-primary) 0deg,
         var(--color-gray-200) 90deg
       );
     }

@@ -571,11 +571,11 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
         });
         window.dispatchEvent(event);
         
-        // デフォルトの成功時の処理
+        // デフォルトの成功時の処理 - 新しく作成したグループのカレンダー画面へ遷移
         setTimeout(() => {
           if (!event.defaultPrevented) {
             if (window.location.pathname === '/groups/new') {
-              window.location.href = '/';
+              window.location.href = `/groups/${newGroup.id}/weekly-schedule`;
             }
           }
         }, 100);
@@ -588,7 +588,11 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
     cancelBtn?.addEventListener('click', () => {
       // キャンセル時の処理
       if (window.location.pathname === '/groups/new') {
-        window.location.href = '/';
+        // グループがある場合は最初のグループのカレンダー画面へ
+        if (currentGroups.length > 0) {
+          window.location.href = `/groups/${currentGroups[0].id}/weekly-schedule`;
+        }
+        // グループがない場合はそのままページに留まる
       } else {
         // カスタムイベントを発火
         const event = new CustomEvent('group-form-cancel', {

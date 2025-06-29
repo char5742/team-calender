@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 
 // RegExを定数として定義
 const ERROR_CLASS_REGEX = /error/
+const URL_END_REGEX = /\/$|index\.html$/
 
 test.describe('GroupCreateForm', () => {
   test.beforeEach(async ({ page }) => {
@@ -24,7 +25,7 @@ test.describe('GroupCreateForm', () => {
     await expect(page.locator('text=yamada@example.com')).toBeVisible()
   })
 
-  test.skip('バリデーションが機能する', async ({ page }) => {
+  test('バリデーションが機能する', async ({ page }) => {
     // メンバーを1人選択（ボタンを有効化）
     await page.locator('input[value="member-1"]').check()
 
@@ -36,7 +37,7 @@ test.describe('GroupCreateForm', () => {
     await expect(page.locator('.error-message')).toContainText('グループ名を入力してください')
   })
 
-  test.skip('メンバー未選択でエラーが表示される', async ({ page }) => {
+  test('メンバー未選択でエラーが表示される', async ({ page }) => {
     // グループ名を入力
     await page.fill('#group-name', 'テストグループ')
 
@@ -50,7 +51,7 @@ test.describe('GroupCreateForm', () => {
     )
   })
 
-  test.skip('グループ名の重複チェックが機能する', async ({ page }) => {
+  test('グループ名の重複チェックが機能する', async ({ page }) => {
     // 既存のグループ名を入力
     await page.fill('#group-name', '開発チーム')
 
@@ -69,7 +70,7 @@ test.describe('GroupCreateForm', () => {
     await expect(page.locator('.error-message')).toBeVisible()
   })
 
-  test.skip('グループが正常に作成される', async ({ page }) => {
+  test('グループが正常に作成される', async ({ page }) => {
     // コンソールメッセージを記録
     const consoleMessages: string[] = []
     page.on('console', (msg) => {
@@ -95,7 +96,7 @@ test.describe('GroupCreateForm', () => {
     expect(successMessage).toBeTruthy()
   })
 
-  test.skip('キャンセルボタンが機能する', async ({ page }) => {
+  test('キャンセルボタンが機能する', async ({ page }) => {
     // グループ名を入力
     await page.fill('#group-name', 'キャンセルテスト')
 
@@ -104,6 +105,6 @@ test.describe('GroupCreateForm', () => {
 
     // ホームページへ遷移することを確認
     await page.waitForURL('**/', { timeout: 10000 })
-    expect(page.url()).toMatch(/\/$|index\.html$/)
+    expect(page.url()).toMatch(URL_END_REGEX)
   })
 })

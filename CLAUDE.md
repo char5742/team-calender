@@ -305,3 +305,16 @@ LLM_API_ENDPOINT=https://api.example.com/v1
 ## ライセンス
 
 MIT License
+
+## その他
+- biome-ignoreの使用は禁止
+
+## 開発ルール
+
+### コーディング規約
+- TypeScriptを使用
+- BiomeとVitestを活用したTDD開発
+- コンポーネント駆動開発（Astroコンポーネント）
+- biome-ignoreの使用は禁止
+  - 2025-01-14: E2Eテストのスキップに使用していたbiome-ignoreを削除
+  - テストの実装を改善し、モックデータのリセット制限を受け入れる形で対応

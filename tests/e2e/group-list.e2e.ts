@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test'
 
+// 定数定義
+const HIDDEN_CLASS_REGEX = /hidden/
+
+// テスト用のグローバル変数の型定義
+declare global {
+  interface Window {
+    lastGroupClick?: { groupId: string }
+  }
+}
+
 test.describe('グループ一覧表示', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -55,31 +65,33 @@ test.describe('グループ一覧表示', () => {
     expect(hoverBoxShadow).toContain('rgba(0, 123, 255')
   })
 
-  test.skip('グループクリック時にイベントが発火する', async ({ page }) => {
+  test('グループクリック時にイベントが発火する', async ({ page }) => {
     await page.goto('/')
 
-    // グループクリックイベントをリッスンする
-    await page.addInitScript(() => {
-      window.addEventListener('group-click', (event) => {
-        const customEvent = event as CustomEvent
-        ;(window as Window & { lastClickedGroupId?: string }).lastClickedGroupId =
-          customEvent.detail?.groupId
+    // ページが完全に読み込まれるまで待機
+    await page.waitForLoadState('networkidle')
+
+    // イベントリスナーを設定
+    await page.evaluateHandle(() => {
+      window.addEventListener('group-click', (event: Event) => {
+        const customEvent = event as CustomEvent<{ groupId: string }>
+        window.lastGroupClick = customEvent.detail
       })
     })
 
-    // 最初のグループをクリック
-    const firstGroup = await page.locator('.group-item').first()
-    await firstGroup.locator('.group-button').click()
+    // グループボタンをクリックして、イベントを待機
+    const clickPromise = page.waitForFunction(() => window.lastGroupClick !== undefined, {
+      timeout: 5000,
+    })
 
-    // スタイルの変更を待つ
-    await page.waitForTimeout(100)
+    await page.locator('.group-item .group-button').first().click()
 
-    // イベントが発火したことを確認
-    const clickedGroupId = await page.evaluate(
-      () => (window as Window & { lastClickedGroupId?: string }).lastClickedGroupId,
-    )
-    expect(clickedGroupId).toBeDefined()
-    expect(typeof clickedGroupId).toBe('string')
+    await clickPromise
+
+    const clickedId = await page.evaluate(() => window.lastGroupClick?.groupId)
+
+    expect(clickedId).toBeDefined()
+    expect(typeof clickedId).toBe('string')
   })
 
   test('メンバーが多いグループで「他◯人」表示が機能する', async ({ page }) => {
@@ -108,19 +120,48 @@ test.describe('グループ一覧表示', () => {
   })
 
   // TODO: クライアントサイドJavaScriptの実行環境を改善後に有効化
-  test.skip('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
+  // 現在の問題: GroupManagementコンポーネントの編集フォーム表示処理が
+  // E2E環境で正しく動作しない（モックデータの初期化タイミングの問題）
+  test('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
     await page.goto('/')
 
     // ページが完全に読み込まれるまで待機
     await page.waitForLoadState('networkidle')
 
+    // JavaScriptが初期化されるまで待機
+    await page.waitForFunction(
+      () => {
+        return (
+          (window as Window & { groupManagementInitialized?: boolean })
+            .groupManagementInitialized === true
+        )
+      },
+      { timeout: 10000 },
+    )
+
     // グループ一覧の最初のグループの編集ボタンをクリック
     const editButton = await page.locator('.group-item').first().locator('.edit-btn')
     await expect(editButton).toBeVisible()
+
+    // クリック前にコンソールメッセージを監視
+    const consolePromise = page.waitForEvent('console', {
+      predicate: (msg) => msg.text().includes('group-edit event received'),
+      timeout: 5000,
+    })
+
     await editButton.click()
 
-    // 編集フォームコンテナが表示されることを確認（簡略化）
+    // イベントが発火するまで待機
+    await consolePromise
+
+    // 編集フォームコンテナが表示されることを確認
+    await page.waitForSelector('#edit-form-container:not(.hidden)', {
+      timeout: 5000,
+      state: 'visible',
+    })
+
     const editFormContainer = await page.locator('#edit-form-container')
-    await expect(editFormContainer).not.toHaveClass(/hidden/)
+    await expect(editFormContainer).toBeVisible()
+    await expect(editFormContainer).not.toHaveClass(HIDDEN_CLASS_REGEX)
   })
 })

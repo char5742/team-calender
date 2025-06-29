@@ -18,6 +18,11 @@ const { title } = Astro.props
   </head>
   <body>
     <slot />
+    <script>
+      // E2Eテスト環境の初期化
+      import { initE2ETestEnvironment } from '../lib/e2eTestSetup';
+      initE2ETestEnvironment();
+    </script>
   </body>
 </html>
 

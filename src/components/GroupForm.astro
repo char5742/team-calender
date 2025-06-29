@@ -1,5 +1,6 @@
 ---
 import type { Group, TeamMember } from '../lib/schema'
+import { generateFormId } from '../utils/id'
 
 export interface Props {
   group?: Group
@@ -10,14 +11,14 @@ export interface Props {
   existingGroups?: Group[]
 }
 
-const { group, teamMembers, mode, onSubmit, onCancel, existingGroups = [] } = Astro.props
+const { group, teamMembers, mode, existingGroups = [] } = Astro.props
 const isEdit = mode === 'edit'
-const formId = `group-form-${Date.now()}`
+const formId = generateFormId()
 ---
 
 <div class="group-form" data-existing-groups={JSON.stringify(existingGroups || [])} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
   <h3>{isEdit ? 'グループを編集' : '新しいグループを作成'}</h3>
-  <form id={formId}>
+  <form id={formId} novalidate>
     <div class="form-group">
       <label for={`${formId}-name`}>グループ名</label>
       <input
@@ -28,7 +29,7 @@ const formId = `group-form-${Date.now()}`
         placeholder="グループ名を入力"
         required
       />
-      <div class="error-message" id={`${formId}-name-error`} style="display: none;">
+      <div class="error-message hidden" id={`${formId}-name-error`}>
         このグループ名は既に使用されています
       </div>
     </div>
@@ -51,7 +52,7 @@ const formId = `group-form-${Date.now()}`
           </label>
         ))}
       </div>
-      <div class="error-message" id={`${formId}-members-error`} style="display: none;">
+      <div class="error-message hidden" id={`${formId}-members-error`}>
         少なくとも1人のメンバーを選択してください
       </div>
     </div>
@@ -81,13 +82,7 @@ const formId = `group-form-${Date.now()}`
     const existingGroups = existingGroupsData ? JSON.parse(existingGroupsData) : [];
     const group = groupData ? JSON.parse(groupData) : null;
     
-    console.log('GroupForm データ:', {
-      formId,
-      existingGroups,
-      group,
-      isEdit,
-      existingGroupsCount: existingGroups.length
-    });
+    // データの準備完了
     
     // グループ名の入力フィールドとエラーメッセージの要素を取得
     const nameInput = document.getElementById(`${formId}-name`);
@@ -98,8 +93,6 @@ const formId = `group-form-${Date.now()}`
     function checkDuplicateName(name) {
       const trimmedName = name.trim();
       if (!trimmedName) return false;
-      
-      console.log('Checking duplicate for:', trimmedName, 'in', existingGroups);
       
       return existingGroups.some(g => {
         // 編集モードの場合、自分自身は除外
@@ -113,10 +106,10 @@ const formId = `group-form-${Date.now()}`
       nameInput.addEventListener('input', (e) => {
         const isDuplicate = checkDuplicateName(e.target.value);
         if (isDuplicate) {
-          nameError.style.display = 'block';
+          nameError.classList.remove('hidden');
           nameInput.classList.add('error');
         } else {
-          nameError.style.display = 'none';
+          nameError.classList.add('hidden');
           nameInput.classList.remove('error');
         }
       });
@@ -135,25 +128,24 @@ const formId = `group-form-${Date.now()}`
       if (!name) {
         hasError = true;
       } else if (checkDuplicateName(name)) {
-        nameError.style.display = 'block';
+        nameError.classList.remove('hidden');
         nameInput.classList.add('error');
         hasError = true;
       } else {
-        nameError.style.display = 'none';
+        nameError.classList.add('hidden');
         nameInput.classList.remove('error');
       }
       
       // メンバー数のバリデーション
       if (memberIds.length === 0) {
-        membersError.style.display = 'block';
+        membersError.classList.remove('hidden');
         hasError = true;
       } else {
-        membersError.style.display = 'none';
+        membersError.classList.add('hidden');
       }
       
       // エラーがなければ送信
       if (!hasError) {
-        console.log('Dispatching group-form-submit event:', { name, memberIds });
         window.dispatchEvent(new CustomEvent('group-form-submit', {
           detail: { name, memberIds }
         }));
@@ -302,5 +294,14 @@ const formId = `group-form-${Date.now()}`
   input.error:focus {
     border-color: #dc3545;
     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+  }
+
+  .hidden {
+    display: none;
+  }
+  
+  /* より具体的なセレクタで上書きを防ぐ */
+  .group-form .hidden {
+    display: none;
   }
 </style> 

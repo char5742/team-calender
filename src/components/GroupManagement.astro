@@ -130,8 +130,9 @@ const teamMembers = teamMembersStore.get()
   if (!(window as any).groupsData) {
     (window as any).groupsData = [
       { id: 'group-1', name: '開発チーム', memberIds: ['member-1', 'member-2', 'member-3'] },
-      { id: 'group-2', name: 'デザインチーム', memberIds: ['member-4', 'member-5'] },
-      { id: 'group-3', name: 'マーケティングチーム', memberIds: ['member-6', 'member-7', 'member-8', 'member-9'] }
+      { id: 'group-2', name: '営業チーム', memberIds: ['member-4', 'member-5'] },
+      { id: 'group-3', name: 'マーケティングチーム', memberIds: ['member-4', 'member-5', 'member-6'] },
+      { id: 'group-4', name: 'プロジェクトA', memberIds: ['member-1', 'member-4', 'member-5'] }
     ];
   }
 
@@ -142,10 +143,7 @@ const teamMembers = teamMembersStore.get()
       { id: 'member-3', name: '鈴木一郎', email: 'suzuki@example.com' },
       { id: 'member-4', name: '田中美咲', email: 'tanaka@example.com' },
       { id: 'member-5', name: '高橋健太', email: 'takahashi@example.com' },
-      { id: 'member-6', name: '伊藤愛', email: 'ito@example.com' },
-      { id: 'member-7', name: '渡辺翔', email: 'watanabe@example.com' },
-      { id: 'member-8', name: '中村真理', email: 'nakamura@example.com' },
-      { id: 'member-9', name: '小林大輔', email: 'kobayashi@example.com' }
+      { id: 'member-6', name: '渡辺 由美', email: 'watanabe@example.com' }
     ];
   }
 

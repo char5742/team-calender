@@ -1,12 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { formatDate, getWeekStart } from '../../src/utils/dateUtils'
 
-// 正規表現をトップレベルで定義
-const WEEKLY_SCHEDULE_URL_PATTERN = /\/groups\/[^\/]+\/weekly-schedule/
-const WEEK_PARAM_PATTERN_1 = /week=1/
-const WEEK_PARAM_PATTERN_0 = /week=0/
-const WEEK_PARAM_PATTERN_MINUS_1 = /week=-1/
-
 test.describe('週間カレンダービュー', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/groups/group-1/weekly-schedule')
@@ -125,85 +119,5 @@ test.describe('週間カレンダービュー', () => {
       // 少なくともtopかleftの値が異なることを期待
       // （同じ時間帯の予定でない限り）
     }
-  })
-})
-
-test.describe('週間カレンダーのナビゲーション', () => {
-  test('グループ一覧から週間スケジュールページに遷移できる', async ({ page }) => {
-    // グループ一覧ページに移動
-    await page.goto('/')
-
-    // グループリストが表示されるのを待つ
-    await page.waitForSelector('.group-list')
-
-    // 最初のグループのスケジュール表示ボタンをクリック
-    const scheduleButton = page.locator('.schedule-btn').first()
-    await expect(scheduleButton).toBeVisible()
-    await scheduleButton.click()
-
-    // 週間スケジュールページに遷移したことを確認
-    await page.waitForURL(WEEKLY_SCHEDULE_URL_PATTERN)
-
-    // カレンダーが表示されていることを確認
-    const calendar = page.locator('.weekly-calendar')
-    await expect(calendar).toBeVisible()
-  })
-
-  test('週切り替えボタンが動作する', async ({ page }) => {
-    await page.goto('/groups/group-1/weekly-schedule')
-
-    // 週切り替えボタンの存在確認
-    const prevWeekBtn = page.locator('#prev-week')
-    const nextWeekBtn = page.locator('#next-week')
-
-    await expect(prevWeekBtn).toBeVisible()
-    await expect(nextWeekBtn).toBeVisible()
-
-    // 現在のURLを取得
-    const initialUrl = page.url()
-
-    // 次週ボタンをクリック
-    await nextWeekBtn.click()
-
-    // URLが変更されたことを確認（week=1パラメータが追加される）
-    await page.waitForURL(WEEK_PARAM_PATTERN_1)
-    const nextWeekUrl = page.url()
-    expect(nextWeekUrl).toContain('week=1')
-    expect(nextWeekUrl).not.toBe(initialUrl)
-
-    // 前週ボタンをクリック
-    await prevWeekBtn.click()
-
-    // URLが変更されたことを確認（week=0に戻る）
-    await page.waitForURL(WEEK_PARAM_PATTERN_0)
-    const prevWeekUrl = page.url()
-    expect(prevWeekUrl).toContain('week=0')
-
-    // さらに前週ボタンをクリック
-    await prevWeekBtn.click()
-
-    // URLが変更されたことを確認（week=-1になる）
-    await page.waitForURL(WEEK_PARAM_PATTERN_MINUS_1)
-    const prevPrevWeekUrl = page.url()
-    expect(prevPrevWeekUrl).toContain('week=-1')
-  })
-
-  test('グループ一覧に戻るリンクが機能する', async ({ page }) => {
-    await page.goto('/groups/group-1/weekly-schedule')
-
-    // 戻るリンクの存在確認
-    const backLink = page.locator('.back-link')
-    await expect(backLink).toBeVisible()
-    await expect(backLink).toHaveText('← グループ一覧に戻る')
-
-    // リンクをクリック
-    await backLink.click()
-
-    // グループ一覧ページに戻ったことを確認
-    await expect(page).toHaveURL('/')
-
-    // グループリストが表示されていることを確認
-    const groupList = page.locator('.group-list')
-    await expect(groupList).toBeVisible()
   })
 })

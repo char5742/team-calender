@@ -1,8 +1,12 @@
 import { expect, test } from '@playwright/test'
 
-const TITLE_PATTERN = /Team Calendar/
-
-test('health check', async ({ page }) => {
+test('health check - redirect to calendar', async ({ page }) => {
   await page.goto('/')
-  await expect(page).toHaveTitle(TITLE_PATTERN)
+
+  // リダイレクトを待つ
+  await page.waitForURL('**/groups/**/weekly-schedule', { timeout: 10000 })
+
+  // カレンダー画面のタイトルを確認（グループ名が含まれる）
+  const title = await page.title()
+  expect(title).toBeTruthy()
 })

@@ -231,161 +231,159 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
   }
 
   .hidden {
-    display: none !important;
+    display: none;
+  }
+  
+  /* より具体的なセレクタで上書きを防ぐ */
+  .group-create-form .hidden {
+    display: none;
   }
 </style>
 
 <script define:vars={{ existingGroups }}>
-  // モックデータの初期化（データが存在しない場合のみ）
-  if (!window.groupsData) {
-    window.groupsData = [
-      { id: 'group-1', name: '開発チーム', memberIds: ['member-1', 'member-2', 'member-3'] },
-      { id: 'group-2', name: '営業チーム', memberIds: ['member-4', 'member-5'] },
-      { id: 'group-3', name: 'マーケティングチーム', memberIds: ['member-4', 'member-5', 'member-6'] },
-      { id: 'group-4', name: 'プロジェクトA', memberIds: ['member-1', 'member-4', 'member-5'] }
-    ];
-  }
-
-  if (!window.teamMembersData) {
-    window.teamMembersData = [
-      { id: 'member-1', name: '山田太郎', email: 'yamada@example.com' },
-      { id: 'member-2', name: '佐藤花子', email: 'sato@example.com' },
-      { id: 'member-3', name: '鈴木一郎', email: 'suzuki@example.com' },
-      { id: 'member-4', name: '田中美咲', email: 'tanaka@example.com' },
-      { id: 'member-5', name: '高橋健太', email: 'takahashi@example.com' },
-      { id: 'member-6', name: '渡辺 由美', email: 'watanabe@example.com' }
-    ];
-  }
-
-  // グループストアの簡易実装
-  const groupsStore = {
-    get: () => window.groupsData || []
-  };
-
-  const teamMembersStore = {
-    get: () => window.teamMembersData || []
-  };
-
-  const createGroup = (name, memberIds) => {
-    const newGroup = {
-      id: `group-${Date.now()}`,
-      name,
-      memberIds
-    };
-    window.groupsData = [...window.groupsData, newGroup];
-    console.log('グループが作成されました:', newGroup);
-    return newGroup;
-  };
-
+  // 即座に実行される同期的な初期化
   const form = document.getElementById('group-create-form');
   const cancelBtn = document.getElementById('cancel-btn');
   const errorMessage = document.getElementById('error-message');
   const groupNameInput = document.getElementById('group-name');
-
-  // 初期データとして既存のグループを設定
-  const currentGroups = existingGroups.length > 0 ? existingGroups : groupsStore.get();
-
-  // グループ名の重複チェック関数
-  function checkDuplicateName(name) {
-    const trimmedName = name.trim();
-    if (!trimmedName) return false;
-    
-    return currentGroups.some(g => 
-      g.name.toLowerCase() === trimmedName.toLowerCase()
-    );
+  
+  // E2Eテスト環境の確認
+  const isE2E = window.__E2E_TEST_MODE__ === true;
+  
+  // 初期データの設定
+  let currentGroups = existingGroups || [];
+  let dataAdapter = null;
+  
+  // E2Eテスト環境の場合、モックデータを即座に設定
+  if (isE2E && window.__E2E_MOCK_DATA__ && currentGroups.length === 0) {
+    currentGroups = [...window.__E2E_MOCK_DATA__.groups];
+  }
+  
+  // 非同期でデータアダプターを初期化（本番環境用）
+  if (!isE2E) {
+    (async () => {
+      try {
+        const module = await import('../lib/e2eDataAdapter');
+        dataAdapter = module.dataAdapter;
+      } catch (error) {
+        console.error('Failed to load data adapter:', error);
+      }
+    })();
   }
 
-  // グループ名の入力時にリアルタイムでチェック
-  groupNameInput?.addEventListener('input', (e) => {
-    const isDuplicate = checkDuplicateName(e.target.value);
-    if (isDuplicate) {
-      showError('このグループ名は既に使用されています。');
-      groupNameInput.classList.add('error');
-    } else {
-      hideError();
-      groupNameInput.classList.remove('error');
-    }
-  });
-
-  form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const formData = new FormData(form);
-    const groupName = formData.get('groupName');
-    const memberIds = formData.getAll('memberIds');
-
-    // バリデーション
-    if (!groupName.trim()) {
-      showError('グループ名を入力してください。');
-      return;
+    // グループ名の重複チェック関数
+    function checkDuplicateName(name) {
+      const trimmedName = name.trim();
+      if (!trimmedName) return false;
+      
+      return currentGroups.some(g => 
+        g.name.toLowerCase() === trimmedName.toLowerCase()
+      );
     }
 
-    // グループ名の重複チェック
-    if (checkDuplicateName(groupName)) {
-      showError('このグループ名は既に使用されています。');
-      groupNameInput.classList.add('error');
-      return;
-    }
+    // グループ名の入力時にリアルタイムでチェック
+    groupNameInput?.addEventListener('input', (e) => {
+      const isDuplicate = checkDuplicateName(e.target.value);
+      if (isDuplicate) {
+        showError('このグループ名は既に使用されています。');
+        groupNameInput.classList.add('error');
+      } else {
+        hideError();
+        groupNameInput.classList.remove('error');
+      }
+    });
 
-    if (memberIds.length === 0) {
-      showError('少なくとも1人のメンバーを選択してください。');
-      return;
-    }
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    try {
-      // グループを作成
-      const newGroup = createGroup(groupName.trim(), memberIds);
-      
-      // 成功メッセージを表示（実装により異なる）
-      console.log('グループが作成されました:', newGroup);
-      
-      // フォームをリセット
-      form.reset();
-      
-      // カスタムイベントを発火（他の開発者が利用できるように）
-      const event = new CustomEvent('groupCreated', {
-        detail: { group: newGroup },
-        bubbles: true
-      });
-      form.dispatchEvent(event);
-      
-      // デフォルトの成功時の処理（ページ遷移やモーダルを閉じるなど）
-      // カスタムイベントがpreventDefaultされない場合のみ実行
-      setTimeout(() => {
-        if (!event.defaultPrevented) {
-          if (window.location.pathname === '/groups/new') {
-            window.location.href = '/';
-          }
+      const formData = new FormData(form);
+      const groupName = formData.get('groupName');
+      const memberIds = formData.getAll('memberIds');
+
+      // バリデーション
+      if (!groupName.trim()) {
+        showError('グループ名を入力してください。');
+        return;
+      }
+
+      // グループ名の重複チェック
+      if (checkDuplicateName(groupName)) {
+        showError('このグループ名は既に使用されています。');
+        groupNameInput.classList.add('error');
+        return;
+      }
+
+      if (memberIds.length === 0) {
+        showError('少なくとも1人のメンバーを選択してください。');
+        return;
+      }
+
+      try {
+        // グループを作成
+        let newGroup;
+        
+        if (dataAdapter) {
+          // データアダプターが利用可能な場合
+          newGroup = dataAdapter.createGroup(groupName.trim(), memberIds);
+        } else {
+          // フォールバック: 簡易的なグループ作成
+          newGroup = {
+            id: `group-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            name: groupName.trim(),
+            memberIds
+          };
+          currentGroups.push(newGroup);
         }
-      }, 100);
-    } catch (error) {
-      showError('グループの作成中にエラーが発生しました。');
-      console.error(error);
-    }
-  });
+        
+        // 成功メッセージを表示
+        console.log('グループが作成されました:', newGroup);
+        
+        // フォームをリセット
+        form.reset();
+        
+        // カスタムイベントを発火
+        const event = new CustomEvent('groupCreated', {
+          detail: { group: newGroup },
+          bubbles: true
+        });
+        form.dispatchEvent(event);
+        
+        // デフォルトの成功時の処理
+        setTimeout(() => {
+          if (!event.defaultPrevented) {
+            if (window.location.pathname === '/groups/new') {
+              window.location.href = '/';
+            }
+          }
+        }, 100);
+      } catch (error) {
+        showError('グループの作成中にエラーが発生しました。');
+        console.error(error);
+      }
+    });
 
-  cancelBtn?.addEventListener('click', () => {
-    // キャンセル時の処理（他の開発者の実装に合わせて調整）
-    if (window.location.pathname === '/groups/new') {
-      window.location.href = '/';
-    } else {
-      form.reset();
-    }
-  });
+    cancelBtn?.addEventListener('click', () => {
+      // キャンセル時の処理
+      if (window.location.pathname === '/groups/new') {
+        window.location.href = '/';
+      } else {
+        form.reset();
+      }
+    });
 
-  function showError(message) {
-    if (errorMessage) {
-      errorMessage.textContent = message;
-      errorMessage.classList.remove('hidden');
-      setTimeout(() => {
+    function showError(message) {
+      if (errorMessage) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+        setTimeout(() => {
+          errorMessage.classList.add('hidden');
+        }, 5000);
+      }
+    }
+
+    function hideError() {
+      if (errorMessage) {
         errorMessage.classList.add('hidden');
-      }, 5000);
+      }
     }
-  }
-
-  function hideError() {
-    if (errorMessage) {
-      errorMessage.classList.add('hidden');
-    }
-  }
 </script> 

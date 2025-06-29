@@ -1,5 +1,6 @@
 ---
 import type { Group } from '../lib/schema'
+import { generateModalId } from '../utils/id'
 
 export interface Props {
   group?: Group
@@ -7,7 +8,7 @@ export interface Props {
 }
 
 const { group, isOpen = false } = Astro.props
-const modalId = `delete-modal-${Date.now()}`
+const modalId = generateModalId()
 ---
 
 <div id={modalId} class={`modal-overlay ${isOpen ? 'open' : ''}`}>
@@ -231,7 +232,13 @@ const modalId = `delete-modal-${Date.now()}`
   }
 
   .hidden {
-    display: none !important;
+    display: none;
+  }
+  
+  /* より具体的なセレクタで上書きを防ぐ */
+  .modal .hidden,
+  .modal-overlay .hidden {
+    display: none;
   }
 
   .spinner-icon {

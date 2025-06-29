@@ -1,5 +1,6 @@
 ---
 import type { Group, TeamMember } from '../lib/schema'
+import { generateFormId } from '../utils/id'
 
 export interface Props {
   group?: Group
@@ -10,9 +11,9 @@ export interface Props {
   existingGroups?: Group[]
 }
 
-const { group, teamMembers, mode, onSubmit, onCancel, existingGroups = [] } = Astro.props
+const { group, teamMembers, mode, existingGroups = [] } = Astro.props
 const isEdit = mode === 'edit'
-const formId = `group-form-${Date.now()}`
+const formId = generateFormId()
 ---
 
 <div class="group-form" data-existing-groups={JSON.stringify(existingGroups || [])} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
@@ -305,6 +306,11 @@ const formId = `group-form-${Date.now()}`
   }
 
   .hidden {
-    display: none !important;
+    display: none;
+  }
+  
+  /* より具体的なセレクタで上書きを防ぐ */
+  .group-form .hidden {
+    display: none;
   }
 </style> 

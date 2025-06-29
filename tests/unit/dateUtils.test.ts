@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'bun:test'
 import { addWeeks, formatDate, getWeekEnd, getWeekStart } from '../../src/utils/dateUtils'
 
 describe('dateUtils', () => {

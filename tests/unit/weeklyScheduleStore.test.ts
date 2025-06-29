@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'bun:test'
 import { mockCalendarEvents, mockGroups } from '../../src/lib/mockData'
 import { groupsStore, selectedGroupIdStore } from '../../src/stores/groupStore'
 import {

@@ -75,6 +75,7 @@ test.describe('GroupManagement', () => {
     await expect(createFormContainer.locator('input[name="name"]')).toHaveClass(ERROR_CLASS_REGEX)
   })
 
+  // biome-ignore lint/suspicious/noSkippedTests: E2E環境の初期化問題により一時的にスキップ
   test.skip('グループが正常に作成される', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
@@ -89,7 +90,6 @@ test.describe('GroupManagement', () => {
 
     // 初期のグループリストアイテム数を取得
     const initialGroupCount = await page.locator('#group-list-container .group-item').count()
-    console.log(`Initial group count: ${initialGroupCount}`)
 
     // グループ作成ボタンをクリック
     await page.click('#create-group-btn')
@@ -119,9 +119,8 @@ test.describe('GroupManagement', () => {
         submitButton.click(),
       ])
       navigationOccurred = true
-    } catch (e) {
+    } catch (_e) {
       // ナビゲーションが発生しなかった
-      console.log('Navigation did not occur')
     }
 
     if (navigationOccurred) {
@@ -133,7 +132,6 @@ test.describe('GroupManagement', () => {
 
       // 新しいグループ数を確認
       const newGroupCount = await page.locator('#group-list-container .group-item').count()
-      console.log(`New group count: ${newGroupCount}`)
 
       // 作成したグループが表示されていることを確認
       const newGroupElement = page.locator('#group-list-container .group-item').filter({
@@ -144,14 +142,11 @@ test.describe('GroupManagement', () => {
         await expect(newGroupElement).toBeVisible()
       } else {
         // グループがリストに見つからない
-        console.log(`Created group "${groupName}" not found in list`)
         expect(newGroupCount).toBe(initialGroupCount + 1)
       }
     } else {
       // エラーメッセージを確認
       const errorMessage = await createFormContainer.locator('.error-message:visible').textContent()
-      console.log(`Error message: ${errorMessage}`)
-      console.log(`Console errors: ${consoleErrors.join(', ')}`)
 
       // エラーがある場合はテスト失敗
       expect(errorMessage).toBeNull()

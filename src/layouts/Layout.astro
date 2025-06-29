@@ -1,4 +1,6 @@
 ---
+import Header from '../components/Header.astro'
+
 export interface Props {
   title: string
 }
@@ -14,30 +16,119 @@ const { title } = Astro.props
     <meta name="description" content="チームの予定を効率的に管理するカレンダーアプリケーション" />
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/styles/design-system.css" />
     <title>{title} - チームカレンダー</title>
+    <!-- テーマ初期化スクリプト（フラッシュ防止） -->
+    <script>
+      // テーマの初期化をheadで実行してフラッシュを防ぐ
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+        
+        // トランジション無効化クラスを追加
+        document.documentElement.classList.add('theme-transition-disable');
+      })();
+    </script>
   </head>
   <body>
-    <slot />
+    <Header currentPath={Astro.url.pathname} />
+    <main class="main-content">
+      <slot />
+    </main>
     <script>
       // E2Eテスト環境の初期化
       import { initE2ETestEnvironment } from '../lib/e2eTestSetup';
       initE2ETestEnvironment();
+      
+      // テーマ管理システム
+      class ThemeManager {
+        theme: string;
+        
+        constructor() {
+          this.theme = this.getTheme();
+          this.init();
+        }
+        
+        init() {
+          // トランジションを有効化
+          setTimeout(() => {
+            document.documentElement.classList.remove('theme-transition-disable');
+          }, 100);
+          
+          // システムテーマの変更を監視
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+              this.setTheme(e.matches ? 'dark' : 'light');
+            }
+          });
+        }
+        
+        getTheme() {
+          const savedTheme = localStorage.getItem('theme');
+          if (savedTheme) return savedTheme;
+          
+          return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        
+        setTheme(theme: string) {
+          this.theme = theme;
+          
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+          
+          localStorage.setItem('theme', theme);
+        }
+        
+        toggle() {
+          this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
+        }
+      }
+      
+      // グローバルに公開
+      (window as any).themeManager = new ThemeManager();
     </script>
   </body>
 </html>
 
 <style is:global>
+  /* デザインシステムのインポート */
+  @import '/src/styles/design-system.css';
+
   html {
-    font-family: system-ui, sans-serif;
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+  }
+  
+  /* ダークモードクラスベースの実装 */
+  html.dark {
+    color-scheme: dark;
   }
   
   body {
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
+    background-color: var(--color-background);
+    min-height: 100vh;
   }
   
   * {
     box-sizing: border-box;
+  }
+  
+  /* メインコンテンツのスタイル */
+  .main-content {
+    min-height: calc(100vh - 80px); /* ヘッダーの高さを考慮 */
+    padding-top: var(--spacing-6); /* ヘッダーとの間隔 */
+    padding-bottom: var(--spacing-12);
   }
 </style> 

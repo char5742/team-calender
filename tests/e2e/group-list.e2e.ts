@@ -35,7 +35,8 @@ test.describe('グループ一覧表示', () => {
     // 開発チームの確認
     const devTeam = groupList.locator('.group-item').first()
     await expect(devTeam.locator('.group-name')).toHaveText('開発チーム')
-    await expect(devTeam.locator('.member-count')).toHaveText('3人')
+    // メンバー数の表示が変更されたため、アイコンとテキストを含めて確認
+    await expect(devTeam.locator('.member-count')).toContainText('3')
     await expect(devTeam.locator('.member-name')).toHaveCount(3)
 
     // メンバー名の確認
@@ -48,21 +49,34 @@ test.describe('グループ一覧表示', () => {
   test('グループホバー時にスタイルが変更される', async ({ page }) => {
     const groupItem = page.locator('.group-item').first()
 
-    // ホバー前のbox-shadowを取得
-    const initialBoxShadow = await groupItem.evaluate((el) => window.getComputedStyle(el).boxShadow)
+    // ホバー前の状態を取得
+    const initialStyles = await groupItem.evaluate((el) => {
+      const styles = window.getComputedStyle(el)
+      return {
+        transform: styles.transform,
+        borderColor: styles.borderColor,
+      }
+    })
 
     // ホバー
     await groupItem.hover()
 
     // transitionの完了を待つ
-    await page.waitForTimeout(300)
+    await page.waitForTimeout(350)
 
-    // ホバー後のbox-shadowを取得
-    const hoverBoxShadow = await groupItem.evaluate((el) => window.getComputedStyle(el).boxShadow)
+    // ホバー後の状態を取得
+    const hoverStyles = await groupItem.evaluate((el) => {
+      const styles = window.getComputedStyle(el)
+      return {
+        transform: styles.transform,
+        borderColor: styles.borderColor,
+      }
+    })
 
-    // box-shadowが追加されていることを確認
-    expect(initialBoxShadow).toBe('none')
-    expect(hoverBoxShadow).toContain('rgba(0, 123, 255')
+    // transformが変更されていることを確認（translateY(-2px)）
+    expect(initialStyles.transform).toBe('none')
+    expect(hoverStyles.transform).toContain('matrix')
+    expect(hoverStyles.transform).not.toBe(initialStyles.transform)
   })
 
   test('グループクリック時にイベントが発火する', async ({ page }) => {

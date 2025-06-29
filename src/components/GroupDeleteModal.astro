@@ -12,7 +12,7 @@ const modalId = generateModalId()
 ---
 
 <div id={modalId} class={`modal-overlay ${isOpen ? 'open' : ''}`}>
-  <div class="modal">
+  <div class="modal glass">
     <div class="modal-header">
       <h3>グループを削除</h3>
     </div>
@@ -113,10 +113,12 @@ const modalId = generateModalId()
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
     display: none;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: var(--z-index-modal-backdrop);
   }
 
   .modal-overlay.open {
@@ -124,12 +126,22 @@ const modalId = generateModalId()
   }
 
   .modal {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
     max-width: 400px;
     width: 90%;
-    animation: modalFadeIn 0.2s ease-out;
+    animation: modalFadeIn var(--duration-normal) var(--easing-out);
+    border: 1px solid var(--color-border);
+  }
+
+  /* ガラスモーフィズム効果を適用 */
+  .modal.glass {
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(var(--blur-lg));
+    -webkit-backdrop-filter: blur(var(--blur-lg));
+    border: 1px solid var(--color-glass-border);
+    box-shadow: var(--shadow-glass);
   }
 
   @keyframes modalFadeIn {
@@ -144,23 +156,25 @@ const modalId = generateModalId()
   }
 
   .modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e0e0e0;
+    padding: var(--spacing-6);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .modal-header h3 {
     margin: 0;
-    font-size: 1.25rem;
-    color: #333;
+    font-size: var(--font-size-xl);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
   }
 
   .modal-body {
-    padding: 1.5rem;
+    padding: var(--spacing-6);
   }
 
   .modal-body p {
-    margin: 0 0 1rem 0;
-    color: #555;
+    margin: 0 0 var(--spacing-4) 0;
+    color: var(--color-text-secondary);
+    line-height: var(--line-height-relaxed);
   }
 
   .modal-body p:last-child {
@@ -168,32 +182,39 @@ const modalId = generateModalId()
   }
 
   .modal-body strong {
-    color: #333;
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
   }
 
   .warning {
-    color: #dc3545;
-    font-size: 0.875rem;
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
   }
 
   .modal-actions {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e0e0e0;
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid var(--color-border);
     display: flex;
-    gap: 1rem;
+    gap: var(--spacing-4);
     justify-content: flex-end;
   }
 
   .btn {
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
+    padding: var(--spacing-2) var(--spacing-6);
+    font-size: var(--font-size-base);
     border: none;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
+    transition: all var(--duration-fast) var(--easing-in-out);
+    font-weight: var(--font-weight-medium);
     position: relative;
     min-width: 100px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
   }
 
   .btn:disabled {
@@ -202,25 +223,25 @@ const modalId = generateModalId()
   }
 
   .btn-danger {
-    background-color: #dc3545;
+    background-color: var(--color-error);
     color: white;
   }
 
   .btn-danger:hover:not(:disabled) {
-    background-color: #c82333;
+    background-color: #dc2626;
   }
 
   .btn-danger.loading {
-    background-color: #dc3545;
+    background-color: var(--color-error);
   }
 
   .btn-secondary {
-    background-color: #6c757d;
+    background-color: var(--color-gray-500);
     color: white;
   }
 
   .btn-secondary:hover:not(:disabled) {
-    background-color: #545b62;
+    background-color: var(--color-gray-600);
   }
 
   .btn-text,
@@ -228,7 +249,7 @@ const modalId = generateModalId()
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
   }
 
   .hidden {

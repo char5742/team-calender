@@ -32,7 +32,7 @@ const {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    padding: var(--spacing-8);
   }
   
   .loading-container.full-screen {
@@ -42,7 +42,16 @@ const {
     right: 0;
     bottom: 0;
     background-color: rgba(255, 255, 255, 0.9);
-    z-index: 9999;
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    z-index: var(--z-index-modal);
+  }
+  
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .loading-container.full-screen {
+      background-color: rgba(0, 0, 0, 0.9);
+    }
   }
   
   .loading-spinner {
@@ -51,12 +60,12 @@ const {
   
   .spinner {
     display: inline-flex;
-    gap: 0.25rem;
+    gap: var(--spacing-1);
   }
   
   .spinner > div {
-    background-color: #007bff;
-    border-radius: 100%;
+    background-color: var(--color-primary-500);
+    border-radius: var(--radius-full);
     display: inline-block;
     animation: sk-bouncedelay 1.4s infinite ease-in-out both;
   }
@@ -86,9 +95,9 @@ const {
   }
   
   .loading-message {
-    margin-top: 1rem;
-    color: #6c757d;
-    font-size: 0.875rem;
+    margin-top: var(--spacing-4);
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-sm);
   }
   
   @keyframes sk-bouncedelay {

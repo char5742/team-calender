@@ -8,6 +8,19 @@ export interface Props {
 }
 
 const { groups, selectedGroupId } = Astro.props
+
+// グループのアイコンをランダムに選択するための絵文字セット
+const groupIcons = ['👥', '🎯', '🚀', '💡', '🌟', '🎨', '🏆', '🌈', '💼', '🔥']
+const getGroupIcon = (groupId: string) => {
+  // グループID全体を使用してより多様なアイコンを選択
+  let hash = 0
+  for (let i = 0; i < groupId.length; i++) {
+    hash = (hash << 5) - hash + groupId.charCodeAt(i)
+    hash &= hash // Convert to 32bit integer
+  }
+  const index = Math.abs(hash) % groupIcons.length
+  return groupIcons[index]
+}
 ---
 
 <div class="group-list">
@@ -34,17 +47,30 @@ const { groups, selectedGroupId } = Astro.props
             class="group-button"
             onclick={`window.dispatchEvent(new CustomEvent('group-click', { detail: { groupId: '${group.id}' } }))`}
           >
-            <div class="group-header">
-              <h3 class="group-name">{group.name}</h3>
-              <span class="member-count">{group.members.length}人</span>
-            </div>
-            <div class="member-list">
-              {group.members.slice(0, 3).map((member) => (
-                <span class="member-name">{member.name}</span>
-              ))}
-              {group.members.length > 3 && (
-                <span class="more-members">他{group.members.length - 3}人</span>
-              )}
+            <div class="group-content">
+              <div class="group-icon">{getGroupIcon(group.id)}</div>
+              <div class="group-info">
+                <div class="group-header">
+                  <h3 class="group-name">{group.name}</h3>
+                  <span class="member-count">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                      <circle cx="9" cy="7" r="4"></circle>
+                      <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    {group.members.length}
+                  </span>
+                </div>
+                <div class="member-list">
+                  {group.members.slice(0, 3).map((member) => (
+                    <span class="member-name">{member.name}</span>
+                  ))}
+                  {group.members.length > 3 && (
+                    <span class="more-members">+{group.members.length - 3}</span>
+                  )}
+                </div>
+              </div>
             </div>
           </button>
           <div class="group-actions">
@@ -122,39 +148,47 @@ const { groups, selectedGroupId } = Astro.props
 
 <style>
   .group-list {
-    padding: 1.5rem;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    max-width: 400px;
+    padding: var(--spacing-6);
+    background-color: var(--color-background-secondary);
+    border-radius: var(--radius-xl);
+    max-width: 420px;
+    box-shadow: var(--shadow-sm);
   }
 
   h2 {
-    margin: 0 0 1rem 0;
-    font-size: 1.25rem;
-    color: #333;
+    margin: 0 0 var(--spacing-5) 0;
+    font-size: var(--font-size-2xl);
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-tight);
   }
 
   .empty-state {
     text-align: center;
-    padding: 3rem 2rem;
+    padding: var(--spacing-12) var(--spacing-8);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
   }
 
   .empty-icon {
-    color: #dee2e6;
-    margin-bottom: 1rem;
+    color: var(--color-gray-300);
+    margin-bottom: var(--spacing-4);
+    opacity: 0.8;
   }
 
   .empty-message {
-    color: #495057;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--spacing-2) 0;
   }
 
   .empty-description {
-    color: #6c757d;
-    font-size: 0.875rem;
+    color: var(--color-text-tertiary);
+    font-size: var(--font-size-sm);
     margin: 0;
+    line-height: var(--line-height-relaxed);
   }
 
   .groups {
@@ -163,115 +197,219 @@ const { groups, selectedGroupId } = Astro.props
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--spacing-3);
   }
 
   .group-item {
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: all var(--duration-normal) var(--easing-spring);
     position: relative;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    backdrop-filter: blur(var(--blur-sm));
   }
 
   .group-item:hover {
-    border-color: #007bff;
-    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-primary-300);
   }
 
   .group-item.selected {
-    border-color: #007bff;
-    background-color: #f0f7ff;
+    border-color: var(--color-primary-500);
+    background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-surface) 100%);
+    box-shadow: 0 4px 12px rgba(90, 122, 255, 0.15);
   }
 
   .group-button {
     width: 100%;
-    padding: 1rem;
-    padding-right: 6rem;
+    padding: var(--spacing-4);
+    padding-right: calc(var(--spacing-24) + var(--spacing-4));
     background: none;
     border: none;
     text-align: left;
     cursor: pointer;
     font-family: inherit;
+    position: relative;
+    z-index: 1;
+  }
+
+  .group-content {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-4);
+  }
+
+  .group-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--color-background-tertiary);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--duration-normal) var(--easing-in-out);
+  }
+
+  .group-item:hover .group-icon {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
+  }
+
+  .group-item.selected .group-icon {
+    background: linear-gradient(135deg, var(--color-primary-100) 0%, var(--color-primary-200) 100%);
+  }
+
+  .group-info {
+    flex: 1;
+    min-width: 0;
   }
 
   .group-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-2);
+    gap: var(--spacing-3);
   }
 
   .group-name {
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    letter-spacing: var(--letter-spacing-tight);
+    line-height: var(--line-height-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .member-count {
-    font-size: 0.875rem;
-    color: #6c757d;
-    background-color: #e9ecef;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    background: var(--color-background-tertiary);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .member-count svg {
+    opacity: 0.7;
   }
 
   .member-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #6c757d;
+    gap: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
   }
 
   .member-name {
-    background-color: #f8f9fa;
-    padding: 0.125rem 0.5rem;
-    border-radius: 4px;
+    background: var(--color-background-secondary);
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: var(--letter-spacing-tight);
+    box-shadow: var(--shadow-xs);
+    transition: all var(--duration-fast) var(--easing-in-out);
+  }
+
+  .group-item:hover .member-name {
+    background: var(--color-background-tertiary);
   }
 
   .more-members {
-    color: #007bff;
-    font-style: italic;
+    color: var(--color-primary-500);
+    font-weight: var(--font-weight-semibold);
+    background: var(--color-primary-50);
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-xs);
   }
 
   .group-actions {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: var(--spacing-4);
+    right: var(--spacing-4);
     display: flex;
-    gap: 0.5rem;
+    gap: var(--spacing-2);
+    z-index: 10;
+    opacity: 0;
+    transform: translateX(8px);
+    transition: all var(--duration-normal) var(--easing-in-out);
+  }
+
+  .group-item:hover .group-actions {
+    opacity: 1;
+    transform: translateX(0);
   }
 
   .action-btn {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     padding: 0;
     border: none;
-    background-color: transparent;
-    color: #6c757d;
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(var(--blur-md));
+    color: var(--color-text-tertiary);
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all var(--duration-fast) var(--easing-spring);
+    position: relative;
+    z-index: 10;
+    box-shadow: var(--shadow-sm);
   }
 
   .action-btn:hover {
-    background-color: #f8f9fa;
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md);
   }
 
   .edit-btn:hover {
-    color: #007bff;
+    color: var(--color-primary-500);
+    background: var(--color-primary-50);
   }
 
   .schedule-btn:hover {
-    color: #28a745;
+    color: var(--color-success);
+    background: rgba(16, 185, 129, 0.1);
   }
 
   .delete-btn:hover {
-    color: #dc3545;
+    color: var(--color-error);
+    background: rgba(239, 68, 68, 0.1);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .group-list {
+      max-width: 100%;
+      padding: var(--spacing-4);
+    }
+
+    .group-actions {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .action-btn {
+      width: 32px;
+      height: 32px;
+    }
   }
 </style> 

@@ -40,12 +40,13 @@ test.describe('週間カレンダービュー', () => {
 
   test('メンバー名が正しく表示される', async ({ page }) => {
     const calendar = page.locator('.weekly-calendar')
-    const memberNames = calendar.locator('.member-name')
+    const memberRows = calendar.locator('.member-row')
 
     // 開発チームのメンバー数（3人）を確認
-    await expect(memberNames).toHaveCount(3)
+    await expect(memberRows).toHaveCount(3)
 
-    // メンバー名の確認
+    // メンバー名の確認（.member-name-textセレクターを使用）
+    const memberNames = calendar.locator('.member-name-text')
     const names = await memberNames.allTextContents()
     expect(names).toContain('山田太郎')
     expect(names).toContain('佐藤花子')

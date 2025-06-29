@@ -74,31 +74,45 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
 
 <div class="weekly-calendar">
   <div class="calendar-header">
-    <div class="corner-cell"></div>
+    <div class="corner-cell" aria-hidden="true"></div>
     {dateHeaders.map(header => (
-      <div class="day-header">
+      <div class="day-header" role="columnheader">
         <div class="day-label">{header.dayLabel}</div>
         <div class="date-label">{header.dateStr}</div>
       </div>
     ))}
   </div>
 
-  <div class="calendar-grid">
+  <div class="calendar-grid" role="grid">
     {members.map((member) => {
       const memberEvents = weeklySchedule.eventsByMember[member.id] || []
       const eventsByDay = organizeEventsByDay(memberEvents, weekStartDate)
       
       return (
-        <div class="member-row">
-          <div class="member-name">{member.name}</div>
+        <div class="member-row" role="row">
+          <div class="member-name" role="rowheader">
+            <span class="member-avatar">{member.name.charAt(0)}</span>
+            <span class="member-name-text">{member.name}</span>
+          </div>
           <div class="member-schedule">
             {eventsByDay.map((dayEvents, dayIndex) => (
-              <div class="day-cell" data-day={dayIndex}>
+              <div class="day-cell" data-day={dayIndex} role="gridcell">
+                {dayEvents.length === 0 && (
+                  <div class="empty-state">
+                    <span class="empty-dot"></span>
+                  </div>
+                )}
                 {dayEvents.map((event) => {
                   const position = calculateEventPosition(event, dayIndex)
+                  // イベントタイプを判定（タイトルから推測）
+                  const eventType = event.title.includes('会議') || event.title.includes('ミーティング') 
+                    ? 'meeting' 
+                    : 'work'
+                  
                   return (
                     <div 
                       class="event-block"
+                      data-type={eventType}
                       style={`
                         position: absolute;
                         top: ${position.top};
@@ -107,6 +121,7 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
                         right: 0;
                         background-color: ${event.color || '#1976D2'};
                       `}
+                      title={`${event.title} (${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })})`}
                     >
                       <span class="event-title">{event.title}</span>
                     </div>
@@ -123,27 +138,35 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
 
 <style>
   .weekly-calendar {
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
+    background-color: var(--color-surface);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
     overflow: hidden;
+    box-shadow: var(--shadow-lg);
   }
 
   .calendar-header {
     display: grid;
-    grid-template-columns: 120px repeat(7, 1fr);
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e0e0e0;
+    grid-template-columns: 140px repeat(7, 1fr);
+    background: linear-gradient(to bottom, var(--color-background-secondary), var(--color-background-tertiary));
+    border-bottom: 2px solid var(--color-border);
   }
 
   .corner-cell {
-    border-right: 1px solid #e0e0e0;
+    border-right: 2px solid var(--color-border);
   }
 
   .day-header {
-    padding: 1rem;
+    padding: var(--spacing-4);
     text-align: center;
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid var(--color-border);
+    position: relative;
+  }
+
+  /* 週末の曜日に背景色を追加 */
+  .day-header:nth-child(7),
+  .day-header:nth-child(8) {
+    background-color: rgba(239, 68, 68, 0.05);
   }
 
   .day-header:last-child {
@@ -151,25 +174,41 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
   }
 
   .day-label {
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 0.25rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-1);
+    font-size: var(--font-size-sm);
+  }
+
+  /* 土曜日と日曜日の色分け */
+  .day-header:nth-child(7) .day-label {
+    color: var(--color-info);
+  }
+
+  .day-header:nth-child(8) .day-label {
+    color: var(--color-error);
   }
 
   .date-label {
-    font-size: 0.875rem;
-    color: #6c757d;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-medium);
   }
 
   .calendar-grid {
-    min-height: 400px;
+    min-height: 450px;
   }
 
   .member-row {
     display: grid;
-    grid-template-columns: 120px 1fr;
-    border-bottom: 1px solid #e0e0e0;
-    min-height: 100px;
+    grid-template-columns: 140px 1fr;
+    border-bottom: 1px solid var(--color-border);
+    min-height: 120px;
+    transition: background-color var(--duration-fast) var(--easing-in-out);
+  }
+
+  .member-row:hover {
+    background-color: var(--color-surface-hover);
   }
 
   .member-row:last-child {
@@ -177,13 +216,34 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
   }
 
   .member-name {
-    padding: 1rem;
-    font-weight: 500;
-    color: #333;
-    background-color: #f8f9fa;
-    border-right: 1px solid #e0e0e0;
+    padding: var(--spacing-4);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    background: linear-gradient(to right, var(--color-background-secondary), var(--color-background-tertiary));
+    border-right: 2px solid var(--color-border);
     display: flex;
     align-items: center;
+    font-size: var(--font-size-base);
+    gap: var(--spacing-3);
+  }
+
+  .member-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .member-name-text {
+    flex: 1;
   }
 
   .member-schedule {
@@ -193,9 +253,16 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
   }
 
   .day-cell {
-    border-right: 1px solid #e0e0e0;
+    border-right: 1px solid var(--color-border);
     position: relative;
-    min-height: 100px;
+    min-height: 120px;
+    padding: var(--spacing-2);
+  }
+
+  /* 週末のセルに背景色 */
+  .day-cell[data-day="5"],
+  .day-cell[data-day="6"] {
+    background-color: rgba(239, 68, 68, 0.02);
   }
 
   .day-cell:last-child {
@@ -203,31 +270,55 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
   }
 
   .event-block {
-    margin: 2px;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    margin: var(--spacing-1);
+    padding: var(--spacing-2) var(--spacing-3);
+    border-radius: var(--radius-md);
     overflow: hidden;
     cursor: pointer;
-    transition: opacity 0.2s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all var(--duration-fast) var(--easing-spring);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
   }
 
   .event-block:hover {
-    opacity: 0.9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
   }
 
   .event-title {
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     color: white;
-    font-weight: 500;
+    font-weight: var(--font-weight-semibold);
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 
-  /* レスポンシブ対応（基本的なもの） */
+  /* イベントタイプ別のスタイル */
+  .event-block[data-type="meeting"] {
+    background: linear-gradient(135deg, var(--color-info), var(--color-primary-600));
+  }
+
+  .event-block[data-type="work"] {
+    background: linear-gradient(135deg, var(--color-warning), #ea580c);
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 1024px) {
+    .calendar-header,
+    .member-row {
+      grid-template-columns: 100px repeat(7, 1fr);
+    }
+
+    .member-name {
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-3);
+    }
+  }
+
   @media (max-width: 768px) {
     .calendar-header,
     .member-row {
@@ -235,16 +326,56 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
     }
 
     .member-name {
-      font-size: 0.875rem;
-      padding: 0.75rem 0.5rem;
+      font-size: var(--font-size-xs);
+      padding: var(--spacing-2);
     }
 
     .day-header {
-      padding: 0.75rem 0.5rem;
+      padding: var(--spacing-3) var(--spacing-1);
+    }
+
+    .day-label {
+      font-size: var(--font-size-xs);
+    }
+
+    .date-label {
+      font-size: var(--font-size-xs);
     }
 
     .event-title {
-      font-size: 0.625rem;
+      font-size: 0.7rem;
     }
+
+    .event-block {
+      padding: var(--spacing-1) var(--spacing-2);
+    }
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .day-header:nth-child(7),
+    .day-header:nth-child(8) {
+      background-color: rgba(239, 68, 68, 0.03);
+    }
+
+    .day-cell[data-day="5"],
+    .day-cell[data-day="6"] {
+      background-color: rgba(239, 68, 68, 0.01);
+    }
+  }
+
+  .empty-state {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.3;
+  }
+
+  .empty-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-gray-300);
   }
 </style> 

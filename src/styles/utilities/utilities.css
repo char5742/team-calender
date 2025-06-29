@@ -1,0 +1,171 @@
+/**
+ * Utility Classes
+ *
+ * 汎用的に使用されるユーティリティクラスのみを定義
+ * 実際に使用されているクラスのみを含む
+ */
+
+@layer utilities {
+  /* Layout Utilities */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
+  }
+
+  /* Display Utilities */
+  .hidden {
+    display: none !important;
+  }
+
+  /* Accessibility Utilities */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Focus visible only for keyboard users */
+  .focus-visible:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Skip to content link */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--color-background);
+    color: var(--color-primary-500);
+    padding: var(--spacing-2) var(--spacing-4);
+    text-decoration: none;
+    z-index: 100;
+    border-radius: var(--radius-md);
+  }
+
+  .skip-link:focus {
+    top: var(--spacing-2);
+    left: var(--spacing-2);
+  }
+
+  /* Visually hidden but accessible */
+  .visually-hidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+    white-space: nowrap;
+  }
+
+  /* Text overflow utilities */
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Pointer events */
+  .pointer-events-none {
+    pointer-events: none;
+  }
+
+  .pointer-events-auto {
+    pointer-events: auto;
+  }
+
+  /* User select */
+  .select-none {
+    user-select: none;
+  }
+
+  .select-text {
+    user-select: text;
+  }
+
+  /* Z-index utilities */
+  .z-10 {
+    z-index: 10;
+  }
+
+  .z-20 {
+    z-index: 20;
+  }
+
+  .z-30 {
+    z-index: 30;
+  }
+
+  .z-40 {
+    z-index: 40;
+  }
+
+  .z-50 {
+    z-index: 50;
+  }
+
+  /* Overflow utilities */
+  .overflow-hidden {
+    overflow: hidden;
+  }
+
+  .overflow-auto {
+    overflow: auto;
+  }
+
+  .overflow-x-auto {
+    overflow-x: auto;
+  }
+
+  .overflow-y-auto {
+    overflow-y: auto;
+  }
+
+  /* Positioning utilities */
+  .relative {
+    position: relative;
+  }
+
+  .absolute {
+    position: absolute;
+  }
+
+  .fixed {
+    position: fixed;
+  }
+
+  .sticky {
+    position: sticky;
+  }
+
+  /* Responsive utilities */
+  @media (max-width: 767px) {
+    .mobile-only {
+      display: block;
+    }
+
+    .desktop-only {
+      display: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .mobile-only {
+      display: none;
+    }
+
+    .desktop-only {
+      display: block;
+    }
+  }
+}

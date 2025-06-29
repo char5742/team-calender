@@ -1,6 +1,6 @@
 ---
-import Header from '../../../components/Header.astro'
 import WeeklyCalendarView from '../../../components/WeeklyCalendarView.astro'
+import Layout from '../../../layouts/Layout.astro'
 import { loadMockData, mockCalendarEvents } from '../../../lib/mockData'
 import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
 import type { GroupWithMembers } from '../../../stores/groupStore'
@@ -62,43 +62,29 @@ const weekEnd = new Date(weekStart)
 weekEnd.setDate(weekEnd.getDate() + 6)
 ---
 
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{group.name}</title>
-    <link rel="stylesheet" href="/src/styles/design-system.css" />
-    <link rel="stylesheet" href="/src/styles/animations.css" />
-  </head>
-  <body>
-    <Header currentGroupId={groupId} />
-    
-    <main class="main">
-      <div class="schedule-page">
-        <div class="page-header">
-          <h1 class="heading-primary">
-            {group.name}の週間スケジュール
-          </h1>
-          <div class="week-info visual-secondary">
-            {formatDate(weekStart, 'YYYY年M月D日')} - {formatDate(weekEnd, 'YYYY年M月D日')}
-          </div>
-        </div>
-
-        <div class="schedule-content">
-          {weeklySchedule ? (
-            <WeeklyCalendarView 
-              weeklySchedule={weeklySchedule} 
-              members={groupWithMembers.members}
-            />
-          ) : (
-            <p class="visual-secondary">スケジュールデータがありません</p>
-          )}
-        </div>
+<Layout title={group.name}>
+  <div class="schedule-page">
+    <div class="page-header">
+      <h1 class="heading-primary">
+        {group.name}の週間スケジュール
+      </h1>
+      <div class="week-info visual-secondary">
+        {formatDate(weekStart, 'YYYY年M月D日')} - {formatDate(weekEnd, 'YYYY年M月D日')}
       </div>
-    </main>
-  </body>
-</html>
+    </div>
+
+    <div class="schedule-content">
+      {weeklySchedule ? (
+        <WeeklyCalendarView 
+          weeklySchedule={weeklySchedule} 
+          members={groupWithMembers.members}
+        />
+      ) : (
+        <p class="visual-secondary">スケジュールデータがありません</p>
+      )}
+    </div>
+  </div>
+</Layout>
 
 <script>
   // URLパラメータから現在の週のオフセットを取得
@@ -123,17 +109,6 @@ weekEnd.setDate(weekEnd.getDate() + 6)
 </script>
 
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    background-color: var(--color-background);
-  }
-
-  .main {
-    min-height: calc(100vh - 48px); /* ヘッダーの高さ(48px)を引いた高さ */
-  }
-
   /* ウィークリースケジュールページ専用のレイアウト調整 */
   .schedule-page {
     width: 100%;

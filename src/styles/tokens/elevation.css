@@ -1,0 +1,60 @@
+/* エレベーショントークン */
+@layer tokens {
+  :root {
+    /* Box Shadows - ライトモード */
+    --shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.07), 0 2px 4px -2px oklch(0 0 0 / 0.05);
+    --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.08), 0 4px 6px -4px oklch(0 0 0 / 0.05);
+    --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.1), 0 8px 10px -6px oklch(0 0 0 / 0.05);
+    --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.25);
+
+    /* Inner Shadows */
+    --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.06);
+
+    /* Focus Shadows */
+    --shadow-focus: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.1);
+
+    /* Z-index Scale */
+    --z-index-base: 0;
+    --z-index-dropdown: 1000;
+    --z-index-sticky: 1020;
+    --z-index-fixed: 1030;
+    --z-index-modal-backdrop: 1040;
+    --z-index-modal: 1050;
+    --z-index-popover: 1060;
+    --z-index-tooltip: 1070;
+    --z-index-notification: 1080;
+  }
+
+  /* ダークモード調整 */
+  html.dark {
+    /* Box Shadows - より強いコントラスト */
+    --shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.15);
+    --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.15);
+    --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.2), 0 2px 4px -2px oklch(0 0 0 / 0.15);
+    --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.25), 0 4px 6px -4px oklch(0 0 0 / 0.15);
+    --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.3), 0 8px 10px -6px oklch(0 0 0 / 0.15);
+    --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.5);
+
+    /* Inner Shadows */
+    --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.15);
+
+    /* Focus Shadows */
+    --shadow-focus: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.2);
+  }
+
+  /* メディアクエリベースのダークモード（フォールバック） */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      --shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.15);
+      --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.15);
+      --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.2), 0 2px 4px -2px oklch(0 0 0 / 0.15);
+      --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.25), 0 4px 6px -4px oklch(0 0 0 / 0.15);
+      --shadow-xl: 0 20px 25px -5px oklch(0 0 0 / 0.3), 0 8px 10px -6px oklch(0 0 0 / 0.15);
+      --shadow-2xl: 0 25px 50px -12px oklch(0 0 0 / 0.5);
+      --shadow-inner: inset 0 2px 4px 0 oklch(0 0 0 / 0.15);
+      --shadow-focus: 0 0 0 3px oklch(from var(--color-primary) l c h / 0.2);
+    }
+  }
+}

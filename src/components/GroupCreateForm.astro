@@ -341,12 +341,15 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
         // フォームをリセット
         form.reset();
         
-        // カスタムイベントを発火
-        const event = new CustomEvent('groupCreated', {
-          detail: { group: newGroup },
+        // カスタムイベントを発火（GroupManagementが期待する形式で）
+        const event = new CustomEvent('group-form-submit', {
+          detail: { 
+            name: groupName.trim(), 
+            memberIds: memberIds 
+          },
           bubbles: true
         });
-        form.dispatchEvent(event);
+        window.dispatchEvent(event);
         
         // デフォルトの成功時の処理
         setTimeout(() => {
@@ -367,6 +370,11 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
       if (window.location.pathname === '/groups/new') {
         window.location.href = '/';
       } else {
+        // カスタムイベントを発火
+        const event = new CustomEvent('group-form-cancel', {
+          bubbles: true
+        });
+        window.dispatchEvent(event);
         form.reset();
       }
     });

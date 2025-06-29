@@ -82,13 +82,7 @@ const formId = generateFormId()
     const existingGroups = existingGroupsData ? JSON.parse(existingGroupsData) : [];
     const group = groupData ? JSON.parse(groupData) : null;
     
-    console.log('GroupForm データ:', {
-      formId,
-      existingGroups,
-      group,
-      isEdit,
-      existingGroupsCount: existingGroups.length
-    });
+    // データの準備完了
     
     // グループ名の入力フィールドとエラーメッセージの要素を取得
     const nameInput = document.getElementById(`${formId}-name`);
@@ -99,8 +93,6 @@ const formId = generateFormId()
     function checkDuplicateName(name) {
       const trimmedName = name.trim();
       if (!trimmedName) return false;
-      
-      console.log('Checking duplicate for:', trimmedName, 'in', existingGroups);
       
       return existingGroups.some(g => {
         // 編集モードの場合、自分自身は除外
@@ -154,7 +146,6 @@ const formId = generateFormId()
       
       // エラーがなければ送信
       if (!hasError) {
-        console.log('Dispatching group-form-submit event:', { name, memberIds });
         window.dispatchEvent(new CustomEvent('group-form-submit', {
           detail: { name, memberIds }
         }));

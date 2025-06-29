@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Team Calendar - チームカレンダー
 
 ## プロジェクト概要
@@ -173,7 +178,7 @@ Default to using Bun instead of Node.js.
 ### 基本的な使用方法
 
 - Use `bun <file>` instead of `node <file>` or `ts-node <file>`
-- Use `bun test` instead of `jest` or `vitest`
+- Use `bun test` instead of `jest`
 - Use `bun build <file.html|file.ts|file.css>` instead of `webpack` or `esbuild`
 - Use `bun install` instead of `npm install` or `yarn install` or `pnpm install`
 - Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
@@ -313,7 +318,7 @@ MIT License
 
 ### コーディング規約
 - TypeScriptを使用
-- BiomeとVitestを活用したTDD開発
+- BiomeとBun Testを活用したTDD開発
 - コンポーネント駆動開発（Astroコンポーネント）
 - biome-ignoreの使用は禁止
   - 2025-01-14: E2Eテストのスキップに使用していたbiome-ignoreを削除

@@ -1,0 +1,592 @@
+---
+import type { CalendarEvent, TeamMember, WeeklySchedule } from '../lib/schema'
+import { formatDate } from '../utils/dateUtils'
+import EventPopover from './EventPopover.astro'
+
+export interface Props {
+  weeklySchedule: WeeklySchedule
+  members: TeamMember[]
+}
+
+const { weeklySchedule, members } = Astro.props
+
+// 週の開始日を取得
+const weekStartDate = new Date(weeklySchedule.weekStart)
+
+// 曜日のラベル
+const dayLabels = ['月', '火', '水', '木', '金', '土', '日']
+
+// 日付ヘッダーを生成
+const dateHeaders = Array.from({ length: 7 }, (_, i) => {
+  const date = new Date(weekStartDate)
+  date.setDate(date.getDate() + i)
+  return {
+    dayLabel: dayLabels[i],
+    dateStr: formatDate(date, 'M/D'),
+    date: date,
+  }
+})
+
+// 各メンバーの予定を日付ごとに整理
+function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
+  const eventsByDay: CalendarEvent[][] = Array.from({ length: 7 }, () => [])
+
+  for (const event of events) {
+    const eventStart = new Date(event.start)
+    const dayDiff = Math.floor(
+      (eventStart.getTime() - weekStartDate.getTime()) / (1000 * 60 * 60 * 24),
+    )
+
+    if (dayDiff >= 0 && dayDiff < 7) {
+      eventsByDay[dayDiff].push(event)
+    }
+  }
+
+  return eventsByDay
+}
+---
+
+<div class="weekly-calendar-wrapper">
+  <div class="weekly-calendar minimal-card content-appear" id="weekly-calendar">
+    <div class="calendar-header">
+      <div class="corner-cell" aria-hidden="true"></div>
+      {dateHeaders.map((header, index) => (
+        <div class={`day-header content-appear-delay-${Math.min(index + 1, 3)}`} role="columnheader">
+          <div class="day-label visual-secondary">{header.dayLabel}</div>
+          <div class="date-label visual-tertiary">{header.dateStr}</div>
+        </div>
+      ))}
+    </div>
+
+    <div class="calendar-scroll-container">
+      <div class="calendar-grid" role="grid">
+        {members.map((member, memberIndex) => {
+          const memberEvents = weeklySchedule.eventsByMember[member.id] || []
+          const eventsByDay = organizeEventsByDay(memberEvents, weekStartDate)
+          
+          return (
+            <div class={`member-row content-appear-delay-${Math.min(memberIndex + 1, 3)}`} role="row">
+              <div class="member-name" role="rowheader">
+                <span class="member-avatar">{member.name.charAt(0)}</span>
+                <span class="member-name-text visual-primary">{member.name}</span>
+              </div>
+              <div class="member-schedule">
+                {eventsByDay.map((dayEvents, dayIndex) => (
+                  <div class="day-cell" data-day={dayIndex} role="gridcell">
+                    <div class="events-container">
+                      {dayEvents.map((event) => {
+                        const eventType = event.label || (event.title.includes('会議') || event.title.includes('ミーティング') 
+                          ? 'meeting' 
+                          : 'work')
+                        
+                        return (
+                          <div 
+                            class="event-block minimal-hover"
+                            data-type={eventType}
+                            data-event-id={event.id}
+                            style={`border-left-color: ${event.color || 'var(--color-primary-500)'};`}
+                            tabindex="0"
+                            role="button"
+                            aria-label={`${event.title} - ${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}から${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}まで`}
+                          >
+                            <div class="event-time">
+                              {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                              {' - '}
+                              {new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                            <div class="event-title">{event.title}</div>
+                            {event.label && (
+                              <div class="event-category">{event.label}</div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Popover -->
+<EventPopover />
+
+<script>
+  // イベントクリックハンドラー
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target) return;
+    
+    const eventBlock = target.closest('.event-block');
+    if (eventBlock) {
+      e.preventDefault();
+      const eventId = eventBlock.getAttribute('data-event-id');
+      // イベントデータを取得して表示（実際の実装では適切にイベントデータを渡す）
+      window.dispatchEvent(new CustomEvent('event-popover-open', { detail: { eventId } }));
+    }
+  });
+  
+  // キーボードナビゲーション対応
+  document.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('event-block') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      target.click();
+    }
+  });
+
+  // スクロール機能を削除（スクロールが不要になったため）
+  
+  // ポップオーバーを閉じる
+  window.addEventListener('event-popover-close', () => {
+    const popover = document.querySelector('.popover-overlay');
+    if (popover) {
+      popover.classList.remove('open');
+    }
+  });
+  
+  // ウィンドウリサイズ時の処理（スクロール制御は不要になったため削除）
+</script>
+
+<style>
+  .weekly-calendar-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1400px; /* 最大幅を設定 */
+    margin: 0 auto; /* 中央寄せ */
+    padding: 0 var(--spacing-6); /* 左右に余白を追加 */
+    overflow: hidden; /* コンテンツがはみ出さないように制限 */
+  }
+
+  .weekly-calendar {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* モバイルでの横スクロール対応 */
+  @media (max-width: 768px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-4); /* モバイルでは余白を小さく */
+    }
+    
+    .weekly-calendar {
+      border-radius: 0;
+    }
+  }
+
+  .calendar-header {
+    display: grid;
+    grid-template-columns: 160px repeat(7, 1fr); /* minmaxを削除してスクロールを防ぐ */
+    background: var(--color-background-secondary);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .corner-cell {
+    border-right: 1px solid var(--color-border);
+  }
+
+  .day-header {
+    padding: var(--spacing-3);
+    text-align: center;
+    border-right: 1px solid var(--color-border);
+    position: relative;
+  }
+
+  /* 週末の曜日に淡い背景色 */
+  .day-header:nth-child(7),
+  .day-header:nth-child(8) {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+
+  .day-header:last-child {
+    border-right: none;
+  }
+
+  .day-label {
+    margin-bottom: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* 土曜日と日曜日の色分け */
+  .day-header:nth-child(7) .day-label {
+    color: var(--color-info);
+  }
+
+  .day-header:nth-child(8) .day-label {
+    color: var(--color-error);
+  }
+
+  .date-label {
+    font-size: var(--font-size-xs);
+  }
+
+  /* 横スクロールコンテナー */
+  .calendar-scroll-container {
+    overflow-x: hidden; /* スクロールを無効化 */
+    overflow-y: hidden;
+    max-width: 100%;
+  }
+
+  .calendar-grid {
+    min-height: 400px;
+    width: 100%; /* min-widthからwidthに変更 */
+  }
+
+  .member-row {
+    display: grid;
+    grid-template-columns: 160px 1fr; /* 140px → 160px に拡大 */
+    border-bottom: 1px solid var(--color-border);
+    min-height: 120px;
+  }
+
+  .member-row:last-child {
+    border-bottom: none;
+  }
+
+  .member-name {
+    padding: var(--spacing-3);
+    background: var(--color-background-secondary);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+  }
+
+  .member-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-500);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+  }
+
+  .member-name-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+  }
+
+  .member-schedule {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* minmaxを削除してスクロールを防ぐ */
+    width: 100%;
+  }
+
+  .day-cell {
+    border-right: 1px solid var(--color-border);
+    padding: var(--spacing-3); /* パディングを増加 */
+  }
+
+  /* 週末のセルに淡い背景色 */
+  .day-cell[data-day="5"],
+  .day-cell[data-day="6"] {
+    background-color: rgba(0, 0, 0, 0.01);
+  }
+
+  .day-cell:last-child {
+    border-right: none;
+  }
+
+  /* イベントコンテナ */
+  .events-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2); /* ギャップを増加 */
+  }
+
+  /* イベントブロック */
+  .event-block {
+    padding: var(--spacing-3) var(--spacing-3); /* 左右のパディングを均一に */
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-in-out);
+    color: var(--color-text-primary); /* テキスト色を濃い色に */
+    font-size: var(--font-size-xs);
+    background-color: var(--color-background-secondary); /* 薄い背景色 */
+    border-left: 4px solid; /* 左側に太いボーダー */
+    position: relative;
+  }
+
+  .event-block:hover {
+    transform: translateX(2px); /* 右へ少し移動 */
+    box-shadow: var(--shadow-sm);
+    background-color: var(--color-surface); /* ホバー時により明るく */
+  }
+
+  .event-time {
+    font-size: 0.625rem;
+    opacity: 0.7; /* より読みやすく */
+    margin-bottom: var(--spacing-1);
+    color: var(--color-text-secondary);
+  }
+
+  .event-title {
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    margin-bottom: var(--spacing-1);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--color-text-primary);
+  }
+
+  .event-category {
+    font-size: 0.625rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-tertiary);
+  }
+
+  /* イベントタイプ別のスタイル */
+  .event-block[data-type="meeting"] {
+    background: var(--color-background-secondary); /* 背景色削除 */
+  }
+
+  .event-block[data-type="work"] {
+    background: var(--color-background-secondary); /* 背景色削除 */
+  }
+
+
+
+  /* 大画面対応 */
+  @media (min-width: 1280px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-8); /* 大画面では余白を大きく */
+    }
+    
+    .calendar-header {
+      grid-template-columns: 180px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 180px 1fr;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .day-cell {
+      padding: var(--spacing-4);
+    }
+
+    .event-block {
+      padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-4); /* 左側を少し多めに */
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .calendar-header {
+      grid-template-columns: 200px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 200px 1fr;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+    }
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 1024px) {
+    .calendar-header {
+      grid-template-columns: 100px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 100px 1fr;
+    }
+
+    .member-name {
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-3);
+      gap: var(--spacing-2);
+    }
+    
+    .member-avatar {
+      width: 28px;
+      height: 28px;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
+    }
+
+    .day-cell {
+      padding: var(--spacing-2);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .calendar-header {
+      grid-template-columns: 60px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 60px 1fr;
+    }
+
+    .member-name {
+      font-size: var(--font-size-xs);
+      padding: var(--spacing-2);
+      gap: var(--spacing-1);
+    }
+    
+    .member-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: var(--font-size-xs);
+    }
+    
+    .member-name-text {
+      display: none; /* モバイルでは名前を非表示 */
+    }
+
+    .day-header {
+      padding: var(--spacing-2) var(--spacing-1);
+    }
+
+    .day-label {
+      font-size: var(--font-size-xs);
+    }
+
+    .date-label {
+      font-size: 0.625rem;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
+    }
+
+    .day-cell {
+      padding: var(--spacing-1);
+    }
+
+    .event-title {
+      font-size: 0.65rem;
+      -webkit-line-clamp: 1; /* モバイルでは1行に制限 */
+    }
+
+    .event-block {
+      padding: var(--spacing-1) var(--spacing-1) var(--spacing-1) var(--spacing-2);
+      margin: 0;
+      border-left-width: 3px; /* モバイルでは細めに */
+    }
+
+    /* モバイルで時刻を短縮表示 */
+    .event-time {
+      font-size: 0.6rem;
+      opacity: 0.8;
+    }
+    
+
+  }
+
+  /* 小画面向けの追加対応 */
+  @media (max-width: 480px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-2); /* 小画面ではさらに余白を小さく */
+    }
+    
+    .calendar-header {
+      grid-template-columns: 40px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 40px 1fr;
+    }
+
+    .member-name {
+      padding: var(--spacing-1);
+    }
+    
+    .member-avatar {
+      width: 20px;
+      height: 20px;
+      font-size: 0.625rem;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
+    }
+
+    .day-cell {
+      padding: 0.125rem; /* 最小限のパディング */
+    }
+    
+    .day-header {
+      padding: var(--spacing-1);
+    }
+    
+    .day-label {
+      font-size: 0.625rem;
+    }
+    
+    .date-label {
+      font-size: 0.5rem;
+    }
+    
+    .event-block {
+      padding: 0.125rem 0.25rem 0.125rem 0.375rem; /* 左側を少し多めに */
+      font-size: 0.6rem;
+      border-left-width: 2px; /* 小画面では更に細く */
+    }
+    
+    .event-time {
+      display: none; /* 小画面では時刻を非表示 */
+    }
+    
+    .event-category {
+      display: none; /* 小画面ではカテゴリを非表示 */
+    }
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .day-header:nth-child(7),
+    .day-header:nth-child(8) {
+      background-color: rgba(239, 68, 68, 0.03);
+    }
+
+    .day-cell[data-day="5"],
+    .day-cell[data-day="6"] {
+      background-color: rgba(239, 68, 68, 0.01);
+    }
+
+    .event-block {
+      background-color: var(--color-surface);
+    }
+
+    .event-block:hover {
+      background-color: var(--color-background-secondary);
+    }
+  }
+
+
+</style> 

@@ -1,6 +1,6 @@
 ---
 import GroupCreateForm from '../../components/GroupCreateForm.astro'
-import Layout from '../../layouts/Layout.astro'
+import Header from '../../components/Header.astro'
 import { loadMockData } from '../../lib/mockData'
 import { groupsStore, teamMembersStore } from '../../stores/groupStore'
 
@@ -13,51 +13,43 @@ const members = teamMembersStore.get()
 const existingGroups = groupsStore.get()
 ---
 
-<Layout title="新しいグループを作成">
-  <main>
-    <div class="container">
-      <nav class="breadcrumb">
-        <a href="/">ホーム</a>
-        <span>/</span>
-        <a href="/groups">グループ一覧</a>
-        <span>/</span>
-        <span>新規作成</span>
-      </nav>
-      
-      <GroupCreateForm members={members} existingGroups={existingGroups} />
-    </div>
-  </main>
-</Layout>
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新しいグループを作成 - Team Calendar</title>
+    <link rel="stylesheet" href="/src/styles/design-system.css" />
+    <link rel="stylesheet" href="/src/styles/animations.css" />
+  </head>
+  <body>
+    <Header />
+    
+    <main>
+      <div class="container">
+        <GroupCreateForm members={members} existingGroups={existingGroups} />
+      </div>
+    </main>
+  </body>
+</html>
 
 <style>
-  main {
+  body {
+    margin: 0;
+    padding: 0;
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--color-background);
+  }
+
+  main {
+    min-height: calc(100vh - 48px);
+    background-color: var(--color-background-secondary);
     padding: 2rem 1rem;
   }
 
   .container {
     max-width: 800px;
     margin: 0 auto;
-  }
-
-  .breadcrumb {
-    margin-bottom: 2rem;
-    font-size: 0.875rem;
-  }
-
-  .breadcrumb a {
-    color: #4a90e2;
-    text-decoration: none;
-  }
-
-  .breadcrumb a:hover {
-    text-decoration: underline;
-  }
-
-  .breadcrumb span {
-    color: #666;
-    margin: 0 0.5rem;
   }
 </style>
 

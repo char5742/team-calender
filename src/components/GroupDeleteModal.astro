@@ -1,104 +1,51 @@
 ---
-import type { Group } from '../lib/schema'
-import { generateModalId } from '../utils/id'
-
-export interface Props {
-  group?: Group
-  isOpen?: boolean
-}
-
-const { group, isOpen = false } = Astro.props
-const modalId = generateModalId()
+// 削除確認モーダルのコンポーネント
 ---
 
-<div id={modalId} class={`modal-overlay ${isOpen ? 'open' : ''}`}>
-  <div class="modal">
-    <div class="modal-header">
-      <h3>グループを削除</h3>
-    </div>
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-content minimal-card">
+    <h3 class="heading-tertiary">グループを削除しますか？</h3>
     <div class="modal-body">
-      <p>
-        本当に「<strong>{group?.name || ''}</strong>」を削除しますか？
+      <p class="visual-secondary">
+        「<strong class="visual-primary"></strong>」を削除すると、このグループに関連するすべてのデータが失われます。
       </p>
-      <p class="warning">
-        この操作は取り消すことができません。
-      </p>
+      <p class="visual-tertiary">この操作は取り消せません。</p>
     </div>
     <div class="modal-actions">
-      <button type="button" class="btn btn-danger" data-action="delete">
-        <span class="btn-text">削除する</span>
-        <span class="btn-spinner hidden">
-          <svg class="spinner-icon" width="16" height="16" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.416" stroke-dashoffset="10">
-              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
-            </circle>
-          </svg>
-          削除中...
-        </span>
+      <button class="btn btn-primary btn-danger interactive" data-action="confirm">
+        削除する
       </button>
-      <button type="button" class="btn btn-secondary" data-action="cancel">
+      <button class="btn btn-subtle" data-action="cancel">
         キャンセル
       </button>
     </div>
   </div>
 </div>
 
-<script define:vars={{ modalId }}>
-  // ローディング状態の簡易実装
-  const isLoadingStore = {
-    get: () => false,
-    subscribe: (callback) => {
-      // 簡易実装のため、常にfalseを返す
-      callback(false);
-    }
-  };
-  
-  const modal = document.getElementById(modalId);
+<script>
+  const modal = document.getElementById('delete-modal');
   
   if (modal) {
-    const deleteButton = modal.querySelector('[data-action="delete"]');
+    const confirmButton = modal.querySelector('[data-action="confirm"]');
     const cancelButton = modal.querySelector('[data-action="cancel"]');
-    const btnText = modal.querySelector('.btn-text');
-    const btnSpinner = modal.querySelector('.btn-spinner');
-    
-    // ローディング状態の購読
-    isLoadingStore.subscribe(isLoading => {
-      if (deleteButton) {
-        deleteButton.disabled = isLoading;
-        deleteButton.classList.toggle('loading', isLoading);
-      }
-      if (cancelButton) {
-        cancelButton.disabled = isLoading;
-      }
-      if (btnText) {
-        btnText.classList.toggle('hidden', isLoading);
-      }
-      if (btnSpinner) {
-        btnSpinner.classList.toggle('hidden', !isLoading);
-      }
-    });
     
     // 削除ボタンのクリックイベント
-    if (deleteButton) {
-      deleteButton.addEventListener('click', () => {
-        if (!deleteButton.disabled) {
-          window.dispatchEvent(new CustomEvent('group-delete-confirm'));
-        }
+    if (confirmButton) {
+      confirmButton.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('group-delete-confirm'));
       });
     }
 
     // キャンセルボタンのクリックイベント
     if (cancelButton) {
       cancelButton.addEventListener('click', () => {
-        if (!cancelButton.disabled) {
-          window.dispatchEvent(new CustomEvent('group-delete-cancel'));
-        }
+        window.dispatchEvent(new CustomEvent('group-delete-cancel'));
       });
     }
 
     // オーバーレイクリックでモーダルを閉じる
     modal.addEventListener('click', (e) => {
-      if (e.target === modal && !isLoadingStore.get()) {
+      if (e.target === modal) {
         window.dispatchEvent(new CustomEvent('group-delete-cancel'));
       }
     });
@@ -112,145 +59,81 @@ const modalId = generateModalId()
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: none;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
+    display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: var(--z-index-modal);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--duration-normal) var(--easing-in-out);
+    padding: var(--spacing-4);
   }
 
   .modal-overlay.open {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
   }
 
-  .modal {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    width: 90%;
-    animation: modalFadeIn 0.2s ease-out;
+  .modal-content {
+    max-width: 420px;
+    width: 100%;
+    padding: var(--spacing-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    transform: scale(0.9);
+    transition: transform var(--duration-normal) var(--easing-spring);
   }
 
-  @keyframes modalFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .modal-header {
-    padding: 1.5rem;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .modal-header h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #333;
+  .modal-overlay.open .modal-content {
+    transform: scale(1);
   }
 
   .modal-body {
-    padding: 1.5rem;
+    margin: var(--spacing-6) 0;
   }
 
   .modal-body p {
-    margin: 0 0 1rem 0;
-    color: #555;
-  }
-
-  .modal-body p:last-child {
-    margin-bottom: 0;
-  }
-
-  .modal-body strong {
-    color: #333;
-  }
-
-  .warning {
-    color: #dc3545;
-    font-size: 0.875rem;
+    margin: var(--spacing-3) 0;
   }
 
   .modal-actions {
-    padding: 1rem 1.5rem;
-    border-top: 1px solid #e0e0e0;
     display: flex;
-    gap: 1rem;
-    justify-content: flex-end;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-8);
   }
 
-  .btn {
-    padding: 0.5rem 1.5rem;
-    font-size: 1rem;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-    position: relative;
-    min-width: 100px;
-  }
-
-  .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
+  /* Danger button style */
   .btn-danger {
-    background-color: #dc3545;
+    background: var(--color-error);
     color: white;
   }
 
-  .btn-danger:hover:not(:disabled) {
-    background-color: #c82333;
+  .btn-danger:hover {
+    background: #dc2626;
   }
 
-  .btn-danger.loading {
-    background-color: #dc3545;
-  }
-
-  .btn-secondary {
-    background-color: #6c757d;
-    color: white;
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    background-color: #545b62;
-  }
-
-  .btn-text,
-  .btn-spinner {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .hidden {
-    display: none;
-  }
-  
-  /* より具体的なセレクタで上書きを防ぐ */
-  .modal .hidden,
-  .modal-overlay .hidden {
-    display: none;
-  }
-
-  .spinner-icon {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from {
-      transform: rotate(0deg);
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.8);
     }
-    to {
-      transform: rotate(360deg);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      padding: var(--spacing-6);
+    }
+
+    .modal-actions {
+      flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+      width: 100%;
     }
   }
 </style> 

@@ -1,0 +1,307 @@
+---
+import { loadMockData } from '../lib/mockData'
+import { groupsStore } from '../stores/groupStore'
+
+export interface Props {
+  currentGroupId?: string
+}
+
+const { currentGroupId } = Astro.props
+
+// モックデータを読み込む
+loadMockData()
+
+// グループ一覧を取得
+const groups = groupsStore.get()
+---
+
+<header class="header">
+  <div class="header-container">
+    <!-- Logo/Brand -->
+    <a href="/" class="brand">
+      Team Calendar
+    </a>
+
+    <!-- Tabs Container -->
+    <div class="tabs-container">
+      <div class="tabs-scroll">
+        {groups.map(group => (
+          <a 
+            href={`/groups/${group.id}/weekly-schedule`}
+            class={`tab ${currentGroupId === group.id ? 'active' : ''}`}
+            data-group-id={group.id}
+          >
+            <span class="tab-label">{group.name}</span>
+            <button 
+              class="tab-close"
+              aria-label={`${group.name}を閉じる`}
+              onclick="event.preventDefault(); event.stopPropagation();"
+            >
+              ×
+            </button>
+          </a>
+        ))}
+        
+        <!-- 新規グループ追加ボタン -->
+        <a href="/groups/new" class="tab tab-add" aria-label="新しいグループを追加">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button 
+      id="theme-toggle" 
+      class="theme-toggle"
+      aria-label="テーマを切り替える"
+      title="テーマを切り替える"
+    >
+      <!-- ライトモード時は月アイコンを表示 -->
+      <svg class="icon theme-light-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+      </svg>
+      <!-- ダークモード時は太陽アイコンを表示 -->
+      <svg class="icon theme-dark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"></circle>
+        <line x1="12" y1="1" x2="12" y2="3"></line>
+        <line x1="12" y1="21" x2="12" y2="23"></line>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+        <line x1="1" y1="12" x2="3" y2="12"></line>
+        <line x1="21" y1="12" x2="23" y2="12"></line>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-index-sticky);
+    background-color: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-container {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--spacing-4);
+    gap: var(--spacing-4);
+  }
+
+  /* Brand */
+  .brand {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    letter-spacing: var(--letter-spacing-tight);
+    flex-shrink: 0;
+    padding-right: var(--spacing-4);
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* Tabs Container */
+  .tabs-container {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .tabs-scroll {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .tabs-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 2px;
+  }
+
+  /* Tab Styles */
+  .tab {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 var(--spacing-3);
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+    border-right: 1px solid var(--color-border);
+    transition: all var(--duration-fast) var(--easing-out);
+    position: relative;
+    min-width: 120px;
+    max-width: 200px;
+  }
+
+  .tab:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+
+  .tab.active {
+    background-color: var(--color-surface);
+    color: var(--color-text-primary);
+  }
+
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: var(--color-primary);
+  }
+
+  .tab-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: var(--spacing-2);
+  }
+
+  .tab-close {
+    display: none;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--color-text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--easing-out);
+    flex-shrink: 0;
+  }
+
+  .tab:hover .tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .tab-close:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+
+  /* 新規追加タブ */
+  .tab-add {
+    min-width: 48px;
+    max-width: 48px;
+    justify-content: center;
+    border-right: none;
+  }
+
+  .tab-add svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Theme Toggle */
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: var(--radius-md);
+    background-color: transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-out);
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+
+  .theme-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Icons */
+  .icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Theme icons visibility */
+  html:not(.dark) .theme-dark-icon,
+  html.dark .theme-light-icon {
+    display: none;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .header-container {
+      padding: 0 var(--spacing-2);
+      gap: var(--spacing-2);
+    }
+
+    .brand {
+      font-size: var(--font-size-sm);
+      padding-right: var(--spacing-2);
+    }
+
+    .tab {
+      min-width: 80px;
+      padding: 0 var(--spacing-2);
+      font-size: var(--font-size-xs);
+    }
+  }
+</style>
+
+<script>
+  // テーマトグル
+  const themeToggle = document.getElementById('theme-toggle');
+  
+  themeToggle?.addEventListener('click', () => {
+    const html = document.documentElement;
+    const isDark = html.classList.contains('dark');
+    
+    if (isDark) {
+      html.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    } else {
+      html.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    }
+  });
+
+  // 保存されたテーマを適用
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') {
+    document.documentElement.classList.add('dark');
+  }
+
+  // タブの削除機能（今回は実装しない）
+  // 将来的にグループ削除機能を追加する場合は、ここに実装
+</script> 

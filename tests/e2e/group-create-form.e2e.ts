@@ -2,7 +2,6 @@ import { expect, test } from '@playwright/test'
 
 // RegExを定数として定義
 const ERROR_CLASS_REGEX = /error/
-const URL_END_REGEX = /\/$|index\.html$/
 
 test.describe('GroupCreateForm', () => {
   test.beforeEach(async ({ page }) => {
@@ -103,8 +102,8 @@ test.describe('GroupCreateForm', () => {
     // キャンセルボタンをクリック
     await page.click('button:has-text("キャンセル")')
 
-    // ホームページへ遷移することを確認
-    await page.waitForURL('**/', { timeout: 10000 })
-    expect(page.url()).toMatch(URL_END_REGEX)
+    // 最初のグループのカレンダー画面へ遷移することを確認（グループが存在する場合）
+    await page.waitForURL('**/groups/**/weekly-schedule', { timeout: 10000 })
+    expect(page.url()).toContain('/weekly-schedule')
   })
 })

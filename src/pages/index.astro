@@ -1,71 +1,18 @@
 ---
-import GroupManagement from '../components/GroupManagement.astro'
----
+import { loadMockData } from '../lib/mockData'
+import { groupsStore } from '../stores/groupStore'
 
-<!DOCTYPE html>
-<html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Team Calendar - チームカレンダー</title>
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>Team Calendar</h1>
-        <p>チームメンバーのスケジュールを一元管理</p>
-      </header>
-      
-      <main>
-        <GroupManagement />
-      </main>
-    </div>
-  </body>
-</html>
+// モックデータを読み込む
+loadMockData()
 
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+// グループ一覧を取得
+const groups = groupsStore.get()
 
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-  }
+// グループがない場合は作成画面へリダイレクト
+if (groups.length === 0) {
+  return Astro.redirect('/groups/new')
+}
 
-  .container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  header {
-    background-color: white;
-    padding: 1.5rem 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  header h1 {
-    font-size: 2rem;
-    color: #007bff;
-    margin-bottom: 0.25rem;
-  }
-
-  header p {
-    color: #6c757d;
-  }
-
-  main {
-    flex: 1;
-    padding: 2rem;
-  }
-
-  @media (max-width: 768px) {
-    main {
-      padding: 1rem;
-    }
-  }
-</style> 
+// 最初のグループのカレンダー画面へリダイレクト
+return Astro.redirect(`/groups/${groups[0].id}/weekly-schedule`)
+--- 

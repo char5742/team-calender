@@ -126,26 +126,17 @@ const teamMembers = teamMembersStore.get()
     memberIds: string[];
   }
 
-  // グループストアをwindowオブジェクトに保存
-  if (!(window as any).groupsData) {
-    (window as any).groupsData = [
-      { id: 'group-1', name: '開発チーム', memberIds: ['member-1', 'member-2', 'member-3'] },
-      { id: 'group-2', name: '営業チーム', memberIds: ['member-4', 'member-5'] },
-      { id: 'group-3', name: 'マーケティングチーム', memberIds: ['member-4', 'member-5', 'member-6'] },
-      { id: 'group-4', name: 'プロジェクトA', memberIds: ['member-1', 'member-4', 'member-5'] }
-    ];
-  }
+  // モックデータをインポート（動的インポートを使用）
+  import('../lib/mockData').then(({ mockGroups, mockTeamMembers }) => {
+    // グループストアをwindowオブジェクトに保存
+    if (!(window as any).groupsData) {
+      (window as any).groupsData = mockGroups;
+    }
 
-  if (!(window as any).teamMembersData) {
-    (window as any).teamMembersData = [
-      { id: 'member-1', name: '山田太郎', email: 'yamada@example.com' },
-      { id: 'member-2', name: '佐藤花子', email: 'sato@example.com' },
-      { id: 'member-3', name: '鈴木一郎', email: 'suzuki@example.com' },
-      { id: 'member-4', name: '田中美咲', email: 'tanaka@example.com' },
-      { id: 'member-5', name: '高橋健太', email: 'takahashi@example.com' },
-      { id: 'member-6', name: '渡辺 由美', email: 'watanabe@example.com' }
-    ];
-  }
+    if (!(window as any).teamMembersData) {
+      (window as any).teamMembersData = mockTeamMembers;
+    }
+  });
 
   // ストア関数の実装
   const groupsStore = {
@@ -372,7 +363,7 @@ const teamMembers = teamMembersStore.get()
         if (modal) {
           modal.classList.add('open');
           // グループ名を設定
-          const group = groupsStore.get().find(g => g.id === groupId);
+          const group = groupsStore.get().find((g: Group) => g.id === groupId);
           if (group) {
             const modalGroupName = modal.querySelector('.modal-body strong');
             if (modalGroupName) {
@@ -441,7 +432,7 @@ const teamMembers = teamMembersStore.get()
       if (!trimmedName) return false;
       
       const allGroups = groupsStore.get();
-      return allGroups.some(g => {
+      return allGroups.some((g: Group) => {
         // 編集中のグループ自身は除外
         if (g.id === currentGroupId) return false;
         return g.name.toLowerCase() === trimmedName.toLowerCase();

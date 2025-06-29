@@ -1,5 +1,15 @@
 import { expect, test } from '@playwright/test'
 
+// 定数定義
+const HIDDEN_CLASS_REGEX = /hidden/
+
+// テスト用のグローバル変数の型定義
+declare global {
+  interface Window {
+    lastGroupClick?: { groupId: string }
+  }
+}
+
 test.describe('グループ一覧表示', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
@@ -61,37 +71,27 @@ test.describe('グループ一覧表示', () => {
     // ページが完全に読み込まれるまで待機
     await page.waitForLoadState('networkidle')
 
-    // イベントリスナーを設定して、グループをクリック
-    const clickResult = await page.evaluate(() => {
-      return new Promise((resolve) => {
-        let clickedId: string | undefined
-
-        // イベントリスナーを設定
-        const handler = (event: Event) => {
-          const customEvent = event as CustomEvent
-          clickedId = customEvent.detail?.groupId
-          console.log('Group clicked:', clickedId)
-          window.removeEventListener('group-click', handler)
-          resolve(clickedId)
-        }
-
-        window.addEventListener('group-click', handler)
-
-        // 最初のグループボタンをクリック
-        const firstButton = document.querySelector('.group-item .group-button') as HTMLButtonElement
-        if (firstButton) {
-          firstButton.click()
-        } else {
-          resolve(undefined)
-        }
-
-        // タイムアウト設定
-        setTimeout(() => resolve(clickedId), 1000)
+    // イベントリスナーを設定
+    await page.evaluateHandle(() => {
+      window.addEventListener('group-click', (event: Event) => {
+        const customEvent = event as CustomEvent<{ groupId: string }>
+        window.lastGroupClick = customEvent.detail
       })
     })
 
-    expect(clickResult).toBeDefined()
-    expect(typeof clickResult).toBe('string')
+    // グループボタンをクリックして、イベントを待機
+    const clickPromise = page.waitForFunction(() => window.lastGroupClick !== undefined, {
+      timeout: 5000,
+    })
+
+    await page.locator('.group-item .group-button').first().click()
+
+    await clickPromise
+
+    const clickedId = await page.evaluate(() => window.lastGroupClick?.groupId)
+
+    expect(clickedId).toBeDefined()
+    expect(typeof clickedId).toBe('string')
   })
 
   test('メンバーが多いグループで「他◯人」表示が機能する', async ({ page }) => {
@@ -133,6 +133,6 @@ test.describe('グループ一覧表示', () => {
 
     // 編集フォームコンテナが表示されることを確認（簡略化）
     const editFormContainer = await page.locator('#edit-form-container')
-    await expect(editFormContainer).not.toHaveClass(/hidden/)
+    await expect(editFormContainer).not.toHaveClass(HIDDEN_CLASS_REGEX)
   })
 })

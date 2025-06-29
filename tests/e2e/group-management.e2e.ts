@@ -3,6 +3,13 @@ import { expect, test } from '@playwright/test'
 // RegExを定数として定義
 const ERROR_CLASS_REGEX = /error/
 
+// テスト用のグローバル変数の型定義
+declare global {
+  interface Window {
+    lastGroupFormSubmit?: { name: string; memberIds: string[] }
+  }
+}
+
 test.describe('GroupManagement', () => {
   test.beforeEach(async ({ page }) => {
     // メインページへ移動
@@ -74,36 +81,24 @@ test.describe('GroupManagement', () => {
     // メンバーを選択（最初のメンバーをチェック）
     await createFormContainer.locator('.member-checkbox input[type="checkbox"]').first().check()
 
-    // イベントリスナーを設定してフォームを送信
-    const submitResult = await page.evaluate(() => {
-      return new Promise((resolve) => {
-        let createdName: string | undefined
-
-        const handler = (event: Event) => {
-          const customEvent = event as CustomEvent
-          console.log('group-form-submit event received:', customEvent.detail)
-          createdName = customEvent.detail.name
-          window.removeEventListener('group-form-submit', handler)
-          resolve(createdName)
-        }
-
-        window.addEventListener('group-form-submit', handler)
-
-        // フォームを送信
-        const submitButton = document.querySelector(
-          '#create-form-container button[type="submit"]',
-        ) as HTMLButtonElement
-        if (submitButton) {
-          submitButton.click()
-        } else {
-          resolve(undefined)
-        }
-
-        // タイムアウト設定
-        setTimeout(() => resolve(createdName), 1000)
+    // イベントリスナーを設定
+    await page.evaluateHandle(() => {
+      window.addEventListener('group-form-submit', (event: Event) => {
+        const customEvent = event as CustomEvent<{ name: string; memberIds: string[] }>
+        window.lastGroupFormSubmit = customEvent.detail
       })
     })
 
+    // フォームを送信して、イベントを待機
+    const submitPromise = page.waitForFunction(() => window.lastGroupFormSubmit !== undefined, {
+      timeout: 5000,
+    })
+
+    await createFormContainer.locator('button[type="submit"]').click()
+
+    await submitPromise
+
+    const submitResult = await page.evaluate(() => window.lastGroupFormSubmit?.name)
     expect(submitResult).toBe('新しいテストグループ')
   })
 })

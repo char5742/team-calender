@@ -122,8 +122,7 @@ test.describe('グループ一覧表示', () => {
   // TODO: クライアントサイドJavaScriptの実行環境を改善後に有効化
   // 現在の問題: GroupManagementコンポーネントの編集フォーム表示処理が
   // E2E環境で正しく動作しない（モックデータの初期化タイミングの問題）
-  // biome-ignore lint/suspicious/noSkippedTests: 一時的にスキップ - モックデータの初期化タイミングの問題を解決後に有効化
-  test.skip('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
+  test('グループの編集ボタンをクリックすると編集フォームが表示される', async ({ page }) => {
     await page.goto('/')
 
     // ページが完全に読み込まれるまで待機

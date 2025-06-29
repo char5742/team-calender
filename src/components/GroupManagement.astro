@@ -117,32 +117,18 @@ const teamMembers = teamMembersStore.get()
   // イベントリスナーを管理するための配列
   const eventHandlers = [];
   
-  // E2Eテスト環境の確認
-  const isE2E = window.__E2E_TEST_MODE__ === true;
-  
   // 同期的な初期データの設定
   let dataAdapter = null;
-  let mockData = null;
   
-  if (isE2E && window.__E2E_MOCK_DATA__) {
-    mockData = window.__E2E_MOCK_DATA__;
-  }
-  
-  // ストア関数の実装（E2Eテスト環境では同期的に動作）
+  // ストア関数の実装
   const groupsStore = {
     get: () => {
-      if (isE2E && mockData) {
-        return mockData.groups || [];
-      }
       return dataAdapter?.getGroups() || [];
     }
   };
   
   const teamMembersStore = {
     get: () => {
-      if (isE2E && mockData) {
-        return mockData.teamMembers || [];
-      }
       return dataAdapter?.getTeamMembers() || [];
     }
   };
@@ -150,33 +136,14 @@ const teamMembers = teamMembersStore.get()
   const getAllGroupsWithMembers = () => groupsStore.get();
   
   const createGroup = (name, memberIds) => {
-    if (isE2E && mockData) {
-      const newGroup = {
-        id: `group-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-        name,
-        memberIds
-      };
-      mockData.groups.push(newGroup);
-      return newGroup;
-    }
     return dataAdapter?.createGroup(name, memberIds);
   };
   
   const updateGroup = (id, data) => {
-    if (isE2E && mockData) {
-      mockData.groups = mockData.groups.map(g =>
-        g.id === id ? { ...g, ...data } : g
-      );
-      return;
-    }
     dataAdapter?.updateGroup(id, data);
   };
   
   const deleteGroup = (id) => {
-    if (isE2E && mockData) {
-      mockData.groups = mockData.groups.filter(g => g.id !== id);
-      return;
-    }
     dataAdapter?.deleteGroup(id);
   };
   
@@ -195,17 +162,15 @@ const teamMembers = teamMembersStore.get()
   // ページ離脱時のクリーンアップ
   window.addEventListener('beforeunload', cleanup);
   
-  // 非同期でデータアダプターを初期化（本番環境用）
-  if (!isE2E) {
-    (async () => {
-      try {
-        const module = await import('../lib/e2eDataAdapter');
-        dataAdapter = module.dataAdapter;
-      } catch (error) {
-        console.error('Failed to load data adapter:', error);
-      }
-    })();
-  }
+  // 非同期でデータアダプターを初期化
+  (async () => {
+    try {
+      const module = await import('../lib/e2eDataAdapter');
+      dataAdapter = module.dataAdapter;
+    } catch (error) {
+      console.error('Failed to load data adapter:', error);
+    }
+  })();
     
     // ローディング状態とエラー状態の簡易実装
     const isLoadingStore = {

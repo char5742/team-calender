@@ -16,71 +16,55 @@ const isEdit = mode === 'edit'
 const formId = generateFormId()
 ---
 
-<div class="group-form glass" data-existing-groups={JSON.stringify(existingGroups || [])} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
-  <h3>{isEdit ? 'グループを編集' : '新しいグループを作成'}</h3>
+<div class="group-form minimal-card" data-existing-groups={JSON.stringify(existingGroups)} data-group={group ? JSON.stringify(group) : undefined} data-is-edit={isEdit}>
+  <h3 class="heading-tertiary">{mode === 'create' ? '新しいグループを作成' : 'グループを編集'}</h3>
+  
   <form id={formId} novalidate>
     <div class="form-group">
-      <label for={`${formId}-name`}>グループ名</label>
-      <div class="input-wrapper">
-        <input
-          type="text"
-          id={`${formId}-name`}
-          name="name"
-          value={group?.name || ''}
-          placeholder="グループ名を入力"
-          required
-        />
-        <div class="input-focus-indicator"></div>
-      </div>
+      <label for={`${formId}-name`} class="visual-secondary">グループ名</label>
+      <input
+        type="text"
+        id={`${formId}-name`}
+        name="name"
+        class="minimal-input"
+        placeholder="グループ名を入力"
+        value={group?.name || ''}
+        required
+      />
       <div class="error-message hidden" id={`${formId}-name-error`}>
-        <svg class="error-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
-        </svg>
-        <span>このグループ名は既に使用されています</span>
+        このグループ名は既に使用されています
       </div>
     </div>
 
     <div class="form-group">
-      <label>メンバーを選択</label>
-      <div class="members-selection glass-subtle">
-        {teamMembers.map((member) => (
-          <label class="member-checkbox">
+      <label class="visual-secondary">メンバーを選択</label>
+      <div class="members-selection">
+        {teamMembers.map(member => (
+          <label class="member-checkbox minimal-card interactive">
             <input
               type="checkbox"
               name="memberIds"
               value={member.id}
               checked={group?.memberIds.includes(member.id)}
             />
-            <div class="checkbox-custom">
-              <svg class="checkbox-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3.5 8L6.5 11L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </div>
             <span class="member-info">
-              <span class="member-name">{member.name}</span>
-              <span class="member-email">{member.email}</span>
+              <span class="member-name visual-primary">{member.name}</span>
+              <span class="member-email visual-tertiary">{member.email}</span>
             </span>
           </label>
         ))}
       </div>
       <div class="error-message hidden" id={`${formId}-members-error`}>
-        <svg class="error-icon" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M8 4.5V8.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="8" cy="11" r="0.5" fill="currentColor"/>
-        </svg>
-        <span>少なくとも1人のメンバーを選択してください</span>
+        少なくとも1人のメンバーを選択してください
       </div>
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn btn-primary ripple-container button-hover focus-glow">
-        <span class="btn-text">{isEdit ? '更新' : '作成'}</span>
+      <button type="submit" class="btn btn-primary interactive">
+        {mode === 'create' ? '作成' : '更新'}
       </button>
-      <button type="button" class="btn btn-secondary ripple-container button-hover focus-glow" data-action="cancel">
-        <span class="btn-text">キャンセル</span>
+      <button type="button" class="btn btn-subtle" data-action="cancel">
+        キャンセル
       </button>
     </div>
   </form>
@@ -181,505 +165,92 @@ const formId = generateFormId()
 
 <style>
   .group-form {
-    background-color: var(--color-surface);
-    padding: var(--spacing-8);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
-    max-width: 500px;
-    box-shadow: var(--shadow-lg);
-    transition: all var(--duration-normal) var(--easing-in-out);
-  }
-
-  /* ガラスモーフィズム効果を強化 */
-  .group-form.glass {
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-xl));
-    -webkit-backdrop-filter: blur(var(--blur-xl));
-    border: 1px solid var(--color-glass-border);
-    box-shadow: var(--shadow-glass);
-  }
-
-  .glass-subtle {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(var(--blur-md));
-    -webkit-backdrop-filter: blur(var(--blur-md));
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  h3 {
-    margin: 0 0 var(--spacing-8) 0;
-    font-size: var(--font-size-2xl);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
-    letter-spacing: -0.02em;
+    padding: var(--spacing-6);
+    border-radius: var(--radius-lg);
   }
 
   .form-group {
     margin-bottom: var(--spacing-6);
   }
 
-  label {
+  .form-group label {
     display: block;
-    margin-bottom: var(--spacing-3);
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
-    letter-spacing: 0.01em;
+    margin-bottom: var(--spacing-2);
   }
 
-  /* input要素のラッパー */
-  .input-wrapper {
-    position: relative;
-  }
-
-  input[type="text"] {
-    width: 100%;
-    padding: var(--spacing-4);
-    font-size: var(--font-size-base);
-    border: 2px solid var(--color-border);
-    border-radius: var(--radius-md);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    background-color: var(--color-background);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-normal);
-  }
-
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--color-primary-500);
-    background-color: var(--color-surface);
-  }
-
-  /* フォーカスインジケーター */
-  .input-focus-indicator {
-    position: absolute;
-    inset: -2px;
-    border-radius: var(--radius-md);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--duration-fast) var(--easing-in-out);
-    background: radial-gradient(
-      ellipse at center,
-      rgba(90, 122, 255, 0.15) 0%,
-      transparent 70%
-    );
-  }
-
-  input[type="text"]:focus ~ .input-focus-indicator {
-    opacity: 1;
-  }
-
+  /* Members selection - シンプル化 */
   .members-selection {
-    max-height: 320px;
-    overflow-y: auto;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-3);
-    background-color: var(--color-background);
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-gray-400) transparent;
-  }
-
-  .members-selection::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  .members-selection::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .members-selection::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray-400);
-    border-radius: var(--radius-full);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
   }
 
   .member-checkbox {
     display: flex;
     align-items: center;
-    padding: var(--spacing-3);
-    margin: var(--spacing-1) 0;
-    cursor: pointer;
+    padding: var(--spacing-3) var(--spacing-4);
     border-radius: var(--radius-md);
+    cursor: pointer;
     transition: all var(--duration-fast) var(--easing-in-out);
-    position: relative;
   }
 
   .member-checkbox:hover {
-    background-color: var(--color-surface-hover);
-    transform: translateX(2px);
+    background: var(--color-surface-hover);
   }
 
-  /* カスタムチェックボックス */
   .member-checkbox input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-  }
-
-  .checkbox-custom {
+    margin-right: var(--spacing-3);
     width: 20px;
     height: 20px;
-    border: 2px solid var(--color-gray-400);
-    border-radius: var(--radius-sm);
-    margin-right: var(--spacing-3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--duration-fast) var(--easing-in-out);
-    background-color: var(--color-background);
-  }
-
-  .checkbox-icon {
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all var(--duration-fast) var(--easing-in-out);
-    color: white;
-    pointer-events: none;
-  }
-
-  .member-checkbox input[type="checkbox"]:checked ~ .checkbox-custom {
-    background-color: var(--color-primary-500);
-    border-color: var(--color-primary-500);
-  }
-
-  .member-checkbox input[type="checkbox"]:checked ~ .checkbox-custom .checkbox-icon {
-    opacity: 1;
-    transform: scale(1);
+    flex-shrink: 0;
+    cursor: pointer;
+    accent-color: var(--color-primary-500);
   }
 
   .member-info {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    gap: var(--spacing-1);
   }
 
-  .member-name {
-    font-weight: var(--font-weight-medium);
-    color: var(--color-text-primary);
-    font-size: var(--font-size-base);
-  }
-
-  .member-email {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-    margin-top: 2px;
-  }
-
+  /* Form actions - シンプル化 */
   .form-actions {
     display: flex;
-    gap: var(--spacing-4);
-    justify-content: flex-end;
+    gap: var(--spacing-3);
     margin-top: var(--spacing-8);
-    padding-top: var(--spacing-6);
-    border-top: 1px solid var(--color-border);
   }
 
-  .btn {
-    padding: var(--spacing-3) var(--spacing-6);
-    font-size: var(--font-size-base);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-in-out);
-    font-weight: var(--font-weight-medium);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-text {
-    position: relative;
-    z-index: 1;
-  }
-
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--easing-in-out);
-  }
-
-  .btn:hover {
-    transform: translateY(-1px);
-  }
-
-  .btn:hover::before {
-    opacity: 1;
-  }
-
-  .btn:active {
-    transform: translateY(0);
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
-    color: white;
-    box-shadow: 
-      0 2px 4px rgba(90, 122, 255, 0.2),
-      0 4px 8px rgba(90, 122, 255, 0.1);
-  }
-
-  .btn-primary::before {
-    background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-700));
-  }
-
-  .btn-primary:hover {
-    box-shadow: 
-      0 4px 8px rgba(90, 122, 255, 0.3),
-      0 8px 16px rgba(90, 122, 255, 0.2);
-  }
-
-  .btn-secondary {
-    background: linear-gradient(135deg, var(--color-gray-100), var(--color-gray-200));
-    color: var(--color-text-primary);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .btn-secondary::before {
-    background: linear-gradient(135deg, var(--color-gray-200), var(--color-gray-300));
-  }
-
-  .btn-secondary:hover {
-    box-shadow: var(--shadow-md);
-  }
-
-  /* エラーメッセージのスタイル改善 */
+  /* Error messages - minimal style */
   .error-message {
+    margin-top: var(--spacing-2);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
     display: flex;
     align-items: center;
     gap: var(--spacing-2);
-    color: var(--color-error);
-    font-size: var(--font-size-sm);
-    margin-top: var(--spacing-2);
-    padding: var(--spacing-2) var(--spacing-3);
-    background-color: rgba(239, 68, 68, 0.05);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    animation: slideIn var(--duration-fast) var(--easing-in-out);
   }
 
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-4px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .error-message.hidden {
+    display: none;
   }
 
-  .error-icon {
-    flex-shrink: 0;
-    color: var(--color-error);
-  }
-
+  /* Input error state */
   input.error {
-    border-color: var(--color-error);
-    background-color: rgba(239, 68, 68, 0.02);
+    border-bottom-color: var(--color-error);
   }
 
-  input.error:focus {
-    border-color: var(--color-error);
-  }
-
-  input.error:focus ~ .input-focus-indicator {
-    background: radial-gradient(
-      ellipse at center,
-      rgba(239, 68, 68, 0.15) 0%,
-      transparent 70%
-    );
-  }
-
-  .hidden {
-    display: none !important;
-  }
-  
-  /* より具体的なセレクタで上書きを防ぐ */
-  .group-form .hidden {
-    display: none !important;
-  }
-
-  /* ダークモード対応 */
-  @media (prefers-color-scheme: dark) {
-    .checkbox-custom {
-      background-color: var(--color-gray-800);
-      border-color: var(--color-gray-600);
-    }
-
-    .glass-subtle {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(255, 255, 255, 0.05);
-    }
-  }
-
-  /* レスポンシブ対応 */
+  /* Responsive */
   @media (max-width: 768px) {
     .group-form {
-      padding: var(--spacing-6);
-      max-width: 100%;
-      border-radius: var(--radius-lg);
-      margin: 0 auto;
-    }
-
-    h3 {
-      font-size: var(--font-size-xl);
-      margin-bottom: var(--spacing-6);
-    }
-
-    .form-group {
-      margin-bottom: var(--spacing-5);
-    }
-
-    label {
-      font-size: var(--font-size-base);
-      margin-bottom: var(--spacing-2);
-    }
-
-    input[type="text"] {
       padding: var(--spacing-4);
-      font-size: var(--font-size-base);
-      min-height: 48px; /* タッチターゲット */
-    }
-
-    .members-selection {
-      max-height: 280px;
-      padding: var(--spacing-2);
-    }
-
-    .member-checkbox {
-      padding: var(--spacing-3) var(--spacing-2);
-      margin: var(--spacing-1) 0;
-      min-height: 48px; /* タッチターゲット */
-    }
-
-    .checkbox-custom {
-      width: 24px;
-      height: 24px;
-      margin-right: var(--spacing-3);
-    }
-
-    .checkbox-icon {
-      width: 18px;
-      height: 18px;
-    }
-
-    .member-info {
-      gap: var(--spacing-1);
-    }
-
-    .member-name {
-      font-size: var(--font-size-base);
-    }
-
-    .member-email {
-      font-size: var(--font-size-xs);
     }
 
     .form-actions {
-      margin-top: var(--spacing-6);
-      padding-top: var(--spacing-4);
-      gap: var(--spacing-3);
-      flex-wrap: wrap;
+      flex-direction: column;
     }
 
-    .btn {
-      flex: 1;
-      min-width: 120px;
-      padding: var(--spacing-3) var(--spacing-4);
-      font-size: var(--font-size-base);
-      min-height: 48px; /* タッチターゲット */
-    }
-
-    .error-message {
-      font-size: var(--font-size-sm);
-      padding: var(--spacing-2);
-      margin-top: var(--spacing-1);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .group-form {
-      padding: var(--spacing-4);
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-      box-shadow: none;
-    }
-
-    h3 {
-      font-size: var(--font-size-lg);
-    }
-
-    .members-selection {
-      max-height: 240px;
-    }
-
-    .member-checkbox {
-      padding: var(--spacing-2);
-    }
-
-    .checkbox-custom {
-      width: 20px;
-      height: 20px;
-      margin-right: var(--spacing-2);
-    }
-
-    .form-actions {
-      justify-content: stretch;
-      gap: var(--spacing-2);
-    }
-
-    .btn {
-      min-width: 0;
-      flex: 1 1 100%;
-    }
-
-    /* 小画面ではプライマリボタンを上に配置 */
-    .btn-primary {
-      order: -1;
-    }
-  }
-
-  /* タッチデバイスでのホバー効果の調整 */
-  @media (hover: none) and (pointer: coarse) {
-    .member-checkbox:hover {
-      background-color: transparent;
-      transform: none;
-    }
-
-    .btn:hover {
-      transform: none;
-    }
-
-    /* タッチ時の視覚的フィードバック */
-    .member-checkbox:active {
-      background-color: var(--color-surface-active);
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-  }
-
-  /* アクセシビリティ: モーション設定 */
-  @media (prefers-reduced-motion: reduce) {
-    .member-checkbox,
-    .btn,
-    .checkbox-icon,
-    .input-focus-indicator {
-      transition: none;
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: none;
-      }
-      to {
-        opacity: 1;
-        transform: none;
-      }
+    .form-actions button {
+      width: 100%;
     }
   }
 </style> 

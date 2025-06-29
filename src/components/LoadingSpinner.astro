@@ -1,50 +1,19 @@
 ---
 export interface Props {
   isLoading?: boolean
-  size?: 'small' | 'medium' | 'large'
   fullScreen?: boolean
   message?: string
-  type?: 'dots' | 'spinner' | 'skeleton'
-  skeletonLines?: number
 }
 
-const {
-  isLoading = false,
-  size = 'medium',
-  fullScreen = false,
-  message = '読み込み中...',
-  type = 'dots',
-  skeletonLines = 3,
-} = Astro.props
+const { isLoading = false, fullScreen = false, message = '読み込み中...' } = Astro.props
 ---
 
-<link rel="stylesheet" href="/src/styles/animations.css" />
-
 {isLoading && (
-  <div class={`loading-container ${fullScreen ? 'full-screen' : ''} ${type === 'skeleton' ? 'skeleton-container' : ''}`}>
-    {type === 'skeleton' ? (
-      <div class="skeleton-wrapper">
-        {Array.from({ length: skeletonLines }).map((_, i) => (
-          <div class={`skeleton skeleton-line ${i === skeletonLines - 1 ? 'skeleton-short' : ''}`}></div>
-        ))}
-      </div>
-    ) : type === 'spinner' ? (
-      <div class={`loading-spinner ${size}`}>
-        <div class="arc-spinner">
-          <div class="spinner-ring"></div>
-        </div>
-        {message && <p class="loading-message animate-fade-in">{message}</p>}
-      </div>
-    ) : (
-      <div class={`loading-spinner ${size}`}>
-        <div class="dots-container">
-          <div class="dot dot-1"></div>
-          <div class="dot dot-2"></div>
-          <div class="dot dot-3"></div>
-        </div>
-        {message && <p class="loading-message animate-fade-in">{message}</p>}
-      </div>
-    )}
+  <div class={`loading-container ${fullScreen ? 'full-screen' : ''}`}>
+    <div class="loading-content">
+      <div class="spinner-minimal"></div>
+      <p class="loading-message visual-secondary">{message}</p>
+    </div>
   </div>
 )}
 
@@ -54,162 +23,71 @@ const {
     align-items: center;
     justify-content: center;
     padding: var(--spacing-8);
-    animation: fadeIn var(--duration-fast) var(--easing-out);
   }
-  
+
   .loading-container.full-screen {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-lg));
-    -webkit-backdrop-filter: blur(var(--blur-lg));
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(var(--blur-sm));
+    -webkit-backdrop-filter: blur(var(--blur-sm));
     z-index: var(--z-index-modal);
   }
-  
-  /* スケルトンコンテナ */
-  .skeleton-container {
-    width: 100%;
-    max-width: 600px;
-  }
-  
-  .skeleton-wrapper {
+
+  .loading-content {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3);
+    align-items: center;
+    gap: var(--spacing-4);
   }
-  
-  .skeleton-line {
-    height: 20px;
-    width: 100%;
-    border-radius: var(--radius-md);
-  }
-  
-  .skeleton-short {
-    width: 60%;
-  }
-  
-  .loading-spinner {
-    text-align: center;
-  }
-  
-  /* Arc風スピナー */
-  .arc-spinner {
-    display: inline-block;
-    position: relative;
-  }
-  
-  .spinner-ring {
-    display: inline-block;
+
+  /* Minimal spinner */
+  .spinner-minimal {
+    width: 40px;
+    height: 40px;
     border: 3px solid var(--color-gray-200);
     border-top-color: var(--color-primary-500);
     border-radius: 50%;
-    animation: arc-spin 0.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    animation: spin 1s linear infinite;
   }
-  
-  /* 新しいドットローディング */
-  .dots-container {
-    display: inline-flex;
-    gap: var(--spacing-2);
-    align-items: center;
-  }
-  
-  .dot {
-    background: linear-gradient(135deg, var(--color-primary-400), var(--color-primary-600));
-    border-radius: var(--radius-full);
-    animation: dot-pulse 1.4s ease-in-out infinite;
-    box-shadow: var(--shadow-sm);
-    transition: transform var(--duration-fast) var(--easing-spring);
-  }
-  
-  .dot-1 {
-    animation-delay: 0s;
-  }
-  
-  .dot-2 {
-    animation-delay: 0.2s;
-  }
-  
-  .dot-3 {
-    animation-delay: 0.4s;
-  }
-  
-  /* サイズ別のスタイル */
-  .small .spinner-ring {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .medium .spinner-ring {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .large .spinner-ring {
-    width: 48px;
-    height: 48px;
-  }
-  
-  .small .dot {
-    width: 8px;
-    height: 8px;
-  }
-  
-  .medium .dot {
-    width: 12px;
-    height: 12px;
-  }
-  
-  .large .dot {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .loading-message {
-    margin-top: var(--spacing-4);
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--letter-spacing-wide);
-  }
-  
-  /* アニメーション定義 */
-  @keyframes arc-spin {
+
+  @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
-  
-  @keyframes dot-pulse {
-    0%, 80%, 100% {
-      transform: scale(0.8) translateY(0);
-      opacity: 0.5;
-    }
-    40% {
-      transform: scale(1.2) translateY(-6px);
-      opacity: 1;
-    }
+
+  .loading-message {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    text-align: center;
   }
-  
-  /* ダークモード対応 */
+
+  /* Dark mode */
   @media (prefers-color-scheme: dark) {
-    .spinner-ring {
+    .loading-container.full-screen {
+      background: rgba(0, 0, 0, 0.9);
+    }
+
+    .spinner-minimal {
       border-color: var(--color-gray-700);
       border-top-color: var(--color-primary-400);
     }
   }
-  
-  /* reduced-motion対応 */
+
+  /* Reduced motion */
   @media (prefers-reduced-motion: reduce) {
-    .spinner-ring,
-    .dot {
+    .spinner-minimal {
       animation: none;
-    }
-    
-    .dot {
-      opacity: 0.7;
+      border-top-color: transparent;
+      background: conic-gradient(
+        from 0deg,
+        var(--color-primary-500) 0deg,
+        var(--color-gray-200) 90deg
+      );
     }
   }
 </style> 

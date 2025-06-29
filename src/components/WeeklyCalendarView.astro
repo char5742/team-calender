@@ -27,33 +27,6 @@ const dateHeaders = Array.from({ length: 7 }, (_, i) => {
   }
 })
 
-// 時間範囲（9:00 - 18:00）
-const START_HOUR = 9
-const END_HOUR = 18
-const TOTAL_HOURS = END_HOUR - START_HOUR
-
-// イベントの位置とサイズを計算する関数
-function calculateEventPosition(event: CalendarEvent, dayIndex: number) {
-  const eventStart = new Date(event.start)
-  const eventEnd = new Date(event.end)
-
-  // イベントの開始時刻が何時間目かを計算
-  const startHour = eventStart.getHours()
-  const startMinute = eventStart.getMinutes()
-  const topPercent = ((startHour - START_HOUR + startMinute / 60) / TOTAL_HOURS) * 100
-
-  // イベントの長さを計算
-  const durationHours = (eventEnd.getTime() - eventStart.getTime()) / (1000 * 60 * 60)
-  const heightPercent = (durationHours / TOTAL_HOURS) * 100
-
-  return {
-    top: `${Math.max(0, Math.min(100, topPercent))}%`,
-    height: `${Math.max(5, Math.min(100 - topPercent, heightPercent))}%`,
-    left: `${(dayIndex * 100) / 7}%`,
-    width: `${100 / 7}%`,
-  }
-}
-
 // 各メンバーの予定を日付ごとに整理
 function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
   const eventsByDay: CalendarEvent[][] = Array.from({ length: 7 }, () => [])
@@ -71,25 +44,16 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
 
   return eventsByDay
 }
-
-// イベントの高さをピクセル単位で計算
-function calculateEventHeight(event: CalendarEvent): number {
-  const eventStart = new Date(event.start)
-  const eventEnd = new Date(event.end)
-  const durationMinutes = (eventEnd.getTime() - eventStart.getTime()) / (1000 * 60)
-  // 1分あたり1pxと仮定、最小40px
-  return Math.max(40, durationMinutes * 0.8)
-}
 ---
 
 <div class="weekly-calendar-wrapper">
-  <div class="weekly-calendar animate-fade-in" id="weekly-calendar">
-    <div class="calendar-header sticky">
+  <div class="weekly-calendar minimal-card content-appear" id="weekly-calendar">
+    <div class="calendar-header">
       <div class="corner-cell" aria-hidden="true"></div>
       {dateHeaders.map((header, index) => (
-        <div class={`day-header card-appear stagger-${Math.min(index + 1, 6)}`} role="columnheader">
-          <div class="day-label">{header.dayLabel}</div>
-          <div class="date-label">{header.dateStr}</div>
+        <div class={`day-header content-appear-delay-${Math.min(index + 1, 3)}`} role="columnheader">
+          <div class="day-label visual-secondary">{header.dayLabel}</div>
+          <div class="date-label visual-tertiary">{header.dateStr}</div>
         </div>
       ))}
     </div>
@@ -101,56 +65,43 @@ function calculateEventHeight(event: CalendarEvent): number {
           const eventsByDay = organizeEventsByDay(memberEvents, weekStartDate)
           
           return (
-            <div class={`member-row card-appear stagger-${Math.min(memberIndex + 1, 6)}`} role="row">
+            <div class={`member-row content-appear-delay-${Math.min(memberIndex + 1, 3)}`} role="row">
               <div class="member-name" role="rowheader">
-                <span class="member-avatar hover-lift">{member.name.charAt(0)}</span>
-                <span class="member-name-text">{member.name}</span>
+                <span class="member-avatar">{member.name.charAt(0)}</span>
+                <span class="member-name-text visual-primary">{member.name}</span>
               </div>
               <div class="member-schedule">
                 {eventsByDay.map((dayEvents, dayIndex) => (
                   <div class="day-cell" data-day={dayIndex} role="gridcell">
-                    {dayEvents.length === 0 && (
-                      <div class="empty-state" data-day={dayIndex}>
-                        <span class="empty-dot"></span>
-                      </div>
-                    )}
-                    {dayEvents.map((event) => {
-                      const position = calculateEventPosition(event, dayIndex)
-                      const eventHeight = calculateEventHeight(event)
-                      // イベントタイプを判定（タイトルから推測）
-                      const eventType = event.label === 'Meeting' || event.title.includes('会議') || event.title.includes('ミーティング') 
-                        ? 'meeting' 
-                        : 'work'
-                      
-                      return (
-                        <div 
-                          class="event-block hover-lift"
-                          data-type={eventType}
-                          data-event-id={event.id}
-                          style={`
-                            position: absolute;
-                            top: ${position.top};
-                            height: ${position.height};
-                            left: 0;
-                            right: 0;
-                            background-color: ${event.color || 'var(--color-primary-500)'};
-                          `}
-                          title={`${event.title} (${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} - ${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })})`}
-                        >
-                          <span class="event-title">{event.title}</span>
-                          {eventHeight >= 60 && (
-                            <>
-                              <span class="event-badge" data-type={eventType}>
-                                {eventType === 'meeting' ? 'M' : 'W'}
-                              </span>
-                              <span class="event-time">
-                                {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                            </>
-                          )}
-                        </div>
-                      )
-                    })}
+                    <div class="events-container">
+                      {dayEvents.map((event) => {
+                        const eventType = event.label || (event.title.includes('会議') || event.title.includes('ミーティング') 
+                          ? 'meeting' 
+                          : 'work')
+                        
+                        return (
+                          <div 
+                            class="event-block minimal-hover"
+                            data-type={eventType}
+                            data-event-id={event.id}
+                            style={`border-left-color: ${event.color || 'var(--color-primary-500)'};`}
+                            tabindex="0"
+                            role="button"
+                            aria-label={`${event.title} - ${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}から${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}まで`}
+                          >
+                            <div class="event-time">
+                              {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                              {' - '}
+                              {new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                            <div class="event-title">{event.title}</div>
+                            {event.label && (
+                              <div class="event-category">{event.label}</div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -159,11 +110,6 @@ function calculateEventHeight(event: CalendarEvent): number {
         })}
       </div>
     </div>
-  </div>
-  
-  <!-- モバイル用のスクロールインジケーター -->
-  <div class="scroll-indicator animate-fade-in" id="scroll-indicator">
-    <span>← スワイプでスクロール →</span>
   </div>
 </div>
 
@@ -184,58 +130,17 @@ function calculateEventHeight(event: CalendarEvent): number {
       window.dispatchEvent(new CustomEvent('event-popover-open', { detail: { eventId } }));
     }
   });
-
-  // タッチジェスチャーサポート
-  const calendarWrapper = document.querySelector('.weekly-calendar-wrapper');
-  const scrollContainer = document.querySelector('.calendar-scroll-container') as HTMLElement;
-  const scrollIndicator = document.getElementById('scroll-indicator');
   
-  if (calendarWrapper && scrollContainer && scrollIndicator) {
-    let isScrolling = false;
-    let startX = 0;
-    let scrollLeft = 0;
-    
-    // タッチ開始
-    scrollContainer.addEventListener('touchstart', (e) => {
-      const touchEvent = e as TouchEvent;
-      isScrolling = true;
-      startX = touchEvent.touches[0].pageX - scrollContainer.offsetLeft;
-      scrollLeft = scrollContainer.scrollLeft;
-    });
-    
-    // タッチ移動
-    scrollContainer.addEventListener('touchmove', (e) => {
-      if (!isScrolling) return;
+  // キーボードナビゲーション対応
+  document.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains('event-block') && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
-      const touchEvent = e as TouchEvent;
-      const x = touchEvent.touches[0].pageX - scrollContainer.offsetLeft;
-      const walk = (x - startX) * 2; // スクロール速度調整
-      scrollContainer.scrollLeft = scrollLeft - walk;
-    });
-    
-    // タッチ終了
-    scrollContainer.addEventListener('touchend', () => {
-      isScrolling = false;
-    });
-    
-    // スクロールインジケーターの表示/非表示
-    let scrollTimeout: NodeJS.Timeout;
-    scrollContainer.addEventListener('scroll', () => {
-      scrollIndicator.classList.add('scrolling');
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
-        scrollIndicator.classList.remove('scrolling');
-      }, 1000);
-    });
-    
-    // 初回表示時にインジケーターを表示
-    if (window.innerWidth <= 768) {
-      scrollIndicator.classList.add('show');
-      setTimeout(() => {
-        scrollIndicator.classList.remove('show');
-      }, 3000);
+      target.click();
     }
-  }
+  });
+
+  // スクロール機能を削除（スクロールが不要になったため）
   
   // ポップオーバーを閉じる
   window.addEventListener('event-popover-close', () => {
@@ -245,77 +150,62 @@ function calculateEventHeight(event: CalendarEvent): number {
     }
   });
   
-  // ウィンドウリサイズ時の処理
-  let resizeTimeout: NodeJS.Timeout;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(() => {
-      const scrollContainer = document.querySelector('.calendar-scroll-container') as HTMLElement;
-      if (scrollContainer && window.innerWidth <= 768) {
-        scrollContainer.scrollLeft = 0;
-      }
-    }, 250);
-  });
+  // ウィンドウリサイズ時の処理（スクロール制御は不要になったため削除）
 </script>
 
 <style>
   .weekly-calendar-wrapper {
     position: relative;
     width: 100%;
+    max-width: 1400px; /* 最大幅を設定 */
+    margin: 0 auto; /* 中央寄せ */
+    padding: 0 var(--spacing-6); /* 左右に余白を追加 */
+    overflow: hidden; /* コンテンツがはみ出さないように制限 */
   }
 
   .weekly-calendar {
     background-color: var(--color-surface);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
     position: relative;
   }
 
   /* モバイルでの横スクロール対応 */
   @media (max-width: 768px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-4); /* モバイルでは余白を小さく */
+    }
+    
     .weekly-calendar {
       border-radius: 0;
-      border-left: none;
-      border-right: none;
     }
   }
 
   .calendar-header {
     display: grid;
-    grid-template-columns: 140px repeat(7, 1fr);
-    background: linear-gradient(to bottom, var(--color-background-secondary), var(--color-background-tertiary));
-    border-bottom: 2px solid var(--color-border);
-  }
-
-  /* スティッキーヘッダー */
-  .calendar-header.sticky {
+    grid-template-columns: 160px repeat(7, 1fr); /* minmaxを削除してスクロールを防ぐ */
+    background: var(--color-background-secondary);
+    border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(var(--blur-xl));
-    -webkit-backdrop-filter: blur(var(--blur-xl));
-    background: var(--color-glass-bg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   .corner-cell {
-    border-right: 2px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
   }
 
   .day-header {
-    padding: var(--spacing-4);
+    padding: var(--spacing-3);
     text-align: center;
     border-right: 1px solid var(--color-border);
     position: relative;
-    min-height: 44px; /* タッチターゲット */
   }
 
-  /* 週末の曜日に背景色を追加 */
+  /* 週末の曜日に淡い背景色 */
   .day-header:nth-child(7),
   .day-header:nth-child(8) {
-    background-color: rgba(239, 68, 68, 0.05);
+    background-color: rgba(0, 0, 0, 0.02);
   }
 
   .day-header:last-child {
@@ -323,10 +213,9 @@ function calculateEventHeight(event: CalendarEvent): number {
   }
 
   .day-label {
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
     margin-bottom: var(--spacing-1);
     font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
   }
 
   /* 土曜日と日曜日の色分け */
@@ -339,34 +228,26 @@ function calculateEventHeight(event: CalendarEvent): number {
   }
 
   .date-label {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-xs);
   }
 
   /* 横スクロールコンテナー */
   .calendar-scroll-container {
-    overflow-x: auto;
-    overflow-y: visible;
-    -webkit-overflow-scrolling: touch; /* iOS スムーズスクロール */
-    scroll-behavior: smooth;
+    overflow-x: hidden; /* スクロールを無効化 */
+    overflow-y: hidden;
+    max-width: 100%;
   }
 
   .calendar-grid {
-    min-height: 450px;
-    min-width: 100%;
+    min-height: 400px;
+    width: 100%; /* min-widthからwidthに変更 */
   }
 
   .member-row {
     display: grid;
-    grid-template-columns: 140px 1fr;
+    grid-template-columns: 160px 1fr; /* 140px → 160px に拡大 */
     border-bottom: 1px solid var(--color-border);
     min-height: 120px;
-    transition: background-color var(--duration-fast) var(--easing-in-out);
-  }
-
-  .member-row:hover {
-    background-color: var(--color-surface-hover);
   }
 
   .member-row:last-child {
@@ -374,205 +255,165 @@ function calculateEventHeight(event: CalendarEvent): number {
   }
 
   .member-name {
-    padding: var(--spacing-4);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    background: linear-gradient(to right, var(--color-background-secondary), var(--color-background-tertiary));
-    border-right: 2px solid var(--color-border);
+    padding: var(--spacing-3);
+    background: var(--color-background-secondary);
+    border-right: 1px solid var(--color-border);
     display: flex;
     align-items: center;
-    font-size: var(--font-size-base);
-    gap: var(--spacing-3);
+    gap: var(--spacing-2);
     position: sticky;
     left: 0;
     z-index: 5;
   }
 
   .member-avatar {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-700));
+    background: var(--color-primary-500);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     font-size: var(--font-size-sm);
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
   }
 
   .member-name-text {
     flex: 1;
+    font-size: var(--font-size-sm);
   }
 
   .member-schedule {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    position: relative;
-    min-width: 700px; /* 最小幅を確保 */
+    grid-template-columns: repeat(7, 1fr); /* minmaxを削除してスクロールを防ぐ */
+    width: 100%;
   }
 
   .day-cell {
     border-right: 1px solid var(--color-border);
-    position: relative;
-    min-height: 120px;
-    padding: var(--spacing-2);
-    min-width: 100px; /* 最小幅を確保 */
+    padding: var(--spacing-3); /* パディングを増加 */
   }
 
-  /* 週末のセルに背景色 */
+  /* 週末のセルに淡い背景色 */
   .day-cell[data-day="5"],
   .day-cell[data-day="6"] {
-    background-color: rgba(239, 68, 68, 0.02);
+    background-color: rgba(0, 0, 0, 0.01);
   }
 
   .day-cell:last-child {
     border-right: none;
   }
 
+  /* イベントコンテナ */
+  .events-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2); /* ギャップを増加 */
+  }
+
+  /* イベントブロック */
   .event-block {
-    margin: var(--spacing-1);
-    padding: var(--spacing-2) var(--spacing-3);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-spring);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    position: relative;
-    min-height: 44px; /* タッチターゲット */
-  }
-
-  /* 強化されたホバーエフェクト */
-  .event-block:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: var(--shadow-lg);
-    z-index: 2;
-  }
-
-  /* タッチデバイスでのホバー無効化 */
-  @media (hover: none) and (pointer: coarse) {
-    .event-block:hover {
-      transform: none;
-    }
-  }
-
-  .event-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    background: rgba(255, 255, 255, 0.3);
+    padding: var(--spacing-3) var(--spacing-3); /* 左右のパディングを均一に */
     border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-in-out);
+    color: var(--color-text-primary); /* テキスト色を濃い色に */
     font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    color: white;
-    margin: var(--spacing-1) 0;
-  }
-  
-  .event-badge[data-type="meeting"] {
-    background: rgba(255, 255, 255, 0.4);
+    background-color: var(--color-background-secondary); /* 薄い背景色 */
+    border-left: 4px solid; /* 左側に太いボーダー */
+    position: relative;
   }
 
-  .event-title {
-    font-size: var(--font-size-xs);
-    color: white;
-    font-weight: var(--font-weight-semibold);
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  .event-block:hover {
+    transform: translateX(2px); /* 右へ少し移動 */
+    box-shadow: var(--shadow-sm);
+    background-color: var(--color-surface); /* ホバー時により明るく */
   }
 
   .event-time {
-    font-size: var(--font-size-xs);
-    color: rgba(255, 255, 255, 0.9);
-    opacity: 0.8;
+    font-size: 0.625rem;
+    opacity: 0.7; /* より読みやすく */
+    margin-bottom: var(--spacing-1);
+    color: var(--color-text-secondary);
+  }
+
+  .event-title {
+    font-weight: var(--font-weight-medium);
+    line-height: 1.3;
+    margin-bottom: var(--spacing-1);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--color-text-primary);
+  }
+
+  .event-category {
+    font-size: 0.625rem;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--color-text-tertiary);
   }
 
   /* イベントタイプ別のスタイル */
   .event-block[data-type="meeting"] {
-    background: linear-gradient(135deg, var(--color-info), var(--color-primary-600));
+    background: var(--color-background-secondary); /* 背景色削除 */
   }
 
   .event-block[data-type="work"] {
-    background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
+    background: var(--color-background-secondary); /* 背景色削除 */
   }
 
-  /* empty-stateの曜日別パターン */
-  .empty-state {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.3;
-    position: relative;
+
+
+  /* 大画面対応 */
+  @media (min-width: 1280px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-8); /* 大画面では余白を大きく */
+    }
+    
+    .calendar-header {
+      grid-template-columns: 180px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 180px 1fr;
+    }
+
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+    }
+
+    .day-cell {
+      padding: var(--spacing-4);
+    }
+
+    .event-block {
+      padding: var(--spacing-3) var(--spacing-3) var(--spacing-3) var(--spacing-4); /* 左側を少し多めに */
+    }
   }
 
-  .empty-state::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0.1;
-    background-image: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      currentColor 10px,
-      currentColor 11px
-    );
-  }
+  @media (min-width: 1536px) {
+    .calendar-header {
+      grid-template-columns: 200px repeat(7, 1fr);
+    }
+    
+    .member-row {
+      grid-template-columns: 200px 1fr;
+    }
 
-  /* 曜日別のパターン色 */
-  .empty-state[data-day="0"]::before { color: var(--color-primary-300); }
-  .empty-state[data-day="1"]::before { color: var(--color-info); }
-  .empty-state[data-day="2"]::before { color: var(--color-success); }
-  .empty-state[data-day="3"]::before { color: var(--color-warning); }
-  .empty-state[data-day="4"]::before { color: var(--color-error); }
-  .empty-state[data-day="5"]::before { color: var(--color-gray-400); }
-  .empty-state[data-day="6"]::before { color: var(--color-gray-500); }
-
-  .empty-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: var(--radius-full);
-    background-color: var(--color-gray-300);
-    position: relative;
-    z-index: 1;
-  }
-
-  /* スクロールインジケーター */
-  .scroll-indicator {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-md));
-    padding: var(--spacing-2) var(--spacing-4);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    box-shadow: var(--shadow-md);
-    opacity: 0;
-    transition: opacity var(--duration-normal) var(--easing-in-out);
-    pointer-events: none;
-    z-index: 20;
-  }
-
-  .scroll-indicator.show,
-  .scroll-indicator.scrolling {
-    opacity: 1;
+    .member-schedule {
+      grid-template-columns: repeat(7, 1fr);
+    }
   }
 
   /* レスポンシブ対応 */
   @media (max-width: 1024px) {
     .calendar-header {
-      grid-template-columns: 100px repeat(7, minmax(90px, 1fr));
+      grid-template-columns: 100px repeat(7, 1fr);
     }
     
     .member-row {
@@ -591,21 +432,22 @@ function calculateEventHeight(event: CalendarEvent): number {
     }
 
     .member-schedule {
-      min-width: 630px;
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
     }
 
     .day-cell {
-      min-width: 90px;
+      padding: var(--spacing-2);
     }
   }
 
   @media (max-width: 768px) {
     .calendar-header {
-      grid-template-columns: 80px repeat(7, minmax(80px, 1fr));
+      grid-template-columns: 60px repeat(7, 1fr);
     }
     
     .member-row {
-      grid-template-columns: 80px 1fr;
+      grid-template-columns: 60px 1fr;
     }
 
     .member-name {
@@ -625,7 +467,7 @@ function calculateEventHeight(event: CalendarEvent): number {
     }
 
     .day-header {
-      padding: var(--spacing-3) var(--spacing-1);
+      padding: var(--spacing-2) var(--spacing-1);
     }
 
     .day-label {
@@ -633,63 +475,95 @@ function calculateEventHeight(event: CalendarEvent): number {
     }
 
     .date-label {
-      font-size: var(--font-size-xs);
+      font-size: 0.625rem;
     }
 
     .member-schedule {
-      min-width: 560px;
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
     }
 
     .day-cell {
-      min-width: 80px;
       padding: var(--spacing-1);
     }
 
     .event-title {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
+      -webkit-line-clamp: 1; /* モバイルでは1行に制限 */
     }
 
     .event-block {
-      padding: var(--spacing-1) var(--spacing-2);
-      margin: 0 var(--spacing-1);
+      padding: var(--spacing-1) var(--spacing-1) var(--spacing-1) var(--spacing-2);
+      margin: 0;
+      border-left-width: 3px; /* モバイルでは細めに */
     }
 
-    /* モバイルでバッジと時刻を非表示 */
-    .event-badge,
+    /* モバイルで時刻を短縮表示 */
     .event-time {
-      display: none;
+      font-size: 0.6rem;
+      opacity: 0.8;
     }
     
-    /* スクロールインジケーターを常に表示 */
-    .scroll-indicator {
-      display: block;
-    }
+
   }
 
   /* 小画面向けの追加対応 */
   @media (max-width: 480px) {
+    .weekly-calendar-wrapper {
+      padding: 0 var(--spacing-2); /* 小画面ではさらに余白を小さく */
+    }
+    
     .calendar-header {
-      grid-template-columns: 60px repeat(7, minmax(70px, 1fr));
+      grid-template-columns: 40px repeat(7, 1fr);
     }
     
     .member-row {
-      grid-template-columns: 60px 1fr;
+      grid-template-columns: 40px 1fr;
     }
 
     .member-name {
-      padding: var(--spacing-2) var(--spacing-1);
+      padding: var(--spacing-1);
+    }
+    
+    .member-avatar {
+      width: 20px;
+      height: 20px;
+      font-size: 0.625rem;
     }
 
     .member-schedule {
-      min-width: 490px;
+      grid-template-columns: repeat(7, 1fr);
+      width: 100%;
     }
 
     .day-cell {
-      min-width: 70px;
+      padding: 0.125rem; /* 最小限のパディング */
     }
     
-    .corner-cell {
-      border-right-width: 1px;
+    .day-header {
+      padding: var(--spacing-1);
+    }
+    
+    .day-label {
+      font-size: 0.625rem;
+    }
+    
+    .date-label {
+      font-size: 0.5rem;
+    }
+    
+    .event-block {
+      padding: 0.125rem 0.25rem 0.125rem 0.375rem; /* 左側を少し多めに */
+      font-size: 0.6rem;
+      border-left-width: 2px; /* 小画面では更に細く */
+    }
+    
+    .event-time {
+      display: none; /* 小画面では時刻を非表示 */
+    }
+    
+    .event-category {
+      display: none; /* 小画面ではカテゴリを非表示 */
     }
   }
 
@@ -704,29 +578,15 @@ function calculateEventHeight(event: CalendarEvent): number {
     .day-cell[data-day="6"] {
       background-color: rgba(239, 68, 68, 0.01);
     }
-    
-    .scroll-indicator {
-      background: var(--color-glass-bg);
-      color: var(--color-text-secondary);
+
+    .event-block {
+      background-color: var(--color-surface);
+    }
+
+    .event-block:hover {
+      background-color: var(--color-background-secondary);
     }
   }
 
-  /* スクロールバーのスタイリング */
-  .calendar-scroll-container::-webkit-scrollbar {
-    height: 6px;
-  }
 
-  .calendar-scroll-container::-webkit-scrollbar-track {
-    background: var(--color-background-secondary);
-    border-radius: var(--radius-sm);
-  }
-
-  .calendar-scroll-container::-webkit-scrollbar-thumb {
-    background: var(--color-gray-400);
-    border-radius: var(--radius-sm);
-  }
-
-  .calendar-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray-500);
-  }
 </style> 

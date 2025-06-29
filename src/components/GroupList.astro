@@ -3,356 +3,144 @@ import type { GroupWithMembers } from '../stores/groupStore'
 
 export interface Props {
   groups: GroupWithMembers[]
-  selectedGroupId?: string | null
-  onGroupClick?: (groupId: string) => void
 }
 
-const { groups, selectedGroupId } = Astro.props
+const { groups } = Astro.props
 
-// グループの色を決定するための関数
-const getGroupColor = (groupId: string) => {
-  const semanticColors = [
-    'var(--color-primary-500)',
-    'var(--color-info)',
-    'var(--color-success)',
-    'var(--color-warning)',
-    'var(--color-gray-500)',
-  ]
-  // グループID全体を使用してより多様な色を選択
-  let hash = 0
-  for (let i = 0; i < groupId.length; i++) {
-    hash = (hash << 5) - hash + groupId.charCodeAt(i)
-    hash &= hash // Convert to 32bit integer
-  }
-  const index = Math.abs(hash) % semanticColors.length
-  return semanticColors[index]
-}
-
-// グループの頭文字を取得
-const getGroupInitials = (name: string) => {
-  return name.slice(0, 2).toUpperCase()
-}
+// バッジカラーの定義
+const badgeColors = [
+  'badge-primary',
+  'badge-info',
+  'badge-success',
+  'badge-warning',
+  'badge-secondary',
+]
 ---
 
-<div class="group-list">
-  <h2>グループ一覧</h2>
+<div class="groups-container">
   {groups.length === 0 ? (
     <div class="empty-state">
-      <div class="empty-visual">
-        <div class="empty-circle"></div>
-        <div class="empty-circle"></div>
-        <div class="empty-circle"></div>
-      </div>
-      <p class="empty-message">まだグループがありません</p>
-      <p class="empty-description">新しいグループを作成して、チームメンバーを管理しましょう</p>
+      <p class="visual-secondary">まだグループがありません</p>
+      <p class="visual-tertiary">新しいグループを作成してメンバーを管理しましょう</p>
     </div>
   ) : (
-    <ul class="groups">
+    <div class="groups-grid">
       {groups.map((group, index) => (
-        <li 
-          class={`group-item card-appear stagger-${Math.min(index + 1, 6)} hover-lift ${
-            group.id === selectedGroupId ? 'selected' : ''
-          }`}
-          data-group-id={group.id}
-        >
-          <button
-            class="group-button"
-            onclick={`window.dispatchEvent(new CustomEvent('group-click', { detail: { groupId: '${group.id}' } }))`}
-            aria-label={`${group.name}グループを選択`}
-          >
-            <div class="group-content">
-              <div class="group-badge" style={`background-color: ${getGroupColor(group.id)}`}>
-                {getGroupInitials(group.name)}
+        <div class={`group-card minimal-card interactive card-stagger stagger-${Math.min(index + 1, 6)}`} data-group-id={group.id}>
+          <div class="group-header">
+            <h3 class="group-name visual-primary">{group.name}</h3>
+            <span class={`badge badge-sm ${badgeColors[index % badgeColors.length]}`}>
+              {group.members.length}人
+            </span>
+          </div>
+          
+          <div class="members-list">
+            {group.members.map((member) => (
+              <div class="member-item">
+                <span class="member-name visual-secondary">{member.name}</span>
+                <span class="member-email visual-tertiary">{member.email}</span>
               </div>
-              <div class="group-info">
-                <div class="group-header">
-                  <h3 class="group-name">{group.name}</h3>
-                  <span class="member-count">
-                    {group.members.length}名
-                  </span>
-                </div>
-                <div class="member-list">
-                  {group.members.slice(0, 3).map((member) => (
-                    <span class="member-name">{member.name}</span>
-                  ))}
-                  {group.members.length > 3 && (
-                    <span class="more-members">+{group.members.length - 3}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </button>
+            ))}
+          </div>
+          
           <div class="group-actions">
-            <a 
-              href={`/groups/${group.id}/weekly-schedule`}
-              class="action-btn schedule-btn"
-              title="スケジュール表示"
-              aria-label={`${group.name}のスケジュールを表示`}
+            <button 
+              class="btn btn-subtle btn-sm"
+              data-action="view"
+              data-group-id={group.id}
+              title="週間スケジュールを表示"
             >
               <span class="action-icon">📅</span>
-              <span class="action-text">週</span>
-            </a>
+              スケジュール
+            </button>
             <button 
-              class="action-btn edit-btn button-hover focus-glow" 
-              data-group-id={group.id} 
-              title="編集"
-              aria-label={`${group.name}を編集`}
+              class="btn btn-subtle btn-sm"
+              data-action="edit"
+              data-group-id={group.id}
+              title="グループを編集"
             >
               <span class="action-icon">✏️</span>
-              <span class="action-text">編</span>
+              編集
             </button>
             <button 
-              class="action-btn delete-btn button-hover focus-glow" 
-              data-group-id={group.id} 
-              title="削除"
-              aria-label={`${group.name}を削除`}
+              class="btn btn-subtle btn-sm"
+              data-action="delete"
+              data-group-id={group.id}
+              title="グループを削除"
             >
               <span class="action-icon">🗑️</span>
-              <span class="action-text">削</span>
+              削除
             </button>
           </div>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )}
 </div>
 
 <script>
-  // イベント委譲を使用して編集・削除ボタンのイベントハンドリング
+  // イベント委譲を使用してボタンのイベントハンドリング
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
+    const button = target.closest('button[data-action]');
     
-    // 編集ボタンのクリック処理
-    const editBtn = target.closest('.edit-btn');
-    if (editBtn) {
-      e.stopPropagation();
-      const groupId = editBtn.getAttribute('data-group-id');
-      console.log('Edit button clicked, groupId:', groupId);
-      if (groupId) {
+    if (button) {
+      const action = button.getAttribute('data-action');
+      const groupId = button.getAttribute('data-group-id');
+      
+      if (action === 'view' && groupId) {
+        // スケジュール表示
+        window.location.href = `/groups/${groupId}/weekly-schedule`;
+      } else if (action === 'edit' && groupId) {
+        // 編集イベント
         window.dispatchEvent(new CustomEvent('group-edit', { 
           detail: { groupId } 
         }));
-      }
-    }
-    
-    // 削除ボタンのクリック処理
-    const deleteBtn = target.closest('.delete-btn');
-    if (deleteBtn) {
-      e.stopPropagation();
-      const groupId = deleteBtn.getAttribute('data-group-id');
-      console.log('Delete button clicked, groupId:', groupId);
-      if (groupId) {
+      } else if (action === 'delete' && groupId) {
+        // 削除イベント
         window.dispatchEvent(new CustomEvent('group-delete', { 
           detail: { groupId } 
         }));
       }
     }
   });
-  
-  // タッチデバイスでのスワイプジェスチャー対応
-  const groupItems = document.querySelectorAll('.group-item');
-  
-  groupItems.forEach((item) => {
-    let startX = 0;
-    let currentX = 0;
-    let diff = 0;
-    let isSwipe = false;
-    
-    const actions = item.querySelector('.group-actions') as HTMLElement;
-    if (!actions) return;
-    
-    item.addEventListener('touchstart', (e) => {
-      const touchEvent = e as TouchEvent;
-      startX = touchEvent.touches[0].clientX;
-      isSwipe = false;
-    });
-    
-    item.addEventListener('touchmove', (e) => {
-      const touchEvent = e as TouchEvent;
-      currentX = touchEvent.touches[0].clientX;
-      diff = startX - currentX;
-      
-      // 左スワイプでアクションを表示
-      if (diff > 50 && !isSwipe) {
-        isSwipe = true;
-        item.classList.add('show-actions');
-      }
-      // 右スワイプでアクションを隠す
-      else if (diff < -50 && isSwipe) {
-        isSwipe = false;
-        item.classList.remove('show-actions');
-      }
-    });
-    
-    item.addEventListener('touchend', () => {
-      // スワイプが不完全な場合は元に戻す
-      if (Math.abs(diff) < 50) {
-        item.classList.remove('show-actions');
-      }
-      diff = 0;
-    });
-  });
-  
-  // 他のアイテムをタップした時にアクションを閉じる
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    const clickedItem = target.closest('.group-item');
-    
-    groupItems.forEach((item) => {
-      if (item !== clickedItem) {
-        item.classList.remove('show-actions');
-      }
-    });
-  });
 </script>
 
 <style>
-  .group-list {
-    padding: var(--spacing-6);
-    background-color: var(--color-background-secondary);
-    border-radius: var(--radius-xl);
-    max-width: 420px;
-    box-shadow: var(--shadow-sm);
+  .groups-container {
+    width: 100%;
   }
 
-  h2 {
-    margin: 0 0 var(--spacing-5) 0;
-    font-size: var(--font-size-2xl);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--letter-spacing-tight);
-  }
-
+  /* Empty state - minimal design */
   .empty-state {
     text-align: center;
-    padding: var(--spacing-12) var(--spacing-8);
-    background: var(--color-surface);
+    padding: var(--spacing-12) var(--spacing-6);
+  }
+
+  .empty-state p {
+    margin: var(--spacing-2) 0;
+  }
+
+  /* Groups grid - clean layout */
+  .groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-6);
+  }
+
+  /* Group card - minimal style */
+  .group-card {
+    padding: var(--spacing-6);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-  }
-
-  .empty-visual {
-    display: flex;
-    justify-content: center;
-    gap: var(--spacing-3);
-    margin-bottom: var(--spacing-6);
-  }
-
-  .empty-circle {
-    width: 48px;
-    height: 48px;
-    background: var(--color-background-tertiary);
-    border-radius: 50%;
-    opacity: 0.5;
-  }
-
-  .empty-circle:nth-child(2) {
-    transform: scale(0.8);
-    opacity: 0.4;
-  }
-
-  .empty-circle:nth-child(3) {
-    transform: scale(0.6);
-    opacity: 0.3;
-  }
-
-  .empty-message {
-    color: var(--color-text-secondary);
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    margin: 0 0 var(--spacing-2) 0;
-  }
-
-  .empty-description {
-    color: var(--color-text-tertiary);
-    font-size: var(--font-size-sm);
-    margin: 0;
-    line-height: var(--line-height-relaxed);
-  }
-
-  .groups {
-    list-style: none;
-    padding: 0;
-    margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3);
-  }
-
-  .group-item {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    transition: all var(--duration-normal) var(--easing-spring);
-    position: relative;
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    backdrop-filter: blur(var(--blur-sm));
-  }
-
-  .group-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--color-primary-300);
-  }
-
-  .group-item.selected {
-    border-color: var(--color-primary-500);
-    background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-surface) 100%);
-    box-shadow: 0 4px 12px rgba(90, 122, 255, 0.15);
-  }
-
-  .group-button {
-    width: 100%;
-    padding: var(--spacing-4);
-    padding-right: calc(var(--spacing-24) + var(--spacing-4));
-    background: none;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    font-family: inherit;
-    position: relative;
-    z-index: 1;
-    min-height: 80px; /* タッチターゲット */
-  }
-
-  .group-content {
-    display: flex;
-    align-items: flex-start;
     gap: var(--spacing-4);
-  }
-
-  .group-badge {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-    color: white;
-    flex-shrink: 0;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--duration-normal) var(--easing-in-out);
-    letter-spacing: var(--letter-spacing-tight);
-  }
-
-  .group-item:hover .group-badge {
-    transform: scale(1.05);
-    box-shadow: var(--shadow-md);
-  }
-
-  .group-info {
-    flex: 1;
-    min-width: 0;
   }
 
   .group-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-2);
+    align-items: flex-start;
     gap: var(--spacing-3);
   }
 
@@ -360,268 +148,80 @@ const getGroupInitials = (name: string) => {
     margin: 0;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    letter-spacing: var(--letter-spacing-tight);
-    line-height: var(--line-height-tight);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
 
-  .member-count {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-    background: var(--color-background-tertiary);
-    padding: var(--spacing-1) var(--spacing-3);
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-medium);
-    white-space: nowrap;
-    box-shadow: var(--shadow-xs);
-  }
-
-  .member-list {
+  /* Members list - clean layout */
+  .members-list {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-2);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-  }
-
-  .member-name {
-    background: var(--color-background-secondary);
-    padding: var(--spacing-1) var(--spacing-3);
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-medium);
-    letter-spacing: var(--letter-spacing-tight);
-    box-shadow: var(--shadow-xs);
-    transition: all var(--duration-fast) var(--easing-in-out);
-  }
-
-  .group-item:hover .member-name {
-    background: var(--color-background-tertiary);
-  }
-
-  .more-members {
-    color: var(--color-primary-500);
-    font-weight: var(--font-weight-semibold);
-    background: var(--color-primary-50);
-    padding: var(--spacing-1) var(--spacing-3);
-    border-radius: var(--radius-full);
-    box-shadow: var(--shadow-xs);
-  }
-
-  .group-actions {
-    position: absolute;
-    top: var(--spacing-4);
-    right: var(--spacing-4);
-    display: flex;
-    gap: var(--spacing-2);
-    z-index: 10;
-    opacity: 0;
-    transform: translateX(8px);
-    transition: all var(--duration-normal) var(--easing-in-out);
-  }
-
-  .group-item:hover .group-actions,
-  .group-item.show-actions .group-actions {
-    opacity: 1;
-    transform: translateX(0);
-  }
-
-  .action-btn {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    border: none;
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-md));
-    color: var(--color-text-tertiary);
-    cursor: pointer;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--duration-fast) var(--easing-spring);
-    position: relative;
-    z-index: 10;
-    box-shadow: var(--shadow-sm);
-    text-decoration: none;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--spacing-3);
+    min-height: 120px;
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: var(--spacing-2);
+  }
+
+  .members-list::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .members-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .members-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+  }
+
+  .member-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .member-item:last-child {
+    border-bottom: none;
+  }
+
+  /* Group actions - subtle buttons */
+  .group-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    margin-top: auto;
+    padding-top: var(--spacing-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .btn-sm {
+    padding: var(--spacing-1) var(--spacing-3);
+    font-size: var(--font-size-sm);
   }
 
   .action-icon {
-    font-size: var(--font-size-lg);
-    line-height: 1;
-    display: none;
+    margin-right: var(--spacing-1);
   }
 
-  .action-text {
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    letter-spacing: var(--letter-spacing-tight);
-  }
-
-  .action-btn:hover {
-    transform: scale(1.1);
-    box-shadow: var(--shadow-md);
-  }
-
-  /* タッチデバイスでのホバー無効化 */
-  @media (hover: none) and (pointer: coarse) {
-    .action-btn:hover {
-      transform: none;
-    }
-  }
-
-  .edit-btn:hover {
-    color: var(--color-primary-500);
-    background: var(--color-primary-50);
-  }
-
-  .schedule-btn:hover {
-    color: var(--color-success);
-    background: rgba(16, 185, 129, 0.1);
-  }
-
-  .delete-btn:hover {
-    color: var(--color-error);
-    background: rgba(239, 68, 68, 0.1);
-  }
-
-  /* Responsive adjustments */
+  /* Responsive */
   @media (max-width: 768px) {
-    .group-list {
-      max-width: 100%;
+    .groups-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-4);
+    }
+
+    .group-card {
       padding: var(--spacing-4);
-      border-radius: 0;
-    }
-
-    h2 {
-      font-size: var(--font-size-xl);
-      margin-bottom: var(--spacing-4);
-    }
-
-    .groups {
-      gap: var(--spacing-2);
-    }
-
-    .group-item {
-      border-radius: var(--radius-md);
-      margin: 0 calc(-1 * var(--spacing-4));
-      border-left: none;
-      border-right: none;
-    }
-
-    .group-item:first-child {
-      border-top-left-radius: var(--radius-md);
-      border-top-right-radius: var(--radius-md);
-    }
-
-    .group-item:last-child {
-      border-bottom-left-radius: var(--radius-md);
-      border-bottom-right-radius: var(--radius-md);
-    }
-
-    .group-button {
-      padding: var(--spacing-3);
-      min-height: 72px;
-      padding-right: calc(var(--spacing-20) + var(--spacing-4));
     }
 
     .group-actions {
-      opacity: 1;
-      transform: translateX(0);
-      right: var(--spacing-3);
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--color-surface);
-      padding: var(--spacing-2);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--color-border);
+      flex-wrap: wrap;
     }
 
-    /* スワイプ時のアクション表示 */
-    .group-item {
-      transition: transform var(--duration-normal) var(--easing-in-out);
-    }
-
-    .group-item.show-actions {
-      transform: translateX(-120px);
-    }
-
-    .group-item.show-actions .group-actions {
-      transform: translateY(-50%) translateX(120px);
-    }
-
-    .action-btn {
-      width: 40px;
-      height: 40px;
-    }
-
-    .action-icon {
-      display: block;
-    }
-
-    .action-text {
-      display: none;
-    }
-
-    .empty-state {
-      padding: var(--spacing-8) var(--spacing-4);
-    }
-
-    .empty-visual {
-      gap: var(--spacing-2);
-      margin-bottom: var(--spacing-4);
-    }
-
-    .empty-circle {
-      width: 40px;
-      height: 40px;
-    }
-
-    .empty-message {
-      font-size: var(--font-size-base);
-    }
-  }
-
-  /* 小画面向けの追加対応 */
-  @media (max-width: 480px) {
-    .group-badge {
-      width: 40px;
-      height: 40px;
-      font-size: var(--font-size-base);
-    }
-
-    .group-name {
-      font-size: var(--font-size-base);
-    }
-
-    .member-count {
-      font-size: var(--font-size-xs);
-      padding: 0 var(--spacing-2);
-    }
-
-    .member-list {
-      gap: var(--spacing-1);
-    }
-
-    .member-name {
-      font-size: var(--font-size-xs);
-      padding: 0 var(--spacing-2);
-    }
-
-    .group-content {
-      gap: var(--spacing-3);
-    }
-  }
-
-  /* ダークモード対応 */
-  @media (prefers-color-scheme: dark) {
-    .group-actions {
-      background: var(--color-surface);
+    .btn-sm {
+      flex: 1;
+      min-width: 0;
     }
   }
 </style> 

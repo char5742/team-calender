@@ -12,9 +12,9 @@ const popoverId = generateModalId()
 ---
 
 <div id={popoverId} class={`popover-overlay ${isOpen ? 'open' : ''}`}>
-  <div class="popover glass">
+  <div class="popover glass-light">
     <div class="popover-header">
-      <span class="event-badge-large" data-type={event?.label === 'Meeting' || event?.title?.includes('会議') || event?.title?.includes('ミーティング') ? 'meeting' : 'work'}>
+      <span class="badge badge-lg event-popover-badge" data-type={event?.label === 'Meeting' || event?.title?.includes('会議') || event?.title?.includes('ミーティング') ? 'meeting' : 'work'}>
         {event?.label === 'Meeting' || event?.title?.includes('会議') || event?.title?.includes('ミーティング') ? 'M' : 'W'}
       </span>
       <h3>{event?.title || ''}</h3>
@@ -117,14 +117,7 @@ const popoverId = generateModalId()
     overflow: hidden;
   }
 
-  /* ガラスモーフィズム効果を適用 */
-  .popover.glass {
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-xl));
-    -webkit-backdrop-filter: blur(var(--blur-xl));
-    border: 1px solid var(--color-glass-border);
-    box-shadow: var(--shadow-glass);
-  }
+  /* グラスモーフィズム効果は design-system.css のクラスを使用 */
 
   @keyframes popoverSlideIn {
     from {
@@ -146,24 +139,23 @@ const popoverId = generateModalId()
     background: linear-gradient(to right, var(--color-background-secondary), var(--color-background-tertiary));
   }
 
-  .event-badge-large {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  /* イベントポップオーバーバッジのカスタムスタイル */
+  .event-popover-badge {
     width: 48px;
     height: 48px;
+    min-width: 48px;
+    min-height: 48px;
     border-radius: var(--radius-lg);
     font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
     color: white;
     box-shadow: var(--shadow-sm);
   }
   
-  .event-badge-large[data-type="meeting"] {
+  .event-popover-badge[data-type="meeting"] {
     background: linear-gradient(135deg, var(--color-info), var(--color-primary-600));
   }
   
-  .event-badge-large[data-type="work"] {
+  .event-popover-badge[data-type="work"] {
     background: linear-gradient(135deg, var(--color-warning), var(--color-warning));
   }
 
@@ -176,7 +168,7 @@ const popoverId = generateModalId()
   }
 
   .popover-body {
-    padding: var(--spacing-6);
+    padding: var(--spacing-4);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-4);
@@ -251,9 +243,11 @@ const popoverId = generateModalId()
       padding: var(--spacing-4);
     }
 
-    .event-badge-large {
+    .event-popover-badge {
       width: 40px;
       height: 40px;
+      min-width: 40px;
+      min-height: 40px;
       font-size: var(--font-size-lg);
     }
   }

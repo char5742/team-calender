@@ -29,11 +29,11 @@ const groups = getAllGroupsWithMembers()
 const teamMembers = teamMembersStore.get()
 ---
 
-<div class="group-management">
-  <div class="header">
-    <h1>グループ管理</h1>
-    <button id="create-group-btn" class="btn btn-primary ripple-container button-hover focus-glow">
-      <span class="btn-badge">新</span>
+<div class="group-management content-container">
+  <div class="header content-section">
+    <h1 class="heading-primary">グループ管理</h1>
+    <button id="create-group-btn" class="btn btn-primary interactive">
+      <span class="badge badge-sm badge-square">新</span>
       新しいグループを作成
     </button>
   </div>
@@ -47,12 +47,12 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ一覧 -->
-  <div id="group-list-container" class="animate-fade-in">
+  <div id="group-list-container" class="content-section animate-fade-in">
     <GroupList groups={groups} />
   </div>
 
   <!-- グループ作成フォーム -->
-  <div id="create-form-container" class="form-container hidden animate-fade-in">
+  <div id="create-form-container" class="form-container content-section hidden animate-fade-in">
     <GroupForm 
       teamMembers={teamMembers}
       mode="create"
@@ -61,16 +61,17 @@ const teamMembers = teamMembersStore.get()
   </div>
 
   <!-- グループ編集フォーム -->
-  <div id="edit-form-container" class="form-container hidden animate-fade-in">
-    <div class="group-form">
-      <h3>グループを編集</h3>
+  <div id="edit-form-container" class="form-container content-section hidden animate-fade-in">
+    <div class="group-form minimal-card">
+      <h3 class="heading-tertiary">グループを編集</h3>
       <form id="edit-form" novalidate>
         <div class="form-group">
-          <label for="edit-name">グループ名</label>
+          <label for="edit-name" class="visual-secondary">グループ名</label>
           <input
             type="text"
             id="edit-name"
             name="name"
+            class="minimal-input"
             placeholder="グループ名を入力"
             required
           />
@@ -80,7 +81,7 @@ const teamMembers = teamMembersStore.get()
         </div>
 
         <div class="form-group">
-          <label>メンバーを選択</label>
+          <label class="visual-secondary">メンバーを選択</label>
           <div class="members-selection" id="edit-members-selection">
             <!-- メンバーチェックボックスは動的に生成 -->
           </div>
@@ -90,10 +91,10 @@ const teamMembers = teamMembersStore.get()
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary ripple-container button-hover focus-glow">
+          <button type="submit" class="btn btn-primary interactive">
             更新
           </button>
-          <button type="button" class="btn btn-secondary ripple-container button-hover focus-glow" data-action="cancel">
+          <button type="button" class="btn btn-subtle" data-action="cancel">
             キャンセル
           </button>
         </div>
@@ -274,10 +275,10 @@ const teamMembers = teamMembersStore.get()
             const errorElement = document.createElement('div');
             errorElement.innerHTML = `
               <div class="error-message" role="alert">
-                <span class="error-badge">!</span>
+                <span class="badge badge-error badge-sm badge-rounded">!</span>
                 <span class="error-text">${error}</span>
                 <button type="button" class="close-btn" aria-label="エラーを閉じる">
-                  <span class="close-badge">×</span>
+                  <span class="badge badge-error badge-sm badge-rounded">×</span>
                 </button>
               </div>
             `;
@@ -575,17 +576,10 @@ const teamMembers = teamMembersStore.get()
     box-shadow: var(--shadow-lg);
   }
 
-  .btn-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
+  /* 作成ボタンのバッジ */
+  .create-btn-badge {
     background: white;
     color: var(--color-primary-500);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
   }
 
   .form-container {
@@ -772,24 +766,12 @@ const teamMembers = teamMembersStore.get()
     box-shadow: var(--shadow-sm);
   }
   
-  :global(.error-badge) {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  /* エラーメッセージ内のバッジサイズ調整 */
+  :global(.error-message[role="alert"] .badge) {
     width: 24px;
     height: 24px;
-    background: var(--color-error);
-    color: white;
-    border-radius: var(--radius-full);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-base);
-  }
-  
-  :global(.close-badge) {
-    font-size: var(--font-size-xl);
-    line-height: 1;
-    font-weight: var(--font-weight-normal);
+    min-width: 24px;
+    min-height: 24px;
   }
   
   :global(.error-text) {
@@ -811,6 +793,12 @@ const teamMembers = teamMembersStore.get()
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  :global(.error-message .close-btn .badge) {
+    font-size: var(--font-size-xl);
+    line-height: 1;
+    font-weight: var(--font-weight-normal);
   }
   
   :global(.error-message .close-btn:hover) {
@@ -1016,7 +1004,7 @@ const teamMembers = teamMembersStore.get()
 
   /* ダークモード対応 */
   @media (prefers-color-scheme: dark) {
-    .btn-badge {
+    .create-btn-badge {
       background: var(--color-primary-800);
       color: white;
     }

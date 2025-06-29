@@ -14,11 +14,11 @@ const navItems = [
 const isActive = (href: string) => currentPath === href
 ---
 
-<header id="main-header" class="header glass">
+<header id="main-header" class="header glass-adaptive fade-on-scroll">
   <div class="header-container">
     <!-- Logo/Brand -->
     <div class="brand">
-      <span class="brand-badge">TC</span>
+      <span class="badge badge-primary badge-square brand-logo-badge">TC</span>
       <span class="brand-text">Team Calendar</span>
     </div>
 
@@ -30,7 +30,7 @@ const isActive = (href: string) => currentPath === href
           class={`nav-link ${isActive(item.href) ? 'active' : ''}`}
           aria-current={isActive(item.href) ? 'page' : undefined}
         >
-          <span class="nav-badge">{item.shortLabel}</span>
+          <span class="badge badge-sm badge-square nav-badge-custom">{item.shortLabel}</span>
           <span class="nav-text">{item.label}</span>
         </a>
       ))}
@@ -40,17 +40,31 @@ const isActive = (href: string) => currentPath === href
     <div class="header-actions">
       <button 
         id="theme-toggle" 
-        class="theme-button ripple-container button-hover focus-glow"
+        class="theme-button btn-subtle focus-glow"
         aria-label="テーマを切り替える"
         title="テーマを切り替える"
       >
-        <span class="theme-light-label">明</span>
-        <span class="theme-dark-label">暗</span>
+        <!-- ライトモード時は月アイコンを表示 -->
+        <svg class="theme-icon theme-light-label" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <!-- ダークモード時は太陽アイコンを表示 -->
+        <svg class="theme-icon theme-dark-label" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
       </button>
 
       <button 
         id="mobile-menu-toggle" 
-        class="menu-button mobile-only ripple-container button-hover focus-glow"
+        class="menu-button mobile-only btn-subtle focus-glow"
         aria-label="メニューを開く"
         aria-expanded="false"
       >
@@ -70,7 +84,7 @@ const isActive = (href: string) => currentPath === href
         href={item.href} 
         class={`mobile-nav-link ${isActive(item.href) ? 'active' : ''}`}
       >
-        <span class="nav-badge">{item.shortLabel}</span>
+        <span class="badge badge-sm badge-square nav-badge-custom">{item.shortLabel}</span>
         <span class="nav-text">{item.label}</span>
       </a>
     ))}
@@ -84,10 +98,13 @@ const isActive = (href: string) => currentPath === href
     z-index: var(--z-index-sticky);
     width: 100%;
     transition: all var(--duration-normal) var(--easing-in-out);
+    border-bottom: 1px solid transparent;
   }
 
   .header.scrolled {
-    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(var(--blur-xl));
+    -webkit-backdrop-filter: blur(var(--blur-xl));
+    border-bottom-color: var(--color-border);
     padding: var(--spacing-2) 0;
   }
 
@@ -105,7 +122,7 @@ const isActive = (href: string) => currentPath === href
     padding: var(--spacing-2) var(--spacing-6);
   }
 
-  /* Brand */
+  /* Brand - シンプル化 */
   .brand {
     display: flex;
     align-items: center;
@@ -114,32 +131,27 @@ const isActive = (href: string) => currentPath === href
     font-size: var(--font-size-lg);
     color: var(--color-text-primary);
     text-decoration: none;
-    transition: transform var(--duration-fast) var(--easing-spring);
+    transition: opacity var(--duration-fast) var(--easing-in-out);
   }
 
   .brand:hover {
-    transform: scale(1.05);
+    opacity: 0.8;
   }
 
-  .brand-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  /* Brand logo badge - minimal style */
+  .brand-logo-badge {
     width: 36px;
     height: 36px;
-    background: var(--color-primary-500);
-    color: white;
-    border-radius: var(--radius-md);
     font-size: var(--font-size-base);
-    font-weight: var(--font-weight-bold);
-    line-height: 1;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .brand-text {
     letter-spacing: var(--letter-spacing-tight);
   }
 
-  /* Navigation */
+  /* Navigation - 簡素化 */
   .nav-desktop {
     display: flex;
     align-items: center;
@@ -156,27 +168,13 @@ const isActive = (href: string) => currentPath === href
     text-decoration: none;
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
-    transition: all var(--duration-fast) var(--easing-spring);
+    transition: all var(--duration-fast) var(--easing-in-out);
     position: relative;
-    overflow: hidden;
-  }
-
-  .nav-link::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--color-primary-100);
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--easing-in-out);
   }
 
   .nav-link:hover {
     color: var(--color-primary-600);
-    transform: translateY(-1px);
-  }
-
-  .nav-link:hover::before {
-    opacity: 0.1;
+    background: var(--color-surface-hover);
   }
 
   .nav-link.active {
@@ -185,28 +183,22 @@ const isActive = (href: string) => currentPath === href
   }
 
   html.dark .nav-link.active {
-    background: rgba(90, 122, 255, 0.15);
+    background: rgba(90, 122, 255, 0.1);
   }
 
-  .nav-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    background: var(--color-text-secondary);
-    color: var(--color-background);
-    border-radius: var(--radius-sm);
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-    line-height: 1;
+  /* Nav badge - minimal style */
+  .nav-badge-custom {
+    background: transparent;
+    color: var(--color-text-secondary);
+    border: 1px solid currentColor;
     transition: all var(--duration-fast) var(--easing-in-out);
   }
 
-  .nav-link:hover .nav-badge,
-  .nav-link.active .nav-badge {
+  .nav-link:hover .nav-badge-custom,
+  .nav-link.active .nav-badge-custom {
     background: var(--color-primary-600);
     color: white;
+    border-color: transparent;
   }
 
   .nav-text {
@@ -230,30 +222,30 @@ const isActive = (href: string) => currentPath === href
     padding: 0 var(--spacing-3);
     border: none;
     border-radius: var(--radius-lg);
-    background: transparent;
-    color: var(--color-text-secondary);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-spring);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
-  }
-
-  .theme-button:hover,
-  .menu-button:hover {
-    background: var(--color-surface-hover);
-    color: var(--color-text-primary);
-    transform: scale(1.05);
-  }
-
-  .theme-button:active,
-  .menu-button:active {
-    transform: scale(0.95);
   }
 
   /* Theme toggle labels */
   html:not(.dark) .theme-dark-label,
   html.dark .theme-light-label {
     display: none;
+  }
+
+  /* Theme icons */
+  .theme-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform var(--duration-fast) var(--easing-in-out);
+  }
+
+  .theme-button:hover .theme-icon {
+    transform: rotate(30deg);
+  }
+
+  .theme-button:active .theme-icon {
+    transform: scale(0.9);
   }
 
   /* Mobile Menu Button */
@@ -325,10 +317,12 @@ const isActive = (href: string) => currentPath === href
     color: var(--color-primary-600);
   }
 
-  .mobile-nav-link .nav-badge {
+  .mobile-nav-link .nav-badge-custom {
     width: 24px;
     height: 24px;
-    font-size: var(--font-size-sm);
+    min-width: 24px;
+    min-height: 24px;
+    font-size: var(--font-size-xs);
   }
 
   /* Responsive */
@@ -368,17 +362,29 @@ const isActive = (href: string) => currentPath === href
 </style>
 
 <script>
-  // スクロール時のヘッダー縮小
+  // スクロール時のヘッダー縮小と動的UI
   const header = document.getElementById('main-header');
+  let scrollTimer: number | null = null;
 
   function updateHeaderOnScroll() {
     const currentScroll = window.pageYOffset;
     
     if (currentScroll > 50) {
       header?.classList.add('scrolled');
+      document.body.classList.add('scrolling');
     } else {
       header?.classList.remove('scrolled');
+      document.body.classList.remove('scrolling');
     }
+
+    // スクロール停止時の処理
+    if (scrollTimer !== null) {
+      clearTimeout(scrollTimer);
+    }
+    
+    scrollTimer = window.setTimeout(() => {
+      document.body.classList.remove('scrolling');
+    }, 150);
   }
 
   window.addEventListener('scroll', updateHeaderOnScroll, { passive: true });

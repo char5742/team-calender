@@ -1,100 +1,51 @@
 ---
-import type { Group } from '../lib/schema'
-import { generateModalId } from '../utils/id'
-
-export interface Props {
-  group?: Group
-  isOpen?: boolean
-}
-
-const { group, isOpen = false } = Astro.props
-const modalId = generateModalId()
+// 削除確認モーダルのコンポーネント
 ---
 
-<div id={modalId} class={`modal-overlay ${isOpen ? 'open' : ''}`}>
-  <div class="modal glass animate-fade-in">
-    <div class="modal-header">
-      <h3>グループを削除</h3>
-    </div>
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal-content minimal-card">
+    <h3 class="heading-tertiary">グループを削除しますか？</h3>
     <div class="modal-body">
-      <p>
-        本当に「<strong>{group?.name || ''}</strong>」を削除しますか？
+      <p class="visual-secondary">
+        「<strong class="visual-primary"></strong>」を削除すると、このグループに関連するすべてのデータが失われます。
       </p>
-      <p class="warning">
-        この操作は取り消すことができません。
-      </p>
+      <p class="visual-tertiary">この操作は取り消せません。</p>
     </div>
     <div class="modal-actions">
-      <button type="button" class="btn btn-danger ripple-container button-hover focus-glow" data-action="delete">
-        <span class="btn-text">削除する</span>
-        <span class="btn-spinner hidden">
-          <span class="spinner-dot">●</span>
-          削除中...
-        </span>
+      <button class="btn btn-primary btn-danger interactive" data-action="confirm">
+        削除する
       </button>
-      <button type="button" class="btn btn-secondary ripple-container button-hover focus-glow" data-action="cancel">
+      <button class="btn btn-subtle" data-action="cancel">
         キャンセル
       </button>
     </div>
   </div>
 </div>
 
-<script define:vars={{ modalId }}>
-  // ローディング状態の簡易実装
-  const isLoadingStore = {
-    get: () => false,
-    subscribe: (callback) => {
-      // 簡易実装のため、常にfalseを返す
-      callback(false);
-    }
-  };
-  
-  const modal = document.getElementById(modalId);
+<script>
+  const modal = document.getElementById('delete-modal');
   
   if (modal) {
-    const deleteButton = modal.querySelector('[data-action="delete"]');
+    const confirmButton = modal.querySelector('[data-action="confirm"]');
     const cancelButton = modal.querySelector('[data-action="cancel"]');
-    const btnText = modal.querySelector('.btn-text');
-    const btnSpinner = modal.querySelector('.btn-spinner');
-    
-    // ローディング状態の購読
-    isLoadingStore.subscribe(isLoading => {
-      if (deleteButton) {
-        deleteButton.disabled = isLoading;
-        deleteButton.classList.toggle('loading', isLoading);
-      }
-      if (cancelButton) {
-        cancelButton.disabled = isLoading;
-      }
-      if (btnText) {
-        btnText.classList.toggle('hidden', isLoading);
-      }
-      if (btnSpinner) {
-        btnSpinner.classList.toggle('hidden', !isLoading);
-      }
-    });
     
     // 削除ボタンのクリックイベント
-    if (deleteButton) {
-      deleteButton.addEventListener('click', () => {
-        if (!deleteButton.disabled) {
-          window.dispatchEvent(new CustomEvent('group-delete-confirm'));
-        }
+    if (confirmButton) {
+      confirmButton.addEventListener('click', () => {
+        window.dispatchEvent(new CustomEvent('group-delete-confirm'));
       });
     }
 
     // キャンセルボタンのクリックイベント
     if (cancelButton) {
       cancelButton.addEventListener('click', () => {
-        if (!cancelButton.disabled) {
-          window.dispatchEvent(new CustomEvent('group-delete-cancel'));
-        }
+        window.dispatchEvent(new CustomEvent('group-delete-cancel'));
       });
     }
 
     // オーバーレイクリックでモーダルを閉じる
     modal.addEventListener('click', (e) => {
-      if (e.target === modal && !isLoadingStore.get()) {
+      if (e.target === modal) {
         window.dispatchEvent(new CustomEvent('group-delete-cancel'));
       }
     });
@@ -108,169 +59,81 @@ const modalId = generateModalId()
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(var(--blur-sm));
     -webkit-backdrop-filter: blur(var(--blur-sm));
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
-    z-index: var(--z-index-modal-backdrop);
+    z-index: var(--z-index-modal);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--duration-normal) var(--easing-in-out);
+    padding: var(--spacing-4);
   }
 
   .modal-overlay.open {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
   }
 
-  .modal {
-    background-color: var(--color-surface);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
-    max-width: 400px;
-    width: 90%;
-    animation: modalFadeIn var(--duration-normal) var(--easing-out);
-    border: 1px solid var(--color-border);
+  .modal-content {
+    max-width: 420px;
+    width: 100%;
+    padding: var(--spacing-8);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-2xl);
+    transform: scale(0.9);
+    transition: transform var(--duration-normal) var(--easing-spring);
   }
 
-  /* ガラスモーフィズム効果を適用 */
-  .modal.glass {
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(var(--blur-lg));
-    -webkit-backdrop-filter: blur(var(--blur-lg));
-    border: 1px solid var(--color-glass-border);
-    box-shadow: var(--shadow-glass);
-  }
-
-  @keyframes modalFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .modal-header {
-    padding: var(--spacing-6);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .modal-header h3 {
-    margin: 0;
-    font-size: var(--font-size-xl);
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
+  .modal-overlay.open .modal-content {
+    transform: scale(1);
   }
 
   .modal-body {
-    padding: var(--spacing-6);
+    margin: var(--spacing-6) 0;
   }
 
   .modal-body p {
-    margin: 0 0 var(--spacing-4) 0;
-    color: var(--color-text-secondary);
-    line-height: var(--line-height-relaxed);
-  }
-
-  .modal-body p:last-child {
-    margin-bottom: 0;
-  }
-
-  .modal-body strong {
-    color: var(--color-text-primary);
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .warning {
-    color: var(--color-error);
-    font-size: var(--font-size-sm);
+    margin: var(--spacing-3) 0;
   }
 
   .modal-actions {
-    padding: var(--spacing-4) var(--spacing-6);
-    border-top: 1px solid var(--color-border);
     display: flex;
-    gap: var(--spacing-4);
-    justify-content: flex-end;
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-8);
   }
 
-  .btn {
-    padding: var(--spacing-2) var(--spacing-6);
-    font-size: var(--font-size-base);
-    border: none;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--duration-fast) var(--easing-in-out);
-    font-weight: var(--font-weight-medium);
-    position: relative;
-    min-width: 100px;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
+  /* Danger button style */
   .btn-danger {
-    background-color: var(--color-error);
+    background: var(--color-error);
     color: white;
   }
 
-  .btn-danger:hover:not(:disabled) {
-    background-color: var(--color-error);
+  .btn-danger:hover {
+    background: #dc2626;
   }
 
-  .btn-danger.loading {
-    background-color: var(--color-error);
-  }
-
-  .btn-secondary {
-    background-color: var(--color-gray-500);
-    color: white;
-  }
-
-  .btn-secondary:hover:not(:disabled) {
-    background-color: var(--color-gray-600);
-  }
-
-  .btn-text,
-  .btn-spinner {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-2);
-  }
-
-  .hidden {
-    display: none;
-  }
-  
-  /* より具体的なセレクタで上書きを防ぐ */
-  .modal .hidden,
-  .modal-overlay .hidden {
-    display: none;
-  }
-
-  .spinner-dot {
-    display: inline-block;
-    animation: pulse 1.4s infinite ease-in-out both;
-  }
-
-  @keyframes pulse {
-    0%, 80%, 100% {
-      opacity: 0;
-      transform: scale(0.8);
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.8);
     }
-    40% {
-      opacity: 1;
-      transform: scale(1);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .modal-content {
+      padding: var(--spacing-6);
+    }
+
+    .modal-actions {
+      flex-direction: column-reverse;
+    }
+
+    .modal-actions button {
+      width: 100%;
     }
   }
 </style> 

@@ -1,21 +1,20 @@
 ---
 export interface Props {
-  error?: string | null
-  className?: string
+  message: string
+  type?: 'error' | 'warning' | 'info'
 }
 
-const { error, className = '' } = Astro.props
+const { message, type = 'error' } = Astro.props
 ---
 
-{error && (
-  <div class={`error-message error-feedback ${className}`} role="alert">
-    <span class="error-badge">!</span>
-    <span class="error-text">{error}</span>
-    <button type="button" class="close-btn ripple-container" aria-label="エラーを閉じる">
-      <span class="close-badge">×</span>
-    </button>
-  </div>
-)}
+<div class={`error-message ${type} content-appear`} role="alert">
+  <span class="error-icon" aria-hidden="true">
+    {type === 'error' && '⚠️'}
+    {type === 'warning' && '⚡'}
+    {type === 'info' && 'ℹ️'}
+  </span>
+  <span class="error-text visual-secondary">{message}</span>
+</div>
 
 <script>
   import { clearError } from '../stores/groupStore';
@@ -50,85 +49,57 @@ const { error, className = '' } = Astro.props
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
-    padding: var(--spacing-4);
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: var(--spacing-3) var(--spacing-4);
+    margin: var(--spacing-4) 0;
     border-radius: var(--radius-md);
-    color: var(--color-error);
-    margin-bottom: var(--spacing-4);
-    animation: slideIn var(--duration-normal) var(--easing-out);
-    box-shadow: var(--shadow-sm);
-  }
-  
-  .error-badge {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    background: var(--color-error);
-    color: white;
-    border-radius: 50%;
-    font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
-  }
-  
-  .error-text {
-    flex-grow: 1;
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-sm);
-  }
-  
-  .close-btn {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    color: var(--color-error);
-    cursor: pointer;
-    padding: var(--spacing-1);
-    border-radius: var(--radius-sm);
+    border: 1px solid;
     transition: all var(--duration-fast) var(--easing-in-out);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
   }
-  
-  .close-btn:hover {
-    background-color: rgba(239, 68, 68, 0.1);
+
+  .error-message.error {
+    background: rgba(239, 68, 68, 0.05);
+    border-color: rgba(239, 68, 68, 0.2);
+    color: var(--color-error);
   }
-  
-  .close-badge {
+
+  .error-message.warning {
+    background: rgba(245, 158, 11, 0.05);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: var(--color-warning);
+  }
+
+  .error-message.info {
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: var(--color-info);
+  }
+
+  .error-icon {
     font-size: var(--font-size-lg);
-    line-height: 1;
-    font-weight: var(--font-weight-normal);
+    flex-shrink: 0;
   }
-  
-  .fade-out {
-    animation: fadeOut var(--duration-normal) var(--easing-out) forwards;
+
+  .error-text {
+    flex: 1;
+    line-height: var(--line-height-relaxed);
   }
-  
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .error-message.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+    .error-message.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
     }
-  }
-  
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-10px);
+
+    .error-message.info {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
     }
   }
 </style> 

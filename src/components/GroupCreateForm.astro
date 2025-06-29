@@ -24,8 +24,8 @@ const members = propsMembers.length > 0 ? propsMembers : teamMembersStore.get()
 const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : groupsStore.get()
 ---
 
-<div class="group-create-form glass">
-  <h2>新しいグループを作成</h2>
+<div class="group-create-form glass-adaptive">
+  <h2 class="form-title">新しいグループを作成</h2>
   <form id="group-create-form" novalidate>
     <div class="form-group">
       <label for="group-name">

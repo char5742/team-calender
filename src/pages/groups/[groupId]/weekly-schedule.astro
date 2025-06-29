@@ -5,7 +5,7 @@ import { loadMockData, mockCalendarEvents } from '../../../lib/mockData'
 import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
 import type { GroupWithMembers } from '../../../stores/groupStore'
 import { currentWeekStartStore, getWeeklySchedule } from '../../../stores/weeklyScheduleStore'
-import { addWeeks, getWeekStart } from '../../../utils/dateUtils'
+import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils'
 
 // 動的ルートのために必要な関数
 export function getStaticPaths() {
@@ -55,35 +55,37 @@ selectedGroupIdStore.set(groupId || null)
 
 // 週間スケジュールを取得（モックデータを使用）
 const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
+
+// 週の開始日と終了日を計算
+const weekStart = displayWeekStart
+const weekEnd = new Date(weekStart)
+weekEnd.setDate(weekEnd.getDate() + 6)
 ---
 
-<Layout title={`${group.name} - 週間スケジュール`}>
-  <div class="container">
-    <header class="page-header">
-      <h1>{group.name}の週間スケジュール</h1>
-      <div class="navigation">
-        <a href="/" class="back-link">← グループ一覧に戻る</a>
-        <div class="week-navigation">
-          <button id="prev-week" class="week-btn" title="前週">
-            <span class="arrow-badge">‹</span>
-          </button>
-          <button id="next-week" class="week-btn" title="次週">
-            <span class="arrow-badge">›</span>
-          </button>
-        </div>
+<Layout title={`${group.name}の週間スケジュール`}>
+  <div class="schedule-page">
+    <div class="page-header">
+      <button onclick="history.back()" class="btn btn-subtle back-button">
+        ← 戻る
+      </button>
+      <h1 class="heading-primary">
+        {group.name}の週間スケジュール
+      </h1>
+      <div class="week-info visual-secondary">
+        {formatDate(weekStart, 'YYYY年M月D日')} - {formatDate(weekEnd, 'YYYY年M月D日')}
       </div>
-    </header>
+    </div>
 
-    {weeklySchedule ? (
-      <WeeklyCalendarView 
-        weeklySchedule={weeklySchedule}
-        members={groupWithMembers.members}
-      />
-    ) : (
-      <div class="no-schedule">
-        <p>スケジュールデータがありません</p>
-      </div>
-    )}
+    <div class="schedule-content">
+      {weeklySchedule ? (
+        <WeeklyCalendarView 
+          weeklySchedule={weeklySchedule} 
+          members={groupWithMembers.members}
+        />
+      ) : (
+        <p class="visual-secondary">スケジュールデータがありません</p>
+      )}
+    </div>
   </div>
 </Layout>
 
@@ -110,84 +112,61 @@ const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
 </script>
 
 <style>
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+  /* ウィークリースケジュールページ専用のレイアウト調整 */
+  :global(.main-content) {
+    padding: 0 !important; /* カレンダー用に余白をリセット */
+  }
+
+  .schedule-page {
+    min-height: calc(100vh - 80px);
+    width: 100%;
+    padding: var(--spacing-8) 0; /* 左右のパディングを削除（カレンダーコンポーネント側で管理） */
   }
 
   .page-header {
-    margin-bottom: 2rem;
-  }
-
-  h1 {
-    margin: 0 0 1rem 0;
-    font-size: 2rem;
-    color: var(--color-text-primary);
-  }
-
-  .navigation {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    margin-bottom: var(--spacing-8);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 var(--spacing-6); /* ヘッダーにも同じ余白を追加 */
   }
 
-  .week-navigation {
-    display: flex;
-    gap: 0.5rem;
+  .back-button {
+    align-self: flex-start;
   }
 
-  .week-btn {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    background-color: white;
-    color: var(--color-text-primary);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
+  .week-info {
+    font-size: var(--font-size-lg);
   }
 
-  .week-btn:hover {
-    background-color: var(--color-background-tertiary);
-    border-color: var(--color-primary-500);
-    color: var(--color-primary-500);
+  .schedule-content {
+    margin-bottom: var(--spacing-12);
+    width: 100%;
+    max-width: 100%; /* コンテナーの最大幅を制限 */
+    margin-left: auto;
+    margin-right: auto;
   }
 
-  .week-btn:active {
-    transform: scale(0.95);
-  }
+  /* レスポンシブ調整 */
+  @media (max-width: 768px) {
+    .schedule-page {
+      padding: var(--spacing-4) 0; /* 左右のパディングを削除 */
+    }
 
-  .arrow-badge {
-    font-size: 1.5rem;
-    line-height: 1;
-    font-weight: 300;
-  }
+    .page-header {
+      margin-bottom: var(--spacing-6);
+      padding: 0 var(--spacing-4); /* モバイルでは余白を小さく */
+    }
 
-  .back-link {
-    color: var(--color-primary-500);
-    text-decoration: none;
-    font-size: 0.875rem;
-  }
+    .heading-primary {
+      font-size: var(--font-size-2xl);
+    }
 
-  .back-link:hover {
-    text-decoration: underline;
-  }
-
-  .no-schedule {
-    text-align: center;
-    padding: 3rem;
-    background-color: var(--color-background-secondary);
-    border-radius: 8px;
-  }
-
-  .no-schedule p {
-    color: var(--color-text-tertiary);
-    margin: 0;
+    .week-info {
+      font-size: var(--font-size-base);
+    }
   }
 </style> 

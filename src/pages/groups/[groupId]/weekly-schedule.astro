@@ -2,8 +2,8 @@
 import Header from '../../../components/Header.astro'
 import WeeklyCalendarView from '../../../components/WeeklyCalendarView.astro'
 import { loadMockData, mockCalendarEvents } from '../../../lib/mockData'
-import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
 import type { GroupWithMembers } from '../../../stores/groupStore'
+import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
 import { currentWeekStartStore, getWeeklySchedule } from '../../../stores/weeklyScheduleStore'
 import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils'
 

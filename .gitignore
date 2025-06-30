@@ -50,6 +50,12 @@ coverage/
 # Test results
 test-results/
 
+# Playwright VRT
+# ベースラインスクリーンショットは Git で管理するため除外しない
+# 実際のテスト結果とdiff画像のみを除外
+tests/e2e/__screenshots__/*-actual.png
+tests/e2e/__screenshots__/*-diff.png
+
 # Bun
 bun.lockb
 

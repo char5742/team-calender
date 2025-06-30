@@ -1,12 +1,15 @@
 import { expect, test } from '@playwright/test'
 
-test('health check - redirect to calendar', async ({ page }) => {
+test('health check - top page shows group management', async ({ page }) => {
   await page.goto('/')
 
-  // リダイレクトを待つ
-  await page.waitForURL('**/groups/**/weekly-schedule', { timeout: 10000 })
+  // ページの読み込みを待つ
+  await page.waitForLoadState('networkidle')
 
-  // カレンダー画面のタイトルを確認（グループ名が含まれる）
+  // GroupManagementコンポーネントが表示されることを確認
+  await expect(page.locator('.groups-container')).toBeVisible({ timeout: 10000 })
+
+  // ページタイトルを確認
   const title = await page.title()
-  expect(title).toBeTruthy()
+  expect(title).toContain('チームカレンダー')
 })

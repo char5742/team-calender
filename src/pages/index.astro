@@ -1,18 +1,12 @@
 ---
-import { loadMockData } from '../lib/mockData'
-import { groupsStore } from '../stores/groupStore'
+import GroupManagement from '../components/GroupManagement.astro'
+import Layout from '../layouts/Layout.astro'
 
-// モックデータを読み込む
-loadMockData()
+const title = 'チームカレンダー'
+---
 
-// グループ一覧を取得
-const groups = groupsStore.get()
-
-// グループがない場合は作成画面へリダイレクト
-if (groups.length === 0) {
-  return Astro.redirect('/groups/new')
-}
-
-// 最初のグループのカレンダー画面へリダイレクト
-return Astro.redirect(`/groups/${groups[0].id}/weekly-schedule`)
---- 
+<Layout title={title}>
+  <main>
+    <GroupManagement />
+  </main>
+</Layout> 

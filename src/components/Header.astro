@@ -4,9 +4,10 @@ import { groupsStore } from '../stores/groupStore'
 
 export interface Props {
   currentGroupId?: string
+  currentPath?: string
 }
 
-const { currentGroupId } = Astro.props
+const { currentGroupId, currentPath } = Astro.props
 
 // モックデータを読み込む
 loadMockData()

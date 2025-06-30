@@ -72,14 +72,17 @@ test.describe('週間カレンダービュー', () => {
     const calendar = page.locator('.weekly-calendar')
     const eventBlock = calendar.locator('.event-block').first()
 
-    // 背景色が設定されていることを確認
-    const backgroundColor = await eventBlock.evaluate((el) => {
-      return window.getComputedStyle(el).backgroundColor
+    // 左側のボーダーの色が設定されていることを確認
+    const borderLeftColor = await eventBlock.evaluate((el) => {
+      return window.getComputedStyle(el).borderLeftColor
     })
 
-    // 透明でないことを確認
-    expect(backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
-    expect(backgroundColor).not.toBe('transparent')
+    // ボーダーの色が透明でないことを確認
+    expect(borderLeftColor).not.toBe('rgba(0, 0, 0, 0)')
+    expect(borderLeftColor).not.toBe('transparent')
+
+    // ボーダーの色が設定されていることを確認（例：primary colorなど）
+    expect(borderLeftColor).toBeTruthy()
   })
 
   test('現在の週の日付が正しく表示される', async ({ page }) => {

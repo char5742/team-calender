@@ -1,0 +1,234 @@
+/* 
+ * Modal Component Styles
+ * Accessible modal dialogs with smooth animations
+ */
+
+@layer components {
+  /* Modal backdrop */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: var(--z-index-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-4);
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--easing-out);
+  }
+
+  .modal-backdrop.active {
+    opacity: 1;
+  }
+
+  /* Modal container */
+  .modal {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+    transition: all var(--duration-normal) var(--easing-spring);
+  }
+
+  .modal-backdrop.active .modal {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+
+  /* Modal sizes */
+  .modal-sm {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .modal-md {
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .modal-lg {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .modal-xl {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .modal-full {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  /* Modal header */
+  .modal-header {
+    padding: var(--spacing-6);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    margin: 0;
+    line-height: var(--line-height-tight);
+  }
+
+  /* Modal close button */
+  .modal-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: all var(--duration-fast) var(--easing-out);
+    margin-left: var(--spacing-4);
+    flex-shrink: 0;
+  }
+
+  .modal-close:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-text-primary);
+  }
+
+  .modal-close:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Modal body */
+  .modal-body {
+    padding: var(--spacing-6);
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  /* Modal footer */
+  .modal-footer {
+    padding: var(--spacing-6);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: var(--spacing-3);
+    justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  /* Modal footer alignment variants */
+  .modal-footer.modal-footer-start {
+    justify-content: flex-start;
+  }
+
+  .modal-footer.modal-footer-center {
+    justify-content: center;
+  }
+
+  .modal-footer.modal-footer-between {
+    justify-content: space-between;
+  }
+
+  /* Animation states */
+  .modal-enter {
+    animation: modalEnter var(--duration-normal) var(--easing-spring);
+  }
+
+  .modal-exit {
+    animation: modalExit var(--duration-fast) var(--easing-out);
+  }
+
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  @keyframes modalExit {
+    from {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+    }
+  }
+
+  /* Prevent body scroll when modal is open */
+  body.modal-open {
+    overflow: hidden;
+  }
+
+  /* Focus trap indicator */
+  .modal:focus {
+    outline: none;
+  }
+
+  /* Mobile responsiveness */
+  @media (max-width: 640px) {
+    .modal-backdrop {
+      padding: 0;
+    }
+
+    .modal:not(.modal-full) {
+      width: 100%;
+      height: 100%;
+      max-width: 100vw;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: var(--spacing-4);
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .modal-backdrop,
+    .modal {
+      transition-duration: 0.01ms !important;
+    }
+
+    .modal-enter,
+    .modal-exit {
+      animation: none;
+    }
+
+    .modal-backdrop.active .modal {
+      transform: none;
+    }
+  }
+
+  /* Dark mode adjustments */
+  @media (prefers-color-scheme: dark) {
+    .modal-backdrop {
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+  }
+}

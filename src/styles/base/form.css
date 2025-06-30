@@ -1,0 +1,385 @@
+/* フォーム要素スタイル - フォーム関連のデフォルトスタイル定義 */
+
+@layer base.form {
+  /* フォーム要素の基本スタイル */
+  form {
+    margin: 0;
+  }
+
+  fieldset {
+    margin: 0;
+    padding: var(--spacing-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    min-width: 0;
+  }
+
+  legend {
+    padding: 0 var(--spacing-2);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  label {
+    display: inline-block;
+    margin-bottom: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  /* 入力要素の共通スタイル */
+  input,
+  textarea,
+  select {
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    color: var(--color-text-primary);
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color var(--duration-fast) var(--easing-in-out), box-shadow
+      var(--duration-fast) var(--easing-in-out);
+  }
+
+  /* フォーカス状態 */
+  input:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-500-20);
+  }
+
+  /* 無効状態 */
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--color-gray-50);
+  }
+
+  /* 読み取り専用 */
+  input:read-only,
+  textarea:read-only {
+    background-color: var(--color-gray-50);
+    cursor: default;
+  }
+
+  /* エラー状態 */
+  input:invalid,
+  textarea:invalid,
+  select:invalid {
+    border-color: var(--color-error);
+  }
+
+  input:invalid:focus,
+  textarea:invalid:focus,
+  select:invalid:focus {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px var(--color-error-20);
+  }
+
+  /* テキストエリア */
+  textarea {
+    min-height: calc(var(--spacing-8) * 3);
+    resize: vertical;
+  }
+
+  /* セレクトボックス */
+  select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23737373' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-3) center;
+    background-size: 10px 6px;
+    padding-right: calc(var(--spacing-3) + 16px);
+    appearance: none;
+  }
+
+  select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236366f1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  /* チェックボックスとラジオボタン */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: auto;
+    height: var(--spacing-5);
+    width: var(--spacing-5);
+    margin-right: var(--spacing-2);
+    cursor: pointer;
+    vertical-align: middle;
+  }
+
+  /* ファイル入力 */
+  input[type="file"] {
+    cursor: pointer;
+    padding: var(--spacing-2);
+  }
+
+  input[type="file"]::file-selector-button {
+    margin-right: var(--spacing-3);
+    padding: var(--spacing-2) var(--spacing-4);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+    background-color: var(--color-gray-100);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--easing-in-out);
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background-color: var(--color-gray-200);
+  }
+
+  /* 範囲入力 */
+  input[type="range"] {
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* 数値入力 */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+    height: auto;
+  }
+
+  /* 検索入力 */
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button {
+    appearance: none;
+  }
+
+  /* 日付・時刻入力 */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"] {
+    cursor: pointer;
+  }
+
+  /* ボタン要素 */
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+  }
+
+  /* フォームグループのユーティリティクラス */
+  .form-group {
+    margin-bottom: var(--spacing-6);
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+  }
+
+  .form-label-required::after {
+    content: " *";
+    color: var(--color-error);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    font-size: var(--font-size-base);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    transition: border-color var(--duration-fast) var(--easing-in-out);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-500-20);
+  }
+
+  .form-input::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .form-textarea {
+    width: 100%;
+    min-height: calc(var(--spacing-8) * 3);
+    padding: var(--spacing-3);
+    font-size: var(--font-size-base);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    resize: vertical;
+    transition: border-color var(--duration-fast) var(--easing-in-out);
+  }
+
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-500-20);
+  }
+
+  .form-select {
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    padding-right: calc(var(--spacing-3) + 20px);
+    font-size: var(--font-size-base);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-background);
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--easing-in-out);
+  }
+
+  .form-select:focus {
+    outline: none;
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-500-20);
+  }
+
+  /* フォームのヘルパーテキスト */
+  .form-help {
+    margin-top: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+  }
+
+  /* フォームのエラーメッセージ */
+  .form-error {
+    margin-top: var(--spacing-1);
+    font-size: var(--font-size-sm);
+    color: var(--color-error);
+  }
+
+  /* インラインフォーム */
+  .form-inline {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+  }
+
+  .form-inline .form-group {
+    margin-bottom: 0;
+  }
+
+  /* フォームの水平レイアウト */
+  .form-horizontal .form-group {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: var(--spacing-4);
+    align-items: start;
+  }
+
+  .form-horizontal .form-label {
+    margin-bottom: 0;
+    padding-top: calc(var(--spacing-2) + 1px);
+  }
+}
+
+@layer base.form.validation {
+  /* バリデーション状態のスタイル */
+
+  /* 成功状態 */
+  .is-valid {
+    border-color: var(--color-success);
+  }
+
+  .is-valid:focus {
+    border-color: var(--color-success);
+    box-shadow: 0 0 0 3px var(--color-success-20);
+  }
+
+  /* エラー状態 */
+  .is-invalid {
+    border-color: var(--color-error);
+  }
+
+  .is-invalid:focus {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 3px var(--color-error-20);
+  }
+
+  /* 警告状態 */
+  .is-warning {
+    border-color: var(--color-warning);
+  }
+
+  .is-warning:focus {
+    border-color: var(--color-warning);
+    box-shadow: 0 0 0 3px var(--color-warning-20);
+  }
+}
+
+@layer base.form.sizes {
+  /* フォーム要素のサイズバリエーション */
+
+  /* 小サイズ */
+  .form-input-sm,
+  .form-select-sm,
+  .form-textarea-sm {
+    padding: var(--spacing-1) var(--spacing-2);
+    font-size: var(--font-size-sm);
+  }
+
+  /* 大サイズ */
+  .form-input-lg,
+  .form-select-lg,
+  .form-textarea-lg {
+    padding: var(--spacing-3) var(--spacing-4);
+    font-size: var(--font-size-lg);
+  }
+}
+
+@layer base.form.accessibility {
+  /* アクセシビリティ向上のためのスタイル */
+
+  /* 必須フィールドのマーク */
+  .required-field::before {
+    content: "* ";
+    color: var(--color-error);
+    font-weight: var(--font-weight-bold);
+  }
+
+  /* エラーアナウンス */
+  .form-error[role="alert"] {
+    font-weight: var(--font-weight-medium);
+  }
+
+  /* フィールドセットの説明 */
+  fieldset[aria-describedby] {
+    position: relative;
+  }
+
+  /* ラベルとフィールドの関連付け強化 */
+  label[for] {
+    cursor: pointer;
+  }
+
+  /* キーボードナビゲーション向上 */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+}

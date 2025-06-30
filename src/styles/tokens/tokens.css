@@ -1,0 +1,16 @@
+/* トークンシステム - すべてのトークンをインポート */
+
+/* カラーシステム */
+@import "./color.css";
+
+/* タイポグラフィ */
+@import "./typography.css";
+
+/* スペーシング */
+@import "./spacing.css";
+
+/* エレベーション（シャドウとz-index） */
+@import "./elevation.css";
+
+/* アニメーション */
+@import "./animation.css";

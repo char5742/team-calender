@@ -1,0 +1,26 @@
+/* 
+ * グローバルCSSエントリーポイント
+ * Modern CSS Architecture with @layer cascade management
+ */
+
+/* レイヤードインポート */
+@import "./reset.css" layer(reset);
+@import "./tokens/tokens.css" layer(tokens);
+@import "./base/base.css" layer(base);
+@import "./base/form.css" layer(base);
+@import "./components/components.css" layer(components);
+@import "./utilities/utilities.css" layer(utilities);
+
+/* レイヤー定義 - カスケーディングの優先順位を制御 */
+@layer reset, tokens, base, components, utilities;
+
+/* カスタムメディアクエリ定義 - レスポンシブブレイクポイント */
+@custom-media --sm (min-width: 640px);
+@custom-media --md (min-width: 768px);
+@custom-media --lg (min-width: 1024px);
+
+/* 
+ * 今後の移行計画:
+ * - components layer: 再利用可能なコンポーネント
+ * - utilities layer: ユーティリティクラス
+ */

@@ -1,0 +1,109 @@
+/* カラートークン - oklch色空間を使用 */
+@layer tokens {
+  :root {
+    /* Primary Colors - oklch色空間 */
+    --color-primary-base: oklch(0 0 0); /* 黒 */
+    --color-primary: var(--color-primary-base);
+    --color-primary-hover: oklch(from var(--color-primary-base) calc(l + 20) c h); /* 相対カラー */
+
+    /* Gray Scale - oklch色空間 */
+    --color-gray-50: oklch(98 0 0);
+    --color-gray-100: oklch(96 0 0);
+    --color-gray-200: oklch(90 0 0);
+    --color-gray-300: oklch(83 0 0);
+    --color-gray-400: oklch(64 0 0);
+    --color-gray-500: oklch(45 0 0);
+    --color-gray-600: oklch(32 0 0);
+    --color-gray-700: oklch(25 0 0);
+    --color-gray-800: oklch(15 0 0);
+    --color-gray-900: oklch(9 0 0);
+
+    /* Semantic Colors - oklch色空間 */
+    --color-success-base: oklch(71 0.15 164); /* 緑 */
+    --color-warning-base: oklch(76 0.12 89); /* オレンジ */
+    --color-error-base: oklch(54 0.2 28); /* 赤 */
+    --color-info-base: oklch(56 0.2 256); /* 青 */
+
+    --color-success: var(--color-success-base);
+    --color-warning: var(--color-warning-base);
+    --color-error: var(--color-error-base);
+    --color-info: var(--color-info-base);
+
+    /* Background Colors */
+    --color-background: oklch(100 0 0); /* 白 */
+    --color-background-secondary: oklch(98 0 0);
+    --color-surface: oklch(100 0 0);
+    --color-surface-hover: oklch(96 0 0);
+
+    /* Text Colors */
+    --color-text-primary: oklch(9 0 0); /* ほぼ黒 */
+    --color-text-secondary: oklch(32 0 0);
+    --color-text-tertiary: oklch(64 0 0);
+    --color-text-inverse: oklch(100 0 0); /* 白 */
+
+    /* Border Colors */
+    --color-border: oklch(90 0 0);
+    --color-border-hover: oklch(83 0 0);
+
+    /* 透明度バリエーション（相対カラー機能） */
+    --color-primary-10: oklch(from var(--color-primary) l c h / 0.1);
+    --color-primary-20: oklch(from var(--color-primary) l c h / 0.2);
+    --color-gray-500-50: oklch(from var(--color-gray-500) l c h / 0.5);
+  }
+
+  /* ダークモード - html.darkクラスベース */
+  html.dark {
+    /* Primary Colors - 反転 */
+    --color-primary-base: oklch(100 0 0); /* 白 */
+    --color-primary: var(--color-primary-base);
+    --color-primary-hover: oklch(from var(--color-primary-base) calc(l - 10) c h);
+
+    /* Background Colors - ダーク */
+    --color-background: oklch(4 0 0); /* ほぼ黒 */
+    --color-background-secondary: oklch(9 0 0);
+    --color-surface: oklch(9 0 0);
+    --color-surface-hover: oklch(15 0 0);
+
+    /* Text Colors - 反転 */
+    --color-text-primary: oklch(98 0 0);
+    --color-text-secondary: oklch(64 0 0);
+    --color-text-tertiary: oklch(45 0 0);
+    --color-text-inverse: oklch(4 0 0);
+
+    /* Border Colors - ダーク */
+    --color-border: oklch(15 0 0);
+    --color-border-hover: oklch(25 0 0);
+
+    /* Semantic Colors - 微調整 */
+    --color-success: oklch(from var(--color-success-base) calc(l + 10) c h);
+    --color-warning: oklch(from var(--color-warning-base) calc(l + 10) c h);
+    --color-error: oklch(from var(--color-error-base) calc(l + 10) c h);
+    --color-info: oklch(from var(--color-info-base) calc(l + 10) c h);
+  }
+
+  /* メディアクエリベースのダークモード（フォールバック） */
+  @media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+      /* Primary Colors - 反転 */
+      --color-primary-base: oklch(100 0 0);
+      --color-primary: var(--color-primary-base);
+      --color-primary-hover: oklch(from var(--color-primary-base) calc(l - 10) c h);
+
+      /* Background Colors - ダーク */
+      --color-background: oklch(4 0 0);
+      --color-background-secondary: oklch(9 0 0);
+      --color-surface: oklch(9 0 0);
+      --color-surface-hover: oklch(15 0 0);
+
+      /* Text Colors - 反転 */
+      --color-text-primary: oklch(98 0 0);
+      --color-text-secondary: oklch(64 0 0);
+      --color-text-tertiary: oklch(45 0 0);
+      --color-text-inverse: oklch(4 0 0);
+
+      /* Border Colors - ダーク */
+      --color-border: oklch(15 0 0);
+      --color-border-hover: oklch(25 0 0);
+    }
+  }
+}

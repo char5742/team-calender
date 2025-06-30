@@ -1,0 +1,46 @@
+/* スペーシングトークン */
+@layer tokens {
+  :root {
+    /* Base Spacing Scale */
+    --spacing-0: 0;
+    --spacing-1: 0.25rem;
+    --spacing-2: 0.5rem;
+    --spacing-3: 0.75rem;
+    --spacing-4: 1rem;
+    --spacing-5: 1.25rem;
+    --spacing-6: 1.5rem;
+    --spacing-8: 2rem;
+    --spacing-10: 2.5rem;
+    --spacing-12: 3rem;
+    --spacing-16: 4rem;
+    --spacing-20: 5rem;
+    --spacing-24: 6rem;
+
+    /* Fluid Spacing - レスポンシブ対応 */
+    --spacing-fluid-xs: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
+    --spacing-fluid-sm: clamp(0.5rem, 0.45rem + 0.25vw, 0.75rem);
+    --spacing-fluid-md: clamp(1rem, 0.95rem + 0.25vw, 1.25rem);
+    --spacing-fluid-lg: clamp(1.5rem, 1.45rem + 0.25vw, 2rem);
+    --spacing-fluid-xl: clamp(2rem, 1.95rem + 0.25vw, 3rem);
+
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-full: 9999px;
+
+    /* Container Widths */
+    --container-xs: 20rem;
+    --container-sm: 24rem;
+    --container-md: 28rem;
+    --container-lg: 32rem;
+    --container-xl: 36rem;
+    --container-2xl: 42rem;
+    --container-3xl: 48rem;
+    --container-4xl: 56rem;
+    --container-5xl: 64rem;
+    --container-6xl: 72rem;
+    --container-max: 80rem;
+  }
+}

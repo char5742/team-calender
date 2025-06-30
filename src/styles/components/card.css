@@ -1,0 +1,190 @@
+/* 
+ * Card Component Styles
+ * Clean and minimal card designs with smooth interactions
+ */
+
+@layer components {
+  /* Base card styles */
+  .card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-6);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Card with hover effect */
+  .card-hover {
+    transition: all var(--duration-fast) var(--easing-out);
+    cursor: pointer;
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .card-hover:active {
+    transform: translateY(0);
+    transition-duration: 50ms;
+  }
+
+  /* Card appearance animation */
+  .card.card-appear {
+    animation: stagger-fade-in var(--duration-normal) var(--easing-spring) both;
+  }
+
+  /* Card with interactive shadow */
+  .card.interactive-shadow {
+    transition: transform var(--duration-fast) var(--easing-spring), box-shadow var(--duration-fast)
+      var(--easing-out);
+  }
+
+  .card.interactive-shadow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Dark mode shadow adjustments */
+  @media (prefers-color-scheme: dark) {
+    .card.interactive-shadow:hover {
+      box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 8px 24px -4px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  /* Focus states for accessibility */
+  .card:focus-visible,
+  .card.focus-card:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary-500), var(--shadow-lg);
+  }
+
+  /* Card stagger animation */
+  .card.card-stagger {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .card.card-stagger.animate {
+    animation: stagger-fade-in var(--duration-normal) var(--easing-spring) forwards;
+  }
+
+  /* Animation keyframes */
+  @keyframes stagger-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Card variants */
+
+  /* Compact card */
+  .card-compact {
+    padding: var(--spacing-4);
+  }
+
+  /* Borderless card */
+  .card-borderless {
+    border: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .card-borderless:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Clickable card */
+  .card-clickable {
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--easing-out);
+  }
+
+  .card-clickable:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-surface-hover);
+  }
+
+  /* Card sections */
+  .card-header {
+    margin: calc(var(--spacing-6) * -1);
+    margin-bottom: var(--spacing-6);
+    padding: var(--spacing-4) var(--spacing-6);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .card-footer {
+    margin: calc(var(--spacing-6) * -1);
+    margin-top: var(--spacing-6);
+    padding: var(--spacing-4) var(--spacing-6);
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-background-secondary);
+  }
+
+  /* Compact variant adjustments */
+  .card-compact .card-header,
+  .card-compact .card-footer {
+    margin: calc(var(--spacing-4) * -1);
+    padding: var(--spacing-3) var(--spacing-4);
+  }
+
+  .card-compact .card-header {
+    margin-bottom: var(--spacing-4);
+  }
+
+  .card-compact .card-footer {
+    margin-top: var(--spacing-4);
+  }
+
+  /* Loading state */
+  .card.loading {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card.loading::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: skeleton-loading 1.5s ease-in-out infinite;
+  }
+
+  @keyframes skeleton-loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .card,
+    .card-hover,
+    .card-clickable {
+      transition-duration: 0.01ms !important;
+    }
+
+    .card-hover:hover,
+    .card.interactive-shadow:hover {
+      transform: none;
+    }
+
+    .card.card-appear,
+    .card.card-stagger.animate {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

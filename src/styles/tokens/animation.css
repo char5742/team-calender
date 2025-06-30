@@ -1,0 +1,230 @@
+/* アニメーショントークン */
+@layer tokens {
+  :root {
+    /* Duration - アニメーション時間 */
+    --duration-instant: 50ms;
+    --duration-fast: 150ms;
+    --duration-normal: 200ms;
+    --duration-slow: 300ms;
+    --duration-slower: 400ms;
+    --duration-slowest: 500ms;
+
+    /* Easing Functions - イージング関数 */
+    --easing-linear: linear;
+    --easing-in: cubic-bezier(0.4, 0, 1, 1);
+    --easing-out: cubic-bezier(0, 0, 0.2, 1);
+    --easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Spring Animations */
+    --easing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --easing-spring-out: cubic-bezier(0.5, 1.65, 0.4, 0.9);
+
+    /* Transition Properties */
+    --transition-colors: color, background-color, border-color;
+    --transition-opacity: opacity;
+    --transition-transform: transform;
+    --transition-all: all;
+
+    /* Motion Preferences */
+    --motion-reduce: initial;
+    --motion-safe: initial;
+  }
+
+  /* モーション設定の尊重 */
+  @media (prefers-reduced-motion: reduce) {
+    :root {
+      --duration-instant: 0ms;
+      --duration-fast: 0ms;
+      --duration-normal: 0ms;
+      --duration-slow: 0ms;
+      --duration-slower: 0ms;
+      --duration-slowest: 0ms;
+      --motion-reduce: 0ms;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    :root {
+      --motion-safe: 1;
+    }
+  }
+}
+
+/* ===== 基本的なアニメーション定義 ===== */
+@layer tokens {
+  /* フェードイン効果 */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* フェードインスケール */
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* スライドイン（上から） */
+  @keyframes slideInTop {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* スライドイン（下から） */
+  @keyframes slideInBottom {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* リップルエフェクト */
+  @keyframes ripple {
+    to {
+      transform: scale(4);
+      opacity: 0;
+    }
+  }
+
+  /* パルス */
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 0.8;
+    }
+  }
+
+  /* シェイク（エラー時） */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: translateX(-4px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+      transform: translateX(4px);
+    }
+  }
+
+  /* チェックマーク（成功時） */
+  @keyframes checkmark {
+    0% {
+      stroke-dashoffset: 100;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* スケルトンローディング */
+  @keyframes skeleton-loading {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  /* スケルトンパルス */
+  @keyframes skeleton-pulse {
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* スタガーアニメーション用の遅延 */
+  @keyframes stagger-fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* コンテンツの段階的な表示 */
+  @keyframes content-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* UIの段階的な表示 */
+  @keyframes ui-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* バックグラウンドフェード */
+  @keyframes background-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.1;
+    }
+  }
+
+  /* コンテンツプレースホルダーのシマー効果 */
+  @keyframes content-placeholder-shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}

@@ -1,26 +1,19 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "complexity": {
-        "all": true,
         "noBannedTypes": "off"
       },
       "correctness": {
-        "all": true,
         "noNodejsModules": "off",
         "useImportExtensions": "off"
       },
-      "performance": {
-        "all": true
-      },
+      "performance": {},
       "style": {
-        "all": true,
         "noDefaultExport": "off",
         "noParameterProperties": "off",
         "useNodejsImportProtocol": "off",
@@ -35,10 +28,19 @@
           "options": {
             "strictCase": false
           }
-        }
+        },
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
       },
       "suspicious": {
-        "all": true,
         "noExplicitAny": "error"
       }
     }
@@ -57,22 +59,23 @@
     }
   },
   "files": {
-    "ignore": [
-      "node_modules",
-      "dist",
-      "coverage",
-      ".nuxt",
-      ".output",
-      "*.min.js",
-      "bun.lockb",
-      ".astro",
-      "test-results/**"
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/dist",
+      "!**/coverage",
+      "!**/.nuxt",
+      "!**/.output",
+      "!**/*.min.js",
+      "!**/bun.lockb",
+      "!**/.astro",
+      "!**/test-results/**"
     ]
   },
 
   "overrides": [
     {
-      "include": ["**/*.astro"],
+      "includes": ["**/*.astro"],
       "linter": {
         "rules": {
           "style": {

@@ -220,8 +220,9 @@
 
 /* ホバー時の浮き上がり効果 */
 .hover-lift {
-  transition: transform var(--duration-fast) var(--easing-spring), box-shadow var(--duration-fast)
-    var(--easing-out);
+  transition:
+    transform var(--duration-fast) var(--easing-spring),
+    box-shadow var(--duration-fast) var(--easing-out);
 }
 
 .hover-lift:hover {
@@ -264,8 +265,9 @@
 
 /* 成功アニメーション */
 .success-feedback {
-  animation: fadeInScale var(--duration-normal) var(--easing-spring), pulse var(--duration-slow)
-    var(--easing-out) var(--duration-normal);
+  animation:
+    fadeInScale var(--duration-normal) var(--easing-spring),
+    pulse var(--duration-slow) var(--easing-out) var(--duration-normal);
 }
 
 /* エラーアニメーション */
@@ -338,19 +340,24 @@ a:active,
 
 /* インタラクティブ要素のシャドウ効果 */
 .interactive-shadow {
-  transition: transform var(--duration-fast) var(--easing-spring), box-shadow var(--duration-fast)
-    var(--easing-out);
+  transition:
+    transform var(--duration-fast) var(--easing-spring),
+    box-shadow var(--duration-fast) var(--easing-out);
 }
 
 .interactive-shadow:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 8px 24px -4px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 4px 12px -2px rgba(0, 0, 0, 0.08),
+    0 8px 24px -4px rgba(0, 0, 0, 0.04);
 }
 
 /* ダークモード用のシャドウ調整 */
 @media (prefers-color-scheme: dark) {
   .interactive-shadow:hover {
-    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 8px 24px -4px rgba(0, 0, 0, 0.2);
+    box-shadow:
+      0 4px 12px -2px rgba(0, 0, 0, 0.3),
+      0 8px 24px -4px rgba(0, 0, 0, 0.2);
   }
 }
 
@@ -370,8 +377,10 @@ a:active,
 /* フォーカス時のグロー効果 */
 .focus-glow:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-primary-500), 0 0 12px 0
-    rgba(90, 122, 255, 0.2);
+  box-shadow:
+    0 0 0 2px var(--color-background),
+    0 0 0 4px var(--color-primary-500),
+    0 0 12px 0 rgba(90, 122, 255, 0.2);
 }
 
 /* 入力フィールド用のフォーカススタイル */
@@ -384,7 +393,9 @@ a:active,
 /* カード用のフォーカススタイル */
 .focus-card:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-primary-500), var(--shadow-lg);
+  box-shadow:
+    0 0 0 2px var(--color-primary-500),
+    var(--shadow-lg);
 }
 
 /* ===== スケルトンローディングの拡張 ===== */
@@ -605,8 +616,9 @@ a:active,
 
 /* スムーズなコンテンツ切り替え */
 .content-transition {
-  transition: opacity var(--duration-normal) var(--easing-in-out), transform var(--duration-normal)
-    var(--easing-in-out);
+  transition:
+    opacity var(--duration-normal) var(--easing-in-out),
+    transform var(--duration-normal) var(--easing-in-out);
 }
 
 .content-transition.hidden {

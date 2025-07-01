@@ -1,0 +1,301 @@
+/*───────────────────────────────────────────────────────────
+  Base Typography Styles
+  
+  Default styles for HTML typography elements.
+  Uses design tokens for consistency.
+───────────────────────────────────────────────────────────*/
+
+/* ===== Body and Document ===== */
+body {
+  font: var(--typography-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== Headings ===== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+  margin-bottom: var(--spacing-4);
+  text-wrap: balance;
+}
+
+h1 {
+  font: var(--typography-heading-1);
+  margin-bottom: var(--spacing-6);
+}
+
+h2 {
+  font: var(--typography-heading-2);
+  margin-bottom: var(--spacing-5);
+}
+
+h3 {
+  font: var(--typography-heading-3);
+  margin-bottom: var(--spacing-4);
+}
+
+h4 {
+  font: var(--typography-heading-4);
+}
+
+h5 {
+  font: var(--typography-heading-5);
+}
+
+h6 {
+  font: var(--typography-heading-6);
+}
+
+/* ===== Paragraphs and Text ===== */
+p {
+  margin-bottom: var(--spacing-4);
+  text-wrap: pretty;
+  orphans: 2;
+  widows: 2;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* Lead paragraph */
+.lead {
+  font: var(--typography-body-large);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+}
+
+/* Small text */
+small {
+  font: var(--typography-body-small);
+  color: var(--color-text-secondary);
+}
+
+/* ===== Links ===== */
+a {
+  color: var(--color-interactive-primary);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.125em;
+  text-decoration-skip-ink: auto;
+  transition: var(--motion-micro);
+}
+
+a:hover {
+  color: var(--color-interactive-primary-hover);
+  text-decoration-thickness: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove default link styling when using button classes */
+a.btn {
+  text-decoration: none;
+}
+
+/* ===== Emphasis and Strong ===== */
+em {
+  font-style: italic;
+}
+
+strong, b {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+/* ===== Code and Preformatted Text ===== */
+code {
+  font: var(--typography-code-inline);
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  padding: 0.125em 0.25em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-primary);
+}
+
+pre {
+  font: var(--typography-code);
+  background-color: var(--color-surface-secondary);
+  color: var(--color-text-primary);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-primary);
+  overflow-x: auto;
+  margin-bottom: var(--spacing-4);
+  tab-size: 2;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ===== Keyboard Input ===== */
+kbd {
+  font: var(--typography-code-inline);
+  background-color: var(--color-surface-tertiary);
+  color: var(--color-text-primary);
+  padding: 0.125em 0.375em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-secondary);
+  box-shadow: 0 1px 0 var(--color-border-secondary);
+  font-size: 0.875em;
+}
+
+/* ===== Abbreviations ===== */
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+  border-bottom: none;
+}
+
+/* ===== Quotes ===== */
+blockquote {
+  margin: var(--spacing-6) 0;
+  padding: var(--spacing-4) var(--spacing-6);
+  border-left: 4px solid var(--color-border-interactive);
+  background-color: var(--color-surface-secondary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+blockquote p {
+  margin-bottom: var(--spacing-3);
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+blockquote cite {
+  display: block;
+  margin-top: var(--spacing-3);
+  font-style: normal;
+  font: var(--typography-label-small);
+  color: var(--color-text-tertiary);
+}
+
+blockquote cite::before {
+  content: "— ";
+}
+
+q {
+  font-style: italic;
+}
+
+/* ===== Horizontal Rule ===== */
+hr {
+  border: none;
+  height: 1px;
+  background-color: var(--color-border-primary);
+  margin: var(--spacing-8) 0;
+}
+
+/* ===== Mark and Highlighting ===== */
+mark {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning);
+  padding: 0.125em 0.25em;
+  border-radius: var(--radius-sm);
+}
+
+/* ===== Subscript and Superscript ===== */
+sub, sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* ===== Text Selection ===== */
+::selection {
+  background-color: color-mix(in srgb, var(--color-interactive-primary) 20%, transparent);
+  color: var(--color-text-primary);
+}
+
+/* ===== Address ===== */
+address {
+  font-style: normal;
+  line-height: var(--line-height-normal);
+  margin-bottom: var(--spacing-4);
+}
+
+/* ===== Definition Lists ===== */
+dl {
+  margin-bottom: var(--spacing-4);
+}
+
+dt {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+dd {
+  margin-bottom: var(--spacing-3);
+  margin-left: var(--spacing-4);
+  color: var(--color-text-secondary);
+}
+
+dd:last-child {
+  margin-bottom: 0;
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  body {
+    color: black;
+    background: white;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+    color: black;
+  }
+  
+  p, blockquote {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  blockquote {
+    page-break-inside: avoid;
+  }
+  
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+  
+  a[href^="http"]:after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #666;
+  }
+  
+  code, pre {
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+  }
+}

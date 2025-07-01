@@ -1,0 +1,12 @@
+/*───────────────────────────────────────────────────────────
+  Base Styles Index
+  
+  Imports all base HTML element styles.
+  These provide sensible defaults for semantic HTML.
+───────────────────────────────────────────────────────────*/
+
+@import "./typography.css";
+@import "./forms.css";
+@import "./media.css";
+@import "./tables.css";
+@import "./lists.css";

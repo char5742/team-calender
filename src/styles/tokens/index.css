@@ -1,0 +1,14 @@
+/*───────────────────────────────────────────────────────────
+  Design Tokens Index
+  
+  Imports all design system tokens in the correct order.
+  These form the foundation of the design system.
+───────────────────────────────────────────────────────────*/
+
+@import "./colors.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./elevation.css";
+@import "./motion.css";
+@import "./breakpoints.css";
+@import "./z-index.css";

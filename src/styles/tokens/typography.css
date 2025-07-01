@@ -1,0 +1,247 @@
+/*───────────────────────────────────────────────────────────
+  Typography Tokens
+  
+  Modern typography system with fluid scaling and 
+  comprehensive font stacks for different use cases.
+───────────────────────────────────────────────────────────*/
+
+:root {
+  /* ===== Font Families ===== */
+  
+  /* Primary sans-serif stack - optimized for readability */
+  --font-family-sans: 
+    "Inter Variable", 
+    "Inter", 
+    ui-sans-serif, 
+    system-ui, 
+    -apple-system, 
+    BlinkMacSystemFont, 
+    "Segoe UI Variable Display", 
+    "Segoe UI", 
+    Helvetica, 
+    "Apple Color Emoji", 
+    Arial, 
+    sans-serif, 
+    "Segoe UI Emoji", 
+    "Segoe UI Symbol";
+
+  /* Serif stack for editorial content */
+  --font-family-serif: 
+    "Newsreader Variable", 
+    "Newsreader", 
+    "Iowan Old Style", 
+    "Apple Garamond", 
+    Baskerville, 
+    "Times New Roman", 
+    "Droid Serif", 
+    Times, 
+    "Source Serif Pro", 
+    serif, 
+    "Apple Color Emoji", 
+    "Segoe UI Emoji", 
+    "Segoe UI Symbol";
+
+  /* Monospace stack for code */
+  --font-family-mono: 
+    ui-monospace, 
+    "Cascadia Code", 
+    "Source Code Pro", 
+    Menlo, 
+    Consolas, 
+    "DejaVu Sans Mono", 
+    monospace;
+
+  /* ===== Font Weights ===== */
+  --font-weight-thin: 100;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+
+  /* ===== Font Sizes (Fluid Typography) ===== */
+  
+  /* Base size - 16px at 375px viewport, 18px at 1200px viewport */
+  --font-size-base: clamp(1rem, 0.95rem + 0.24vw, 1.125rem);
+  
+  /* Scale ratio: 1.2 (Minor Third) for mobile, 1.25 (Major Third) for desktop */
+  --font-size-xs: clamp(0.694rem, 0.664rem + 0.15vw, 0.8rem);
+  --font-size-sm: clamp(0.833rem, 0.798rem + 0.18vw, 0.96rem);
+  --font-size-md: var(--font-size-base);
+  --font-size-lg: clamp(1.2rem, 1.14rem + 0.29vw, 1.406rem);
+  --font-size-xl: clamp(1.44rem, 1.368rem + 0.36vw, 1.688rem);
+  --font-size-2xl: clamp(1.728rem, 1.642rem + 0.43vw, 2.025rem);
+  --font-size-3xl: clamp(2.074rem, 1.97rem + 0.52vw, 2.431rem);
+  --font-size-4xl: clamp(2.488rem, 2.364rem + 0.62vw, 2.919rem);
+  --font-size-5xl: clamp(2.986rem, 2.837rem + 0.74vw, 3.503rem);
+  --font-size-6xl: clamp(3.583rem, 3.404rem + 0.89vw, 4.204rem);
+
+  /* ===== Line Heights ===== */
+  --line-height-none: 1;
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.2;
+  --line-height-normal: 1.4;
+  --line-height-relaxed: 1.6;
+  --line-height-loose: 1.8;
+
+  /* ===== Letter Spacing ===== */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* ===== Semantic Typography Tokens ===== */
+  
+  /* Headings */
+  --typography-heading-1: var(--font-weight-bold) var(--font-size-5xl)/var(--line-height-tight) var(--font-family-sans);
+  --typography-heading-2: var(--font-weight-bold) var(--font-size-4xl)/var(--line-height-tight) var(--font-family-sans);
+  --typography-heading-3: var(--font-weight-semibold) var(--font-size-3xl)/var(--line-height-snug) var(--font-family-sans);
+  --typography-heading-4: var(--font-weight-semibold) var(--font-size-2xl)/var(--line-height-snug) var(--font-family-sans);
+  --typography-heading-5: var(--font-weight-semibold) var(--font-size-xl)/var(--line-height-normal) var(--font-family-sans);
+  --typography-heading-6: var(--font-weight-semibold) var(--font-size-lg)/var(--line-height-normal) var(--font-family-sans);
+
+  /* Body text */
+  --typography-body-large: var(--font-weight-normal) var(--font-size-lg)/var(--line-height-relaxed) var(--font-family-sans);
+  --typography-body: var(--font-weight-normal) var(--font-size-md)/var(--line-height-normal) var(--font-family-sans);
+  --typography-body-small: var(--font-weight-normal) var(--font-size-sm)/var(--line-height-normal) var(--font-family-sans);
+
+  /* Labels and UI text */
+  --typography-label-large: var(--font-weight-medium) var(--font-size-md)/var(--line-height-normal) var(--font-family-sans);
+  --typography-label: var(--font-weight-medium) var(--font-size-sm)/var(--line-height-normal) var(--font-family-sans);
+  --typography-label-small: var(--font-weight-medium) var(--font-size-xs)/var(--line-height-normal) var(--font-family-sans);
+
+  /* Caption and metadata */
+  --typography-caption: var(--font-weight-normal) var(--font-size-xs)/var(--line-height-normal) var(--font-family-sans);
+  --typography-overline: var(--font-weight-semibold) var(--font-size-xs)/var(--line-height-normal) var(--font-family-sans);
+
+  /* Code */
+  --typography-code: var(--font-weight-normal) var(--font-size-sm)/var(--line-height-normal) var(--font-family-mono);
+  --typography-code-inline: var(--font-weight-normal) 0.9em/var(--line-height-normal) var(--font-family-mono);
+
+  /* Editorial content */
+  --typography-article-title: var(--font-weight-bold) var(--font-size-4xl)/var(--line-height-tight) var(--font-family-serif);
+  --typography-article-body: var(--font-weight-normal) var(--font-size-lg)/var(--line-height-relaxed) var(--font-family-serif);
+}
+
+/* ===== Typography Utility Classes ===== */
+
+/* Font families */
+.font-sans { font-family: var(--font-family-sans); }
+.font-serif { font-family: var(--font-family-serif); }
+.font-mono { font-family: var(--font-family-mono); }
+
+/* Font weights */
+.font-thin { font-weight: var(--font-weight-thin); }
+.font-light { font-weight: var(--font-weight-light); }
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-extrabold { font-weight: var(--font-weight-extrabold); }
+.font-black { font-weight: var(--font-weight-black); }
+
+/* Font sizes */
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); }
+.text-2xl { font-size: var(--font-size-2xl); }
+.text-3xl { font-size: var(--font-size-3xl); }
+.text-4xl { font-size: var(--font-size-4xl); }
+.text-5xl { font-size: var(--font-size-5xl); }
+.text-6xl { font-size: var(--font-size-6xl); }
+
+/* Line heights */
+.leading-none { line-height: var(--line-height-none); }
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
+
+/* Letter spacing */
+.tracking-tighter { letter-spacing: var(--letter-spacing-tighter); }
+.tracking-tight { letter-spacing: var(--letter-spacing-tight); }
+.tracking-normal { letter-spacing: var(--letter-spacing-normal); }
+.tracking-wide { letter-spacing: var(--letter-spacing-wide); }
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.tracking-widest { letter-spacing: var(--letter-spacing-widest); }
+
+/* Semantic typography classes */
+.typography-h1 { font: var(--typography-heading-1); letter-spacing: var(--letter-spacing-tight); }
+.typography-h2 { font: var(--typography-heading-2); letter-spacing: var(--letter-spacing-tight); }
+.typography-h3 { font: var(--typography-heading-3); }
+.typography-h4 { font: var(--typography-heading-4); }
+.typography-h5 { font: var(--typography-heading-5); }
+.typography-h6 { font: var(--typography-heading-6); }
+
+.typography-body-lg { font: var(--typography-body-large); }
+.typography-body { font: var(--typography-body); }
+.typography-body-sm { font: var(--typography-body-small); }
+
+.typography-label-lg { font: var(--typography-label-large); }
+.typography-label { font: var(--typography-label); }
+.typography-label-sm { font: var(--typography-label-small); }
+
+.typography-caption { font: var(--typography-caption); }
+.typography-overline { 
+  font: var(--typography-overline); 
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.typography-code { font: var(--typography-code); }
+.typography-code-inline { font: var(--typography-code-inline); }
+
+.typography-article-title { font: var(--typography-article-title); }
+.typography-article-body { font: var(--typography-article-body); }
+
+/* Text alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* Text decoration */
+.underline { text-decoration: underline; }
+.line-through { text-decoration: line-through; }
+.no-underline { text-decoration: none; }
+
+/* Text transform */
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+.normal-case { text-transform: none; }
+
+/* Font feature settings for better typography */
+.font-feature-default {
+  font-feature-settings: 
+    "kern" 1,     /* Kerning */
+    "liga" 1,     /* Ligatures */
+    "clig" 1,     /* Contextual ligatures */
+    "calt" 1;     /* Contextual alternates */
+}
+
+.font-feature-numbers {
+  font-feature-settings: 
+    "kern" 1, 
+    "liga" 1, 
+    "clig" 1, 
+    "calt" 1,
+    "tnum" 1,     /* Tabular numbers */
+    "zero" 1;     /* Slashed zero */
+}
+
+/* Apply default font features to body */
+body {
+  font-feature-settings: 
+    "kern" 1, 
+    "liga" 1, 
+    "clig" 1, 
+    "calt" 1;
+}

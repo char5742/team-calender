@@ -1,0 +1,204 @@
+/*───────────────────────────────────────────────────────────
+  Elevation Tokens
+  
+  Modern shadow and elevation system with semantic naming.
+  Includes both traditional shadows and backdrop effects.
+───────────────────────────────────────────────────────────*/
+
+:root {
+  /* ===== Shadow Color Tokens ===== */
+  --shadow-color-primary: color-mix(in srgb, var(--color-neutral-900) 8%, transparent);
+  --shadow-color-secondary: color-mix(in srgb, var(--color-neutral-900) 4%, transparent);
+  --shadow-color-tertiary: color-mix(in srgb, var(--color-neutral-900) 2%, transparent);
+
+  /* ===== Elevation Scale ===== */
+  
+  /* No elevation */
+  --elevation-none: 
+    0 0 0 0 transparent;
+
+  /* Subtle elevation - for cards on background */
+  --elevation-xs: 
+    0 1px 2px 0 var(--shadow-color-tertiary),
+    0 1px 3px 0 var(--shadow-color-tertiary);
+
+  /* Low elevation - for raised cards */
+  --elevation-sm: 
+    0 1px 3px 0 var(--shadow-color-secondary),
+    0 1px 2px -1px var(--shadow-color-primary);
+
+  /* Medium elevation - for floating elements */
+  --elevation-md: 
+    0 4px 6px -1px var(--shadow-color-secondary),
+    0 2px 4px -2px var(--shadow-color-primary);
+
+  /* High elevation - for dropdowns and popovers */
+  --elevation-lg: 
+    0 10px 15px -3px var(--shadow-color-secondary),
+    0 4px 6px -4px var(--shadow-color-primary);
+
+  /* Very high elevation - for modals */
+  --elevation-xl: 
+    0 20px 25px -5px var(--shadow-color-secondary),
+    0 8px 10px -6px var(--shadow-color-primary);
+
+  /* Maximum elevation - for full screen overlays */
+  --elevation-2xl: 
+    0 25px 50px -12px var(--shadow-color-secondary),
+    0 12px 20px -8px var(--shadow-color-primary);
+
+  /* ===== Inner Shadows ===== */
+  --elevation-inset-xs: inset 0 1px 2px 0 var(--shadow-color-tertiary);
+  --elevation-inset-sm: inset 0 2px 4px 0 var(--shadow-color-secondary);
+  --elevation-inset-md: inset 0 4px 6px 0 var(--shadow-color-secondary);
+
+  /* ===== Colored Shadows ===== */
+  --elevation-primary: 
+    0 4px 6px -1px color-mix(in srgb, var(--color-interactive-primary) 20%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--color-interactive-primary) 10%, transparent);
+
+  --elevation-success: 
+    0 4px 6px -1px color-mix(in srgb, var(--color-status-success) 20%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--color-status-success) 10%, transparent);
+
+  --elevation-warning: 
+    0 4px 6px -1px color-mix(in srgb, var(--color-status-warning) 20%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--color-status-warning) 10%, transparent);
+
+  --elevation-error: 
+    0 4px 6px -1px color-mix(in srgb, var(--color-status-error) 20%, transparent),
+    0 2px 4px -2px color-mix(in srgb, var(--color-status-error) 10%, transparent);
+
+  /* ===== Focus Rings ===== */
+  --focus-ring-primary: 0 0 0 3px color-mix(in srgb, var(--color-interactive-primary) 20%, transparent);
+  --focus-ring-error: 0 0 0 3px color-mix(in srgb, var(--color-status-error) 20%, transparent);
+  --focus-ring-success: 0 0 0 3px color-mix(in srgb, var(--color-status-success) 20%, transparent);
+
+  /* ===== Backdrop Effects ===== */
+  --backdrop-blur-sm: blur(4px);
+  --backdrop-blur-md: blur(8px);
+  --backdrop-blur-lg: blur(16px);
+  --backdrop-blur-xl: blur(24px);
+
+  --backdrop-brightness-dimmed: brightness(0.8);
+  --backdrop-brightness-darkened: brightness(0.6);
+
+  --backdrop-saturate-reduced: saturate(0.8);
+  --backdrop-saturate-enhanced: saturate(1.2);
+}
+
+/* ===== Dark Mode Adjustments ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-color-primary: color-mix(in srgb, var(--color-neutral-950) 40%, transparent);
+    --shadow-color-secondary: color-mix(in srgb, var(--color-neutral-950) 20%, transparent);
+    --shadow-color-tertiary: color-mix(in srgb, var(--color-neutral-950) 10%, transparent);
+
+    /* Enhanced shadows for dark mode */
+    --elevation-md: 
+      0 4px 6px -1px var(--shadow-color-primary),
+      0 2px 4px -2px var(--shadow-color-secondary);
+
+    --elevation-lg: 
+      0 10px 15px -3px var(--shadow-color-primary),
+      0 4px 6px -4px var(--shadow-color-secondary);
+
+    --elevation-xl: 
+      0 20px 25px -5px var(--shadow-color-primary),
+      0 8px 10px -6px var(--shadow-color-secondary);
+
+    --elevation-2xl: 
+      0 25px 50px -12px var(--shadow-color-primary),
+      0 12px 20px -8px var(--shadow-color-secondary);
+  }
+}
+
+/* ===== Elevation Utility Classes ===== */
+
+/* Box shadow utilities */
+.shadow-none { box-shadow: var(--elevation-none); }
+.shadow-xs { box-shadow: var(--elevation-xs); }
+.shadow-sm { box-shadow: var(--elevation-sm); }
+.shadow-md { box-shadow: var(--elevation-md); }
+.shadow-lg { box-shadow: var(--elevation-lg); }
+.shadow-xl { box-shadow: var(--elevation-xl); }
+.shadow-2xl { box-shadow: var(--elevation-2xl); }
+
+/* Inner shadow utilities */
+.shadow-inset-xs { box-shadow: var(--elevation-inset-xs); }
+.shadow-inset-sm { box-shadow: var(--elevation-inset-sm); }
+.shadow-inset-md { box-shadow: var(--elevation-inset-md); }
+
+/* Colored shadow utilities */
+.shadow-primary { box-shadow: var(--elevation-primary); }
+.shadow-success { box-shadow: var(--elevation-success); }
+.shadow-warning { box-shadow: var(--elevation-warning); }
+.shadow-error { box-shadow: var(--elevation-error); }
+
+/* Focus ring utilities */
+.focus-ring-primary:focus-visible { box-shadow: var(--focus-ring-primary); }
+.focus-ring-error:focus-visible { box-shadow: var(--focus-ring-error); }
+.focus-ring-success:focus-visible { box-shadow: var(--focus-ring-success); }
+
+/* Backdrop utilities */
+.backdrop-blur-sm { backdrop-filter: var(--backdrop-blur-sm); }
+.backdrop-blur-md { backdrop-filter: var(--backdrop-blur-md); }
+.backdrop-blur-lg { backdrop-filter: var(--backdrop-blur-lg); }
+.backdrop-blur-xl { backdrop-filter: var(--backdrop-blur-xl); }
+
+.backdrop-brightness-dimmed { backdrop-filter: var(--backdrop-brightness-dimmed); }
+.backdrop-brightness-darkened { backdrop-filter: var(--backdrop-brightness-darkened); }
+
+.backdrop-saturate-reduced { backdrop-filter: var(--backdrop-saturate-reduced); }
+.backdrop-saturate-enhanced { backdrop-filter: var(--backdrop-saturate-enhanced); }
+
+/* Combined backdrop effects */
+.backdrop-overlay {
+  backdrop-filter: var(--backdrop-blur-md) var(--backdrop-brightness-dimmed);
+}
+
+.backdrop-modal {
+  backdrop-filter: var(--backdrop-blur-lg) var(--backdrop-brightness-darkened);
+}
+
+/* ===== Semantic Elevation Classes ===== */
+
+/* Component elevation classes */
+.elevation-card { box-shadow: var(--elevation-sm); }
+.elevation-card-hover { box-shadow: var(--elevation-md); }
+.elevation-floating { box-shadow: var(--elevation-lg); }
+.elevation-modal { box-shadow: var(--elevation-2xl); }
+
+/* Interactive elevation classes with transitions */
+.elevation-interactive {
+  transition: box-shadow var(--duration-fast) var(--easing-out);
+  box-shadow: var(--elevation-sm);
+}
+
+.elevation-interactive:hover {
+  box-shadow: var(--elevation-md);
+}
+
+.elevation-interactive:active {
+  box-shadow: var(--elevation-xs);
+}
+
+/* Elevation with border for subtle definition */
+.elevation-subtle {
+  box-shadow: var(--elevation-xs);
+  border: 1px solid var(--color-border-primary);
+}
+
+/* High contrast elevation for accessibility */
+@media (prefers-contrast: high) {
+  .shadow-xs,
+  .shadow-sm,
+  .shadow-md {
+    border: 1px solid var(--color-border-secondary);
+  }
+  
+  .elevation-card,
+  .elevation-floating {
+    border: 1px solid var(--color-border-secondary);
+  }
+}

@@ -1,0 +1,254 @@
+/*───────────────────────────────────────────────────────────
+  Z-Index Tokens
+  
+  Logical z-index system with semantic naming for proper
+  layering of interface elements.
+───────────────────────────────────────────────────────────*/
+
+:root {
+  /* ===== Base Z-Index Scale ===== */
+  --z-index-auto: auto;
+  --z-index-base: 0;
+  --z-index-below: -1;
+  --z-index-above: 1;
+
+  /* ===== Content Layers ===== */
+  --z-index-content: 1;
+  --z-index-content-overlay: 2;
+  --z-index-content-floating: 3;
+
+  /* ===== Interface Layers ===== */
+  --z-index-ui-base: 10;
+  --z-index-ui-elevated: 20;
+  --z-index-ui-floating: 30;
+
+  /* ===== Navigation Layers ===== */
+  --z-index-nav-base: 100;
+  --z-index-nav-dropdown: 110;
+  --z-index-nav-overlay: 120;
+
+  /* ===== Interactive Layers ===== */
+  --z-index-tooltip: 200;
+  --z-index-popover: 300;
+  --z-index-dropdown: 400;
+  --z-index-sticky: 500;
+  --z-index-fixed: 600;
+
+  /* ===== Overlay Layers ===== */
+  --z-index-overlay-base: 1000;
+  --z-index-overlay-backdrop: 1010;
+  --z-index-overlay-content: 1020;
+
+  /* ===== Modal Layers ===== */
+  --z-index-modal-backdrop: 2000;
+  --z-index-modal-content: 2010;
+  --z-index-modal-header: 2020;
+
+  /* ===== Notification Layers ===== */
+  --z-index-notification: 3000;
+  --z-index-toast: 3100;
+  --z-index-alert: 3200;
+
+  /* ===== Maximum Layers ===== */
+  --z-index-skip-link: 9000;
+  --z-index-debug: 9900;
+  --z-index-maximum: 9999;
+
+  /* ===== Semantic Z-Index Aliases ===== */
+  
+  /* Component-specific z-indices */
+  --z-index-header: var(--z-index-sticky);
+  --z-index-sidebar: var(--z-index-ui-elevated);
+  --z-index-main-nav: var(--z-index-nav-base);
+  --z-index-sub-nav: var(--z-index-nav-dropdown);
+  
+  /* Interactive element z-indices */
+  --z-index-button-group: var(--z-index-ui-base);
+  --z-index-form-floating: var(--z-index-ui-floating);
+  --z-index-autocomplete: var(--z-index-dropdown);
+  
+  /* Feedback element z-indices */
+  --z-index-loading: var(--z-index-overlay-content);
+  --z-index-error: var(--z-index-alert);
+  --z-index-success: var(--z-index-toast);
+  
+  /* Layout element z-indices */
+  --z-index-footer: var(--z-index-ui-base);
+  --z-index-breadcrumb: var(--z-index-content);
+  --z-index-pagination: var(--z-index-content);
+}
+
+/* ===== Z-Index Utility Classes ===== */
+
+/* Base z-index utilities */
+.z-auto { z-index: var(--z-index-auto); }
+.z-base { z-index: var(--z-index-base); }
+.z-below { z-index: var(--z-index-below); }
+.z-above { z-index: var(--z-index-above); }
+
+/* Content layer utilities */
+.z-content { z-index: var(--z-index-content); }
+.z-content-overlay { z-index: var(--z-index-content-overlay); }
+.z-content-floating { z-index: var(--z-index-content-floating); }
+
+/* UI layer utilities */
+.z-ui-base { z-index: var(--z-index-ui-base); }
+.z-ui-elevated { z-index: var(--z-index-ui-elevated); }
+.z-ui-floating { z-index: var(--z-index-ui-floating); }
+
+/* Navigation layer utilities */
+.z-nav-base { z-index: var(--z-index-nav-base); }
+.z-nav-dropdown { z-index: var(--z-index-nav-dropdown); }
+.z-nav-overlay { z-index: var(--z-index-nav-overlay); }
+
+/* Interactive layer utilities */
+.z-tooltip { z-index: var(--z-index-tooltip); }
+.z-popover { z-index: var(--z-index-popover); }
+.z-dropdown { z-index: var(--z-index-dropdown); }
+.z-sticky { z-index: var(--z-index-sticky); }
+.z-fixed { z-index: var(--z-index-fixed); }
+
+/* Overlay layer utilities */
+.z-overlay-base { z-index: var(--z-index-overlay-base); }
+.z-overlay-backdrop { z-index: var(--z-index-overlay-backdrop); }
+.z-overlay-content { z-index: var(--z-index-overlay-content); }
+
+/* Modal layer utilities */
+.z-modal-backdrop { z-index: var(--z-index-modal-backdrop); }
+.z-modal-content { z-index: var(--z-index-modal-content); }
+.z-modal-header { z-index: var(--z-index-modal-header); }
+
+/* Notification layer utilities */
+.z-notification { z-index: var(--z-index-notification); }
+.z-toast { z-index: var(--z-index-toast); }
+.z-alert { z-index: var(--z-index-alert); }
+
+/* Maximum layer utilities */
+.z-skip-link { z-index: var(--z-index-skip-link); }
+.z-debug { z-index: var(--z-index-debug); }
+.z-maximum { z-index: var(--z-index-maximum); }
+
+/* Semantic component utilities */
+.z-header { z-index: var(--z-index-header); }
+.z-sidebar { z-index: var(--z-index-sidebar); }
+.z-main-nav { z-index: var(--z-index-main-nav); }
+.z-sub-nav { z-index: var(--z-index-sub-nav); }
+.z-footer { z-index: var(--z-index-footer); }
+
+/* ===== Position Utilities ===== */
+
+/* Position utilities that work well with z-index */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+.static { position: static; }
+
+/* Common positioning patterns */
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.absolute-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.absolute-top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.absolute-bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.absolute-bottom-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.fixed-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.fixed-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+.fixed-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+}
+
+.sticky-bottom {
+  position: sticky;
+  bottom: 0;
+}
+
+/* ===== Stacking Context Utilities ===== */
+
+/* Create new stacking contexts */
+.isolate {
+  isolation: isolate;
+}
+
+/* Transform creates stacking context */
+.transform-gpu {
+  transform: translate3d(0, 0, 0);
+}
+
+/* Opacity creates stacking context */
+.opacity-layer {
+  opacity: 0.999;
+}
+
+/* ===== Debug Utilities ===== */
+
+/* Visual debugging for z-index issues */
+.debug-z-index {
+  position: relative;
+  z-index: var(--z-index-debug);
+  outline: 2px solid red;
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.debug-z-index::before {
+  content: 'z-index: ' attr(data-z-index);
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: red;
+  color: white;
+  padding: 0.25rem;
+  font-size: 0.75rem;
+  z-index: 1;
+}

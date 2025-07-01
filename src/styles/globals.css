@@ -1,0 +1,53 @@
+/*───────────────────────────────────────────────────────────
+  Modern CSS Architecture with Cascade Layers
+  
+  Layer Order (priority from low to high):
+  1. reset     - Browser normalization
+  2. tokens    - Design system variables
+  3. base      - Base HTML element styles
+  4. layout    - Layout and grid systems
+  5. components - UI component styles
+  6. utilities - Utility classes
+  7. overrides - Theme and context overrides
+───────────────────────────────────────────────────────────*/
+
+@layer reset, tokens, base, layout, components, utilities, overrides;
+
+/* Import layer-specific styles */
+@import "./reset.css" layer(reset);
+@import "./tokens/index.css" layer(tokens);
+@import "./base/index.css" layer(base);
+@import "./layout/index.css" layer(layout);
+@import "./components/index.css" layer(components);
+@import "./utilities/index.css" layer(utilities);
+@import "./overrides/index.css" layer(overrides);
+
+/* Modern media queries using custom media */
+@custom-media --xs (width >= 475px);
+@custom-media --sm (width >= 640px);
+@custom-media --md (width >= 768px);
+@custom-media --lg (width >= 1024px);
+@custom-media --xl (width >= 1280px);
+@custom-media --2xl (width >= 1536px);
+
+/* Container queries for component-level responsiveness */
+@custom-media --container-sm (width >= 20rem);
+@custom-media --container-md (width >= 28rem);
+@custom-media --container-lg (width >= 32rem);
+@custom-media --container-xl (width >= 36rem);
+
+/* Accessibility and preference media queries */
+@custom-media --motion-reduce (prefers-reduced-motion: reduce);
+@custom-media --motion-ok (prefers-reduced-motion: no-preference);
+@custom-media --dark (prefers-color-scheme: dark);
+@custom-media --light (prefers-color-scheme: light);
+@custom-media --high-contrast (prefers-contrast: high);
+@custom-media --low-contrast (prefers-contrast: low);
+
+/* Print media */
+@custom-media --print print;
+
+/* Touch and pointer capabilities */
+@custom-media --touch (pointer: coarse);
+@custom-media --mouse (pointer: fine);
+@custom-media --stylus (pointer: fine) and (hover: none);

@@ -1,0 +1,194 @@
+/*───────────────────────────────────────────────────────────
+  Color Tokens
+  
+  Semantic color system with light/dark mode support.
+  Uses modern CSS features like color-mix() and relative colors.
+───────────────────────────────────────────────────────────*/
+
+:root {
+  /* ===== Base Color Palette ===== */
+  
+  /* Primary Brand Colors */
+  --color-primary-50: oklch(97% 0.01 264);
+  --color-primary-100: oklch(94% 0.02 264);
+  --color-primary-200: oklch(87% 0.04 264);
+  --color-primary-300: oklch(78% 0.07 264);
+  --color-primary-400: oklch(68% 0.11 264);
+  --color-primary-500: oklch(58% 0.15 264);
+  --color-primary-600: oklch(48% 0.13 264);
+  --color-primary-700: oklch(38% 0.11 264);
+  --color-primary-800: oklch(28% 0.08 264);
+  --color-primary-900: oklch(18% 0.05 264);
+  --color-primary-950: oklch(10% 0.02 264);
+
+  /* Neutral Grays */
+  --color-neutral-50: oklch(98% 0.003 264);
+  --color-neutral-100: oklch(96% 0.006 264);
+  --color-neutral-200: oklch(93% 0.01 264);
+  --color-neutral-300: oklch(87% 0.015 264);
+  --color-neutral-400: oklch(74% 0.02 264);
+  --color-neutral-500: oklch(62% 0.02 264);
+  --color-neutral-600: oklch(52% 0.015 264);
+  --color-neutral-700: oklch(42% 0.01 264);
+  --color-neutral-800: oklch(27% 0.008 264);
+  --color-neutral-900: oklch(17% 0.006 264);
+  --color-neutral-950: oklch(9% 0.004 264);
+
+  /* Semantic Colors */
+  --color-success-50: oklch(96% 0.02 142);
+  --color-success-500: oklch(64% 0.15 142);
+  --color-success-600: oklch(54% 0.13 142);
+  --color-success-900: oklch(26% 0.06 142);
+
+  --color-warning-50: oklch(96% 0.02 83);
+  --color-warning-500: oklch(75% 0.15 83);
+  --color-warning-600: oklch(65% 0.13 83);
+  --color-warning-900: oklch(32% 0.06 83);
+
+  --color-error-50: oklch(96% 0.02 17);
+  --color-error-500: oklch(63% 0.18 17);
+  --color-error-600: oklch(53% 0.16 17);
+  --color-error-900: oklch(26% 0.08 17);
+
+  --color-info-50: oklch(96% 0.02 220);
+  --color-info-500: oklch(64% 0.15 220);
+  --color-info-600: oklch(54% 0.13 220);
+  --color-info-900: oklch(26% 0.06 220);
+
+  /* ===== Semantic Color Assignments (Light Mode) ===== */
+  
+  /* Surface Colors */
+  --color-surface-primary: var(--color-neutral-50);
+  --color-surface-secondary: var(--color-neutral-100);
+  --color-surface-tertiary: var(--color-neutral-200);
+  --color-surface-inverse: var(--color-neutral-900);
+  
+  /* Background Colors */
+  --color-background: var(--color-neutral-50);
+  --color-background-secondary: var(--color-neutral-100);
+  --color-background-tertiary: var(--color-neutral-200);
+  --color-background-overlay: color-mix(in srgb, var(--color-neutral-900) 80%, transparent);
+  
+  /* Text Colors */
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-700);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-quaternary: var(--color-neutral-400);
+  --color-text-inverse: var(--color-neutral-50);
+  --color-text-disabled: var(--color-neutral-300);
+  
+  /* Interactive Colors */
+  --color-interactive-primary: var(--color-primary-600);
+  --color-interactive-primary-hover: var(--color-primary-700);
+  --color-interactive-primary-active: var(--color-primary-800);
+  --color-interactive-primary-disabled: var(--color-neutral-300);
+  
+  --color-interactive-secondary: transparent;
+  --color-interactive-secondary-hover: var(--color-neutral-100);
+  --color-interactive-secondary-active: var(--color-neutral-200);
+  
+  --color-interactive-tertiary: transparent;
+  --color-interactive-tertiary-hover: var(--color-neutral-50);
+  --color-interactive-tertiary-active: var(--color-neutral-100);
+  
+  /* Border Colors */
+  --color-border-primary: var(--color-neutral-200);
+  --color-border-secondary: var(--color-neutral-300);
+  --color-border-tertiary: var(--color-neutral-400);
+  --color-border-interactive: var(--color-primary-600);
+  --color-border-focus: var(--color-primary-500);
+  --color-border-error: var(--color-error-500);
+  --color-border-success: var(--color-success-500);
+  --color-border-warning: var(--color-warning-500);
+  
+  /* Status Colors */
+  --color-status-success: var(--color-success-500);
+  --color-status-success-bg: var(--color-success-50);
+  --color-status-success-border: var(--color-success-200);
+  
+  --color-status-warning: var(--color-warning-600);
+  --color-status-warning-bg: var(--color-warning-50);
+  --color-status-warning-border: var(--color-warning-200);
+  
+  --color-status-error: var(--color-error-500);
+  --color-status-error-bg: var(--color-error-50);
+  --color-status-error-border: var(--color-error-200);
+  
+  --color-status-info: var(--color-info-500);
+  --color-status-info-bg: var(--color-info-50);
+  --color-status-info-border: var(--color-info-200);
+}
+
+/* ===== Dark Mode Color Overrides ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Surface Colors */
+    --color-surface-primary: var(--color-neutral-900);
+    --color-surface-secondary: var(--color-neutral-800);
+    --color-surface-tertiary: var(--color-neutral-700);
+    --color-surface-inverse: var(--color-neutral-100);
+    
+    /* Background Colors */
+    --color-background: var(--color-neutral-950);
+    --color-background-secondary: var(--color-neutral-900);
+    --color-background-tertiary: var(--color-neutral-800);
+    --color-background-overlay: color-mix(in srgb, var(--color-neutral-950) 90%, transparent);
+    
+    /* Text Colors */
+    --color-text-primary: var(--color-neutral-100);
+    --color-text-secondary: var(--color-neutral-300);
+    --color-text-tertiary: var(--color-neutral-400);
+    --color-text-quaternary: var(--color-neutral-500);
+    --color-text-inverse: var(--color-neutral-900);
+    --color-text-disabled: var(--color-neutral-600);
+    
+    /* Interactive Colors */
+    --color-interactive-primary: var(--color-primary-500);
+    --color-interactive-primary-hover: var(--color-primary-400);
+    --color-interactive-primary-active: var(--color-primary-300);
+    --color-interactive-primary-disabled: var(--color-neutral-600);
+    
+    --color-interactive-secondary-hover: var(--color-neutral-800);
+    --color-interactive-secondary-active: var(--color-neutral-700);
+    
+    --color-interactive-tertiary-hover: var(--color-neutral-900);
+    --color-interactive-tertiary-active: var(--color-neutral-800);
+    
+    /* Border Colors */
+    --color-border-primary: var(--color-neutral-700);
+    --color-border-secondary: var(--color-neutral-600);
+    --color-border-tertiary: var(--color-neutral-500);
+    
+    /* Status Colors - Adjusted for dark mode */
+    --color-status-success-bg: color-mix(in srgb, var(--color-success-500) 10%, var(--color-neutral-900));
+    --color-status-success-border: color-mix(in srgb, var(--color-success-500) 30%, var(--color-neutral-700));
+    
+    --color-status-warning-bg: color-mix(in srgb, var(--color-warning-500) 10%, var(--color-neutral-900));
+    --color-status-warning-border: color-mix(in srgb, var(--color-warning-500) 30%, var(--color-neutral-700));
+    
+    --color-status-error-bg: color-mix(in srgb, var(--color-error-500) 10%, var(--color-neutral-900));
+    --color-status-error-border: color-mix(in srgb, var(--color-error-500) 30%, var(--color-neutral-700));
+    
+    --color-status-info-bg: color-mix(in srgb, var(--color-info-500) 10%, var(--color-neutral-900));
+    --color-status-info-border: color-mix(in srgb, var(--color-info-500) 30%, var(--color-neutral-700));
+  }
+}
+
+/* ===== High Contrast Mode ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --color-text-primary: var(--color-neutral-950);
+    --color-text-secondary: var(--color-neutral-800);
+    --color-border-primary: var(--color-neutral-500);
+    --color-border-secondary: var(--color-neutral-600);
+  }
+}
+
+@media (prefers-contrast: high) and (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: var(--color-neutral-50);
+    --color-text-secondary: var(--color-neutral-200);
+    --color-background: var(--color-neutral-950);
+    --color-surface-primary: var(--color-neutral-950);
+  }
+}

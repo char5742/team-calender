@@ -1,0 +1,26 @@
+/*
+  -----------------------------------------------------------------------------
+  Global Style Entrypoint (Cascade Layer Orchestrator)
+  -----------------------------------------------------------------------------
+  This file only wires up other style sheets via `@import` while assigning each
+  to a specific cascade layer. No style rules should be added here directly.
+  Docs: https://developer.mozilla.org/en-US/docs/Web/CSS/@layer
+*/
+
+/* Declare the layer order up-front to make intent explicit */
+@layer reset, utilities, tokens, animations;
+
+/* 1. Reset – lowest specificity so it never overrides anything intentionally */
+@import url('./reset.css') layer(reset);
+
+/* 2. Tokens – custom properties, no selectors are defined here so ordering 
+      (imported later to allow overrides) */
+
+/* 3. Utilities + component styles (existing design-system)  */
+@import url('./design-system.css') layer(utilities);
+
+/* 4. Design tokens – placed after utilities to ensure they can override values */
+@import url('./tokens.css') layer(tokens);
+
+/* 5. Micro-interactions & keyframes */
+@import url('./animations.css') layer(animations);

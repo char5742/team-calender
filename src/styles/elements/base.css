@@ -1,0 +1,180 @@
+/*
+ * Base Elements
+ * Default styles for HTML elements
+ */
+
+/* Root element */
+html {
+  font-size: 100%;
+  scroll-behavior: smooth;
+  color-scheme: light dark;
+}
+
+/* Body */
+body {
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-primary);
+}
+
+/* Main content area */
+main {
+  display: block;
+  flex: 1 0 auto;
+}
+
+/* Section spacing */
+section {
+  padding-block: var(--section-spacing);
+}
+
+/* Article styling */
+article {
+  max-width: var(--content-max-width-3xl);
+  margin-inline: auto;
+}
+
+/* Aside styling */
+aside {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* Header and footer */
+header,
+footer {
+  padding-block: var(--spacing-8);
+}
+
+/* Navigation */
+nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Address */
+address {
+  font-style: normal;
+}
+
+/* Details and summary */
+details {
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-4);
+  margin-block: var(--spacing-4);
+}
+
+summary {
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  user-select: none;
+}
+
+details[open] summary {
+  margin-bottom: var(--spacing-3);
+}
+
+/* Figure and figcaption */
+figure {
+  margin: 0;
+}
+
+figcaption {
+  margin-top: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+/* Time element */
+time {
+  color: var(--color-text-secondary);
+}
+
+/* Mark element */
+mark {
+  background-color: var(--color-warning-50);
+  color: var(--color-text-primary);
+  padding-inline: var(--spacing-1);
+}
+
+/* Abbreviation */
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+/* Keyboard input */
+kbd {
+  display: inline-block;
+  padding: var(--spacing-0_5) var(--spacing-1_5);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface-tertiary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 0 1px var(--color-border-primary);
+}
+
+/* Small text */
+small {
+  font-size: var(--font-size-sm);
+}
+
+/* Subscript and superscript */
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+/* Progress element */
+progress {
+  vertical-align: baseline;
+  width: 100%;
+  height: var(--spacing-2);
+  appearance: none;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+progress::-webkit-progress-bar {
+  background-color: var(--color-surface-tertiary);
+}
+
+progress::-webkit-progress-value {
+  background-color: var(--color-brand-500);
+}
+
+progress::-moz-progress-bar {
+  background-color: var(--color-brand-500);
+}
+
+/* Meter element */
+meter {
+  width: 100%;
+  height: var(--spacing-2);
+}
+
+/* Output element */
+output {
+  display: inline-block;
+  font-family: var(--font-family-mono);
+}

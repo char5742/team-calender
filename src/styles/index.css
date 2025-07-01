@@ -1,0 +1,58 @@
+/* 
+ * Modern CSS Architecture
+ * Following ITCSS (Inverted Triangle CSS) methodology
+ * From generic to specific, low specificity to high
+ */
+
+/* 1. Settings - Design tokens and configuration */
+@import './settings/tokens.css';
+@import './settings/media-queries.css';
+
+/* 2. Tools - Mixins and functions (using CSS custom properties) */
+@import './tools/functions.css';
+@import './tools/mixins.css';
+
+/* 3. Generic - Reset and normalize styles */
+@import './generic/reset.css';
+@import './generic/box-sizing.css';
+
+/* 4. Elements - Base HTML element styles */
+@import './elements/base.css';
+@import './elements/typography.css';
+@import './elements/links.css';
+@import './elements/forms.css';
+
+/* 5. Objects - Layout and structural patterns */
+@import './objects/container.css';
+@import './objects/grid.css';
+@import './objects/flex.css';
+@import './objects/stack.css';
+
+/* 6. Components - UI components */
+@import './components/buttons.css';
+@import './components/cards.css';
+@import './components/navigation.css';
+@import './components/modals.css';
+@import './components/forms.css';
+
+/* 7. Patterns - Complex UI patterns */
+@import './patterns/header.css';
+@import './patterns/footer.css';
+@import './patterns/hero.css';
+@import './patterns/content-sections.css';
+
+/* 8. Utilities - Helper classes and overrides */
+@import './utilities/spacing.css';
+@import './utilities/typography.css';
+@import './utilities/colors.css';
+@import './utilities/display.css';
+@import './utilities/animations.css';
+
+/* 9. Themes - Theme variations */
+@import './themes/dark.css';
+@import './themes/contrast.css';
+
+/* Print styles */
+@media print {
+  @import './themes/print.css';
+}

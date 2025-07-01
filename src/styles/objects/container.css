@@ -1,0 +1,76 @@
+/*
+ * Container Object
+ * Consistent max-width and padding for content containers
+ */
+
+/* Base container */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--container-padding-x);
+}
+
+/* Container variants */
+.container--narrow {
+  max-width: var(--content-max-width-3xl);
+}
+
+.container--wide {
+  max-width: var(--content-max-width-7xl);
+}
+
+.container--full {
+  max-width: 100%;
+}
+
+/* Container with vertical padding */
+.container--padded {
+  padding-block: var(--section-spacing);
+}
+
+/* Fluid container */
+.container--fluid {
+  max-width: 100%;
+  padding-inline: var(--container-padding-x);
+}
+
+/* Container with sections */
+.container-section {
+  padding-block: var(--section-spacing);
+}
+
+/* Responsive containers */
+@container (max-width: 768px) {
+  .container {
+    padding-inline: var(--spacing-3);
+  }
+}
+
+/* Content container for readable text */
+.content-container {
+  max-width: var(--content-max-width-3xl);
+  margin-inline: auto;
+}
+
+/* Centered container */
+.container--center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Split container */
+.container--split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-8);
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .container--split {
+    grid-template-columns: 1fr;
+  }
+}

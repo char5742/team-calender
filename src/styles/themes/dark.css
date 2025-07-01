@@ -1,0 +1,207 @@
+/*
+ * Dark Theme
+ * Dark mode color scheme overrides
+ */
+
+/* Dark theme colors */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Brand colors - adjusted for dark mode */
+    --color-brand-50: #082f49;
+    --color-brand-100: #0c4a6e;
+    --color-brand-200: #075985;
+    --color-brand-300: #0369a1;
+    --color-brand-400: #0284c7;
+    --color-brand-500: #0ea5e9;
+    --color-brand-600: #38bdf8;
+    --color-brand-700: #7dd3fc;
+    --color-brand-800: #bae6fd;
+    --color-brand-900: #e0f2fe;
+    --color-brand-950: #f0f9ff;
+
+    /* Surface colors */
+    --color-surface-primary: var(--color-neutral-900);
+    --color-surface-secondary: var(--color-neutral-800);
+    --color-surface-tertiary: var(--color-neutral-700);
+    --color-surface-inverse: var(--color-neutral-50);
+
+    /* Text colors */
+    --color-text-primary: var(--color-neutral-50);
+    --color-text-secondary: var(--color-neutral-400);
+    --color-text-tertiary: var(--color-neutral-500);
+    --color-text-disabled: var(--color-neutral-600);
+    --color-text-inverse: var(--color-neutral-900);
+    --color-text-brand: var(--color-brand-400);
+
+    /* Border colors */
+    --color-border-primary: var(--color-neutral-700);
+    --color-border-secondary: var(--color-neutral-600);
+    --color-border-brand: var(--color-brand-400);
+
+    /* Semantic colors - adjusted for dark mode */
+    --color-success-50: #064e3b;
+    --color-success-500: #10b981;
+    --color-success-700: #34d399;
+    
+    --color-warning-50: #451a03;
+    --color-warning-500: #f59e0b;
+    --color-warning-700: #fbbf24;
+    
+    --color-error-50: #450a0a;
+    --color-error-500: #ef4444;
+    --color-error-700: #f87171;
+    
+    --color-info-50: #1e3a8a;
+    --color-info-500: #3b82f6;
+    --color-info-700: #60a5fa;
+
+    /* Shadows - more subtle in dark mode */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-default: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+    --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+    --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.2);
+    --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* Manual dark mode class */
+.dark {
+  /* Brand colors - adjusted for dark mode */
+  --color-brand-50: #082f49;
+  --color-brand-100: #0c4a6e;
+  --color-brand-200: #075985;
+  --color-brand-300: #0369a1;
+  --color-brand-400: #0284c7;
+  --color-brand-500: #0ea5e9;
+  --color-brand-600: #38bdf8;
+  --color-brand-700: #7dd3fc;
+  --color-brand-800: #bae6fd;
+  --color-brand-900: #e0f2fe;
+  --color-brand-950: #f0f9ff;
+
+  /* Surface colors */
+  --color-surface-primary: var(--color-neutral-900);
+  --color-surface-secondary: var(--color-neutral-800);
+  --color-surface-tertiary: var(--color-neutral-700);
+  --color-surface-inverse: var(--color-neutral-50);
+
+  /* Text colors */
+  --color-text-primary: var(--color-neutral-50);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-tertiary: var(--color-neutral-500);
+  --color-text-disabled: var(--color-neutral-600);
+  --color-text-inverse: var(--color-neutral-900);
+  --color-text-brand: var(--color-brand-400);
+
+  /* Border colors */
+  --color-border-primary: var(--color-neutral-700);
+  --color-border-secondary: var(--color-neutral-600);
+  --color-border-brand: var(--color-brand-400);
+
+  /* Semantic colors - adjusted for dark mode */
+  --color-success-50: #064e3b;
+  --color-success-500: #10b981;
+  --color-success-700: #34d399;
+  
+  --color-warning-50: #451a03;
+  --color-warning-500: #f59e0b;
+  --color-warning-700: #fbbf24;
+  
+  --color-error-50: #450a0a;
+  --color-error-500: #ef4444;
+  --color-error-700: #f87171;
+  
+  --color-info-50: #1e3a8a;
+  --color-info-500: #3b82f6;
+  --color-info-700: #60a5fa;
+
+  /* Shadows - more subtle in dark mode */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-default: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.2);
+  --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.2);
+  --shadow-xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+}
+
+/* Dark mode specific adjustments */
+@media (prefers-color-scheme: dark) {
+  /* Scrollbar styling for dark mode */
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-neutral-600);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-neutral-500);
+  }
+
+  /* Selection colors */
+  ::selection {
+    background-color: var(--color-brand-800);
+    color: var(--color-neutral-900);
+  }
+
+  /* Code blocks */
+  pre {
+    background-color: var(--color-neutral-950);
+    border: 1px solid var(--color-border-primary);
+  }
+
+  :not(pre) > code {
+    background-color: var(--color-neutral-800);
+    border: 1px solid var(--color-border-primary);
+  }
+
+  /* Form inputs */
+  input,
+  select,
+  textarea {
+    background-color: var(--color-neutral-800);
+    border-color: var(--color-neutral-600);
+  }
+
+  input:hover,
+  select:hover,
+  textarea:hover {
+    border-color: var(--color-neutral-500);
+  }
+
+  /* Tables */
+  table {
+    border-color: var(--color-border-primary);
+  }
+
+  th {
+    background-color: var(--color-surface-secondary);
+  }
+
+  td {
+    border-color: var(--color-border-primary);
+  }
+
+  /* Cards and surfaces */
+  .card {
+    background-color: var(--color-surface-secondary);
+    border-color: var(--color-border-primary);
+  }
+
+  /* Modals */
+  .modal {
+    background-color: var(--color-surface-primary);
+  }
+
+  .modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* Color scheme toggle animation */
+:root {
+  transition: background-color var(--duration-normal) var(--easing-out),
+              color var(--duration-normal) var(--easing-out);
+}
+
+* {
+  transition: background-color var(--duration-normal) var(--easing-out),
+              border-color var(--duration-normal) var(--easing-out),
+              color var(--duration-normal) var(--easing-out);
+}

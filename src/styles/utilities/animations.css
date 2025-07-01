@@ -1,0 +1,395 @@
+/*
+ * Animation Utilities
+ * Modern micro-animations and transitions
+ */
+
+/* ===== Keyframe Definitions ===== */
+
+/* Fade animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide animations */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Bounce animation */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-25%);
+  }
+}
+
+/* Spin animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shake animation */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10px);
+  }
+}
+
+/* ===== Animation Classes ===== */
+
+/* Fade animations */
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) var(--easing-out) both;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up var(--duration-normal) var(--easing-out) both;
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down var(--duration-normal) var(--easing-out) both;
+}
+
+.animate-fade-in-scale {
+  animation: fade-in-scale var(--duration-normal) var(--easing-out) both;
+}
+
+/* Slide animations */
+.animate-slide-in-left {
+  animation: slide-in-left var(--duration-normal) var(--easing-out) both;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right var(--duration-normal) var(--easing-out) both;
+}
+
+/* Continuous animations */
+.animate-pulse {
+  animation: pulse 2s var(--easing-in-out) infinite;
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Interaction animations */
+.animate-shake {
+  animation: shake var(--duration-slow) var(--easing-out);
+}
+
+/* ===== Animation Delays ===== */
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-1000 {
+  animation-delay: 1000ms;
+}
+
+/* ===== Transition Utilities ===== */
+
+/* Transition all */
+.transition-all {
+  transition: all var(--duration-normal) var(--easing-out);
+}
+
+/* Transition specific properties */
+.transition-opacity {
+  transition: opacity var(--duration-normal) var(--easing-out);
+}
+
+.transition-transform {
+  transition: transform var(--duration-normal) var(--easing-out);
+}
+
+.transition-colors {
+  transition: color var(--duration-normal) var(--easing-out),
+              background-color var(--duration-normal) var(--easing-out),
+              border-color var(--duration-normal) var(--easing-out);
+}
+
+.transition-shadow {
+  transition: box-shadow var(--duration-normal) var(--easing-out);
+}
+
+/* Transition durations */
+.transition-fast {
+  transition-duration: var(--duration-fast);
+}
+
+.transition-normal {
+  transition-duration: var(--duration-normal);
+}
+
+.transition-slow {
+  transition-duration: var(--duration-slow);
+}
+
+.transition-none {
+  transition: none;
+}
+
+/* ===== Hover Effects ===== */
+
+/* Hover lift */
+.hover-lift {
+  transition: transform var(--duration-fast) var(--easing-out),
+              box-shadow var(--duration-fast) var(--easing-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Hover scale */
+.hover-scale {
+  transition: transform var(--duration-fast) var(--easing-out);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Hover brightness */
+.hover-brightness {
+  transition: filter var(--duration-fast) var(--easing-out);
+}
+
+.hover-brightness:hover {
+  filter: brightness(1.1);
+}
+
+/* Hover shadow */
+.hover-shadow {
+  transition: box-shadow var(--duration-fast) var(--easing-out);
+}
+
+.hover-shadow:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ===== View Transitions API ===== */
+@supports (view-transition-name: none) {
+  /* Page transitions */
+  ::view-transition-old(root) {
+    animation: fade-out var(--duration-normal) var(--easing-out);
+  }
+
+  ::view-transition-new(root) {
+    animation: fade-in var(--duration-normal) var(--easing-out);
+  }
+
+  /* Named transitions */
+  .view-transition-slide {
+    view-transition-name: slide;
+  }
+
+  ::view-transition-old(slide) {
+    animation: slide-out-left var(--duration-normal) var(--easing-out);
+  }
+
+  ::view-transition-new(slide) {
+    animation: slide-in-right var(--duration-normal) var(--easing-out);
+  }
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-pulse,
+  .animate-bounce,
+  .animate-spin {
+    animation: none !important;
+  }
+}
+
+/* ===== Interactive States ===== */
+
+/* Active state */
+.active-scale {
+  transition: transform var(--duration-fast) var(--easing-out);
+}
+
+.active-scale:active {
+  transform: scale(0.95);
+}
+
+/* Focus visible animations */
+.focus-scale:focus-visible {
+  transform: scale(1.05);
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+  position: relative;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
+.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  margin-top: -0.5em;
+  margin-left: -0.5em;
+  border: 2px solid var(--color-brand-200);
+  border-top-color: var(--color-brand-600);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Skeleton loading */
+@keyframes skeleton-wave {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-loading {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-neutral-200);
+}
+
+.skeleton-loading::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: skeleton-wave 1.5s ease-in-out infinite;
+}
+
+@media (prefers-color-scheme: dark) {
+  .skeleton-loading {
+    background-color: var(--color-neutral-800);
+  }
+
+  .skeleton-loading::after {
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+  }
+}

@@ -1,0 +1,35 @@
+/*
+ * Box Sizing
+ * Ensure consistent box model across all elements
+ */
+
+/* Inherit box-sizing for easier component styling */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Set border-box as default */
+html {
+  box-sizing: border-box;
+}
+
+/* Ensure replaced elements respect box-sizing */
+img,
+video,
+iframe,
+embed,
+object {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* Prevent unwanted spacing from inline-block elements */
+button,
+input,
+select,
+textarea {
+  vertical-align: middle;
+}

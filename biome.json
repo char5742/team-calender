@@ -54,7 +54,7 @@
     }
   },
   "files": {
-    "experimentalScannerIgnores": [
+    "ignore": [
       "node_modules",
       "dist",
       "coverage",
@@ -69,7 +69,7 @@
 
   "overrides": [
     {
-      "includes": ["**/*.astro"],
+      "include": ["**/*.astro"],
       "linter": {
         "rules": {
           "style": {

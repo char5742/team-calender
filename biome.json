@@ -1,26 +1,23 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
-    "enabled": true
-  },
+  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
       "complexity": {
-        "all": true,
+        "recommended": true,
         "noBannedTypes": "off"
       },
       "correctness": {
-        "all": true,
+        "recommended": true,
         "noNodejsModules": "off",
         "useImportExtensions": "off"
       },
       "performance": {
-        "all": true
+        "recommended": true
       },
       "style": {
-        "all": true,
+        "recommended": true,
         "noDefaultExport": "off",
         "noParameterProperties": "off",
         "useNodejsImportProtocol": "off",
@@ -38,7 +35,7 @@
         }
       },
       "suspicious": {
-        "all": true,
+        "recommended": true,
         "noExplicitAny": "error"
       }
     }
@@ -57,7 +54,7 @@
     }
   },
   "files": {
-    "ignore": [
+    "experimentalScannerIgnores": [
       "node_modules",
       "dist",
       "coverage",
@@ -72,7 +69,7 @@
 
   "overrides": [
     {
-      "include": ["**/*.astro"],
+      "includes": ["**/*.astro"],
       "linter": {
         "rules": {
           "style": {

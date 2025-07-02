@@ -81,18 +81,27 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
                         
                         return (
                           <div 
-                            class="event-block minimal-hover"
+                            class={`event-block minimal-hover ${event.allDay ? 'all-day-event' : ''}`}
                             data-type={eventType}
                             data-event-id={event.id}
-                            style={`border-left-color: ${event.color || 'var(--color-primary-500)'};`}
+                            data-all-day={event.allDay}
+                            style={event.allDay 
+                              ? `border-top-color: ${event.color || 'var(--color-primary-500)'};` 
+                              : `border-left-color: ${event.color || 'var(--color-primary-500)'};`}
                             tabindex="0"
                             role="button"
-                            aria-label={`${event.title} - ${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}から${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}まで`}
+                            aria-label={`${event.title} - ${event.allDay ? '終日' : `${new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}から${new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}まで`}`}
                           >
                             <div class="event-time">
-                              {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
-                              {' - '}
-                              {new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                              {event.allDay ? (
+                                <span class="all-day-label">終日</span>
+                              ) : (
+                                <>
+                                  {new Date(event.start).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                                  {' - '}
+                                  {new Date(event.end).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}
+                                </>
+                              )}
                             </div>
                             <div class="event-title">{event.title}</div>
                             {event.label && (
@@ -365,6 +374,45 @@ function organizeEventsByDay(events: CalendarEvent[], weekStartDate: Date) {
 
   .event-block[data-type="work"] {
     background: var(--color-background-secondary); /* 背景色削除 */
+  }
+
+  /* 終日予定のスタイル */
+  .all-day-event {
+    opacity: 0.7;
+    background: var(--color-gray-50);
+    border-left: none;
+    border-top: 3px solid;
+    border-top-color: inherit;
+    padding-top: var(--spacing-2);
+  }
+
+  .all-day-event:hover {
+    opacity: 0.9;
+    background: var(--color-gray-100);
+  }
+
+  .all-day-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.625rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .all-day-icon {
+    display: none; /* アイコンは非表示に */
+  }
+
+  /* ダークモード対応 */
+  @media (prefers-color-scheme: dark) {
+    .all-day-event {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .all-day-event:hover {
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.08);
+    }
   }
 
 

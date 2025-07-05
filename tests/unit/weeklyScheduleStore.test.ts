@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'bun:test'
-import { mockCalendarEvents, mockGroups } from '../../src/lib/mockData'
+import { generateWeeklyEvents } from '../../src/mock/dynamicEvents'
+import { groupsData } from '../../src/mock/groupsData'
 import { groupsStore, selectedGroupIdStore } from '../../src/stores/groupStore'
 import {
   currentWeekStartStore,
@@ -8,6 +9,9 @@ import {
   previousWeek,
   weeklyScheduleStore,
 } from '../../src/stores/weeklyScheduleStore'
+
+const groups = groupsData
+const calendarEvents = generateWeeklyEvents()
 
 describe('weeklyScheduleStore', () => {
   beforeEach(() => {
@@ -68,15 +72,15 @@ describe('weeklyScheduleStore', () => {
 
   describe('getWeeklySchedule', () => {
     beforeEach(() => {
-      groupsStore.set(mockGroups)
+      groupsStore.set(groups)
     })
 
     it('指定したグループIDの週間スケジュールを取得できること', () => {
-      const groupId = mockGroups[0].id
+      const groupId = groups[0].id
       const weekStart = '2025-06-30T00:00:00.000Z'
       currentWeekStartStore.set(weekStart)
 
-      const schedule = getWeeklySchedule(groupId, mockCalendarEvents)
+      const schedule = getWeeklySchedule(groupId, calendarEvents)
 
       expect(schedule).toBeDefined()
       expect(schedule?.groupId).toBe(groupId)
@@ -85,17 +89,17 @@ describe('weeklyScheduleStore', () => {
     })
 
     it('存在しないグループIDの場合はnullを返すこと', () => {
-      const schedule = getWeeklySchedule('non-existent-id', mockCalendarEvents)
+      const schedule = getWeeklySchedule('non-existent-id', calendarEvents)
       expect(schedule).toBeNull()
     })
 
     it('メンバーごとに予定が正しくグループ化されること', () => {
-      const groupId = mockGroups[0].id
-      const _group = mockGroups[0]
+      const groupId = groups[0].id
+      const _group = groups[0]
       const weekStart = '2025-06-30T00:00:00.000Z'
       currentWeekStartStore.set(weekStart)
 
-      const schedule = getWeeklySchedule(groupId, mockCalendarEvents)
+      const schedule = getWeeklySchedule(groupId, calendarEvents)
 
       expect(schedule).toBeDefined()
       if (schedule) {
@@ -121,11 +125,11 @@ describe('weeklyScheduleStore', () => {
 
   describe('weeklyScheduleStore', () => {
     beforeEach(() => {
-      groupsStore.set(mockGroups)
+      groupsStore.set(groups)
     })
 
     it('選択されたグループの週間スケジュールが取得できること', () => {
-      const groupId = mockGroups[0].id
+      const groupId = groups[0].id
       selectedGroupIdStore.set(groupId)
 
       const schedule = weeklyScheduleStore.get()
@@ -143,8 +147,8 @@ describe('weeklyScheduleStore', () => {
     })
 
     it('選択グループが変更されたら週間スケジュールも更新されること', () => {
-      const groupId1 = mockGroups[0].id
-      const groupId2 = mockGroups[1].id
+      const groupId1 = groups[0].id
+      const groupId2 = groups[1].id
 
       selectedGroupIdStore.set(groupId1)
       const schedule1 = weeklyScheduleStore.get()
@@ -156,7 +160,7 @@ describe('weeklyScheduleStore', () => {
     })
 
     it('週が変更されたら週間スケジュールも更新されること', () => {
-      const groupId = mockGroups[0].id
+      const groupId = groups[0].id
       selectedGroupIdStore.set(groupId)
 
       const week1 = '2025-06-30T00:00:00.000Z'

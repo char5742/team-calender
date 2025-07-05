@@ -66,7 +66,9 @@ test.describe('VRT - Desktop (1280x720)', () => {
       .locator('.event-block')
       .first()
       .waitFor({ state: 'visible', timeout: 2000 })
-      .catch(() => {})
+      .catch(() => {
+        // 要素が見つからない場合は無視
+      })
 
     // スクリーンショットを撮影
     await expect(page).toHaveScreenshot('weekly-schedule-group1-desktop.png')
@@ -84,7 +86,9 @@ test.describe('VRT - Desktop (1280x720)', () => {
       .locator('.event-block')
       .first()
       .waitFor({ state: 'visible', timeout: 2000 })
-      .catch(() => {})
+      .catch(() => {
+        // 要素が見つからない場合は無視
+      })
 
     // スクリーンショットを撮影
     await expect(page).toHaveScreenshot('weekly-schedule-group2-desktop.png')

@@ -1,28 +1,34 @@
 ---
-import { mockGroups, mockTeamMembers } from '../lib/mockData'
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
+import type { Group, TeamMember } from '../lib/schema'
 import { getAllGroupsWithMembers, groupsStore, teamMembersStore } from '../stores/groupStore'
 import GroupDeleteModal from './GroupDeleteModal.astro'
 import GroupForm from './GroupForm.astro'
 import GroupList from './GroupList.astro'
 import LoadingSpinner from './LoadingSpinner.astro'
 
-// モックデータで初期化（実際の実装ではAPI経由でデータ取得）
-// Note: このコードはサーバーサイドで実行されるため、ページリロード時に毎回実行される
-// 実際のアプリケーションでは、データの永続化（localStorage、データベースなど）が必要
-//
-// 現在の実装の制限事項：
-// 1. グループを作成してもページリロードでリセットされる
-// 2. 編集・削除も同様に永続化されない
-// 3. 本番環境では以下の対応が必要：
-//    - APIサーバーとの連携
-//    - データベースへの保存
-//    - または最低限localStorageでの一時保存
-if (teamMembersStore.get().length === 0) {
-  teamMembersStore.set(mockTeamMembers)
-}
-// グループデータの初期化も同様
-if (groupsStore.get().length === 0) {
-  groupsStore.set(mockGroups)
+// サーバーサイドでライブコレクションからデータを取得してストアを初期化
+if (import.meta.env.SSR) {
+  const groupsRes = await getLiveCollection('groups')
+  const membersRes = await getLiveCollection('teamMembers')
+
+  const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsRes)
+    ? (groupsRes as LiveDataEntry<Group>[])
+    : (groupsRes?.entries ?? [])
+  const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersRes)
+    ? (membersRes as LiveDataEntry<TeamMember>[])
+    : (membersRes?.entries ?? [])
+
+  const groupsData: Group[] = groupsArr.map((entry) => entry.data)
+  const membersData: TeamMember[] = membersArr.map((entry) => entry.data)
+
+  if (groupsStore.get().length === 0) {
+    groupsStore.set(groupsData)
+  }
+  if (teamMembersStore.get().length === 0) {
+    teamMembersStore.set(membersData)
+  }
 }
 
 const groups = getAllGroupsWithMembers()

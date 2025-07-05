@@ -1,5 +1,7 @@
 ---
-import { loadMockData } from '../lib/mockData'
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
+import type { Group } from '../lib/schema'
 import { groupsStore } from '../stores/groupStore'
 
 export interface Props {
@@ -8,8 +10,16 @@ export interface Props {
 
 const { currentGroupId } = Astro.props
 
-// モックデータを読み込む
-loadMockData()
+// Live コレクションからグループを取得しストアへ設定
+const _groupsEntries = await getLiveCollection('groups')
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(_groupsEntries)
+  ? (_groupsEntries as LiveDataEntry<Group>[])
+  : (_groupsEntries?.entries ?? [])
+const groupsData: Group[] = groupsArr.map((entry) => entry.data)
+
+if (groupsStore.get().length === 0) {
+  groupsStore.set(groupsData)
+}
 
 // グループ一覧を取得
 const groups = groupsStore.get()

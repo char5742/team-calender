@@ -1,16 +1,34 @@
 ---
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
 import GroupCreateForm from '../../components/GroupCreateForm.astro'
 import Header from '../../components/Header.astro'
-import { loadMockData } from '../../lib/mockData'
+import type { Group, TeamMember } from '../../lib/schema'
 import { groupsStore, teamMembersStore } from '../../stores/groupStore'
 
-// 開発時とテスト時のモックデータ読み込み
-if (import.meta.env.DEV || import.meta.env.MODE === 'production') {
-  loadMockData()
+// Live コレクションからデータを取得しストアへ設定
+const groupsEntries = await getLiveCollection('groups')
+const membersEntries = await getLiveCollection('teamMembers')
+
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsEntries)
+  ? (groupsEntries as LiveDataEntry<Group>[])
+  : (groupsEntries?.entries ?? [])
+const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersEntries)
+  ? (membersEntries as LiveDataEntry<TeamMember>[])
+  : (membersEntries?.entries ?? [])
+
+const existingGroupsData: Group[] = groupsArr.map((entry) => entry.data)
+const membersData: TeamMember[] = membersArr.map((entry) => entry.data)
+
+if (groupsStore.get().length === 0) {
+  groupsStore.set(existingGroupsData)
+}
+if (teamMembersStore.get().length === 0) {
+  teamMembersStore.set(membersData)
 }
 
-const members = teamMembersStore.get()
-const existingGroups = groupsStore.get()
+const members = membersData
+const existingGroups = existingGroupsData
 ---
 
 <!DOCTYPE html>
@@ -53,19 +71,20 @@ const existingGroups = groupsStore.get()
   }
 </style>
 
-<script>
-  import { loadMockData } from '../../lib/mockData'
+<script lang="ts" define:vars={{ members, existingGroups }}>
   import { teamMembersStore, groupsStore } from '../../stores/groupStore'
   
-  // クライアントサイドでもモックデータを初期化
-  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
-    loadMockData()
+  // 初期データをクライアントストアへ設定
+  if (groupsStore.get().length === 0) {
+    groupsStore.set(existingGroups)
+  }
+  if (teamMembersStore.get().length === 0) {
+    teamMembersStore.set(members)
   }
 
   // グループ作成成功時の処理をカスタマイズ
   document.addEventListener('groupCreated', (event) => {
-    const customEvent = event as CustomEvent
-    const { group } = customEvent.detail
+    const { group } = (event).detail || {}
     
     // トースト通知を表示（実装によって異なる）
     console.log('グループが作成されました:', group)

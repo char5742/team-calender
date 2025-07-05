@@ -1,110 +1,126 @@
 // アプリケーションで使用する主要データスキーマを定義する
 // 仕様書 (docs/仕様書.md) を参照
 
+import { z } from 'zod'
+
 /**
  * 各種 ID は現時点では文字列とする (UUID, Google 由来の ID など)
  */
-export type MemberId = string
-export type GroupId = string
-export type CalendarEventId = string
+export const MemberIdSchema = z.string()
+export type MemberId = z.infer<typeof MemberIdSchema>
+
+export const GroupIdSchema = z.string()
+export type GroupId = z.infer<typeof GroupIdSchema>
+
+export const CalendarEventIdSchema = z.string()
+export type CalendarEventId = z.infer<typeof CalendarEventIdSchema>
 
 /**
  * ユーザーは名前のみ保持
  */
-export interface TeamMember {
+export const TeamMemberSchema = z.object({
   /** メンバー識別子 (Google Account ID など) */
-  id: MemberId
+  id: MemberIdSchema,
   /** 表示名 (Google プロフィール名) */
-  name: string
+  name: z.string(),
   /** Google アカウントのメールアドレス */
-  email: string
-}
+  email: z.string().email(),
+})
+export type TeamMember = z.infer<typeof TeamMemberSchema>
 
 /**
  * カレンダーをまとめて表示するためのグループ
  */
-export interface Group {
+export const GroupSchema = z.object({
   /** グループ識別子 */
-  id: GroupId
+  id: GroupIdSchema,
   /** 任意のグループ名 */
-  name: string
+  name: z.string(),
   /** 所属メンバー (TeamMember.id の配列) */
-  memberIds: MemberId[]
-}
+  memberIds: z.array(MemberIdSchema),
+})
+export type Group = z.infer<typeof GroupSchema>
 
 /**
  * LLM により付与されるラベル
  * – 実装時には i18n 対応やユーザー定義ラベルも考慮して enum ではなく union 型とする
  */
-export type EventLabel =
-  | 'Meeting' // 会議
-  | 'OutOfOffice' // 外出
-  | 'Vacation' // 休暇
-  | 'DocumentWork' // 資料作成
-  | 'Other'
+export const EventLabelSchema = z.union([
+  z.literal('Meeting'), // 会議
+  z.literal('OutOfOffice'), // 外出
+  z.literal('Vacation'), // 休暇
+  z.literal('DocumentWork'), // 資料作成
+  z.literal('Other'),
+])
+export type EventLabel = z.infer<typeof EventLabelSchema>
 
 /**
  * ハイライト時のスタイル情報
  */
-export interface HighlightStyle {
+export const HighlightStyleSchema = z.object({
   /** 背景色 (CSS で解釈可能な値 – 例: #ff0000) */
-  color: string
+  color: z.string(),
   /** アイコンを表す文字列 (例: material-symbols 名称など)。任意 */
-  icon?: string
-}
+  icon: z.string().optional(),
+})
+export type HighlightStyle = z.infer<typeof HighlightStyleSchema>
 
 /**
  * 予定 (Google Calendar Event) を格納するモデル
  */
-export interface CalendarEvent {
-  id: CalendarEventId
+export const CalendarEventSchema = z.object({
+  id: CalendarEventIdSchema,
   /** カレンダー所有者 (TeamMember.id) */
-  ownerId: MemberId
+  ownerId: MemberIdSchema,
   /** Google Calendar API が返す calendarId */
-  calendarId: string
+  calendarId: z.string(),
   /** 予定タイトル */
-  title: string
+  title: z.string(),
   /** 予定詳細 (description) – 任意 */
-  description?: string
+  description: z.string().optional(),
   /** ISO8601 形式の開始日時 */
-  start: string
+  start: z.string().datetime(),
   /** ISO8601 形式の終了日時 */
-  end: string
+  end: z.string().datetime(),
   /** 終日予定かどうか */
-  allDay: boolean
+  allDay: z.boolean(),
   /** Google Calendar が持つ元の色 (hex または colorId) */
-  color?: string
+  color: z.string().optional(),
   /** LLM によるラベル – 任意 */
-  label?: EventLabel
+  label: EventLabelSchema.optional(),
   /** ハイライト用スタイル – 任意 */
-  highlightStyle?: HighlightStyle
-}
+  highlightStyle: HighlightStyleSchema.optional(),
+})
+export type CalendarEvent = z.infer<typeof CalendarEventSchema>
 
 /**
  * ハイライト設定 – ラベルとスタイルのマッピング。
  * ユーザー毎に異なる設定を保持し得るため、設定モデルとは切り離して定義
  */
-export interface HighlightRule {
-  label: EventLabel
-  style: HighlightStyle
-}
+export const HighlightRuleSchema = z.object({
+  label: EventLabelSchema,
+  style: HighlightStyleSchema,
+})
+export type HighlightRule = z.infer<typeof HighlightRuleSchema>
 
 /**
  * ハイライト設定 (シングルユーザーのローカル設定)
  */
-export interface HighlightConfig {
-  highlightRules: HighlightRule[]
-}
+export const HighlightConfigSchema = z.object({
+  highlightRules: z.array(HighlightRuleSchema),
+})
+export type HighlightConfig = z.infer<typeof HighlightConfigSchema>
 
 /**
  * 週単位表示に必要な構造体 (UI 層の集計用)
  * – データ取得層ではなく表示ロジック用の構造体として定義
  */
-export interface WeeklySchedule {
+export const WeeklyScheduleSchema = z.object({
   /** 週の開始日 (ISO8601, 00:00:00) */
-  weekStart: string
+  weekStart: z.string().datetime(),
   /** 対象グループ */
-  groupId: GroupId
+  groupId: GroupIdSchema,
   /** 週内の予定 (メンバー毎にグループ化) */
-  eventsByMember: Record<MemberId, CalendarEvent[]>
-}
+  eventsByMember: z.record(MemberIdSchema, z.array(CalendarEventSchema)),
+})
+export type WeeklySchedule = z.infer<typeof WeeklyScheduleSchema>

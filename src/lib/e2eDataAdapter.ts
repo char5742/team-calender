@@ -1,6 +1,7 @@
+import { groupsData } from '../mock/groupsData'
+import { teamMembersData } from '../mock/teamMembersData'
 import { groupsStore, teamMembersStore } from '../stores/groupStore'
 import { generateGroupId } from '../utils/id'
-import { mockGroups, mockTeamMembers } from './mockData'
 import type { Group, TeamMember } from './schema'
 import { initTestStore, isTestMode } from './testMode'
 
@@ -23,29 +24,29 @@ export class E2EDataAdapter {
   }
 
   private initializeMockData(): void {
-    if (typeof window === 'undefined' || !window.__E2E_TEST_STORE__) {
+    if (typeof window === 'undefined' || !window.e2eTestStore) {
       return
     }
 
-    if (!window.__E2E_TEST_STORE__.initialized) {
-      window.__E2E_TEST_STORE__.groups = [...mockGroups]
-      window.__E2E_TEST_STORE__.teamMembers = [...mockTeamMembers]
-      window.__E2E_TEST_STORE__.initialized = true
+    if (!window.e2eTestStore.initialized) {
+      window.e2eTestStore.groups = [...groupsData]
+      window.e2eTestStore.teamMembers = [...teamMembersData]
+      window.e2eTestStore.initialized = true
     }
   }
 
   // グループ取得
   getGroups(): Group[] {
-    if (isTestMode() && typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-      return window.__E2E_TEST_STORE__.groups || []
+    if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
+      return window.e2eTestStore.groups || []
     }
     return groupsStore.get()
   }
 
   // チームメンバー取得
   getTeamMembers(): TeamMember[] {
-    if (isTestMode() && typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-      return window.__E2E_TEST_STORE__.teamMembers || []
+    if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
+      return window.e2eTestStore.teamMembers || []
     }
     return teamMembersStore.get()
   }
@@ -58,8 +59,8 @@ export class E2EDataAdapter {
       memberIds,
     }
 
-    if (isTestMode() && typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-      window.__E2E_TEST_STORE__.groups = [...window.__E2E_TEST_STORE__.groups, newGroup]
+    if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
+      window.e2eTestStore.groups = [...window.e2eTestStore.groups, newGroup]
     } else {
       // 本番環境では実際のストアを使用
       const currentGroups = groupsStore.get()
@@ -71,8 +72,8 @@ export class E2EDataAdapter {
 
   // グループ更新
   updateGroup(id: string, data: { name: string; memberIds: string[] }): void {
-    if (isTestMode() && typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-      window.__E2E_TEST_STORE__.groups = window.__E2E_TEST_STORE__.groups.map((g) =>
+    if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
+      window.e2eTestStore.groups = window.e2eTestStore.groups.map((g) =>
         g.id === id ? { ...g, ...data } : g,
       )
     } else {
@@ -84,8 +85,8 @@ export class E2EDataAdapter {
 
   // グループ削除
   deleteGroup(id: string): void {
-    if (isTestMode() && typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-      window.__E2E_TEST_STORE__.groups = window.__E2E_TEST_STORE__.groups.filter((g) => g.id !== id)
+    if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
+      window.e2eTestStore.groups = window.e2eTestStore.groups.filter((g) => g.id !== id)
     } else {
       // 本番環境では実際のストアを使用
       const currentGroups = groupsStore.get()

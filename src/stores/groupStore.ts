@@ -1,5 +1,4 @@
 import { atom } from 'nanostores'
-import { mockGroups, mockTeamMembers } from '../lib/mockData'
 import type { Group, TeamMember } from '../lib/schema'
 
 // グループ一覧のストア
@@ -8,15 +7,18 @@ export const groupsStore = atom<Group[]>([])
 // チームメンバー一覧のストア
 export const teamMembersStore = atom<TeamMember[]>([])
 
-// CSRでストアが空の場合、モックデータで初期化
-// これにより編集フォームがクライアント側でも正しく動作する
-if (typeof window !== 'undefined') {
-  if (groupsStore.get().length === 0) {
-    groupsStore.set(mockGroups)
-  }
-  if (teamMembersStore.get().length === 0) {
-    teamMembersStore.set(mockTeamMembers)
-  }
+// サーバーサイドでライブコレクションからデータをロードしてストアに設定
+if (import.meta.env.SSR) {
+  ;(async () => {
+    const { getLiveCollection } = await import('astro:content')
+    const groupsEntries = await getLiveCollection('groups')
+    const membersEntries = await getLiveCollection('teamMembers')
+
+    const gArr = Array.isArray(groupsEntries) ? groupsEntries : (groupsEntries?.entries ?? [])
+    const mArr = Array.isArray(membersEntries) ? membersEntries : (membersEntries?.entries ?? [])
+    groupsStore.set(gArr.map((entry: { data: unknown }) => entry.data as Group))
+    teamMembersStore.set(mArr.map((entry: { data: unknown }) => entry.data as TeamMember))
+  })()
 }
 
 // 選択中のグループIDのストア

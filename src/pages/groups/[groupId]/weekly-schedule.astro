@@ -1,23 +1,46 @@
 ---
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
 import Header from '../../../components/Header.astro'
 import WeeklyCalendarView from '../../../components/WeeklyCalendarView.astro'
-import { loadMockData, mockCalendarEvents } from '../../../lib/mockData'
+import type { CalendarEvent, Group, TeamMember } from '../../../lib/schema'
 import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
 import type { GroupWithMembers } from '../../../stores/groupStore'
 import { currentWeekStartStore, getWeeklySchedule } from '../../../stores/weeklyScheduleStore'
 import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils'
 
-// 動的ルートのために必要な関数
-export function getStaticPaths() {
-  loadMockData()
-  const groups = groupsStore.get()
-  return groups.map((group) => ({
-    params: { groupId: group.id },
-  }))
+// Live コレクションを取得
+const groupsEntries = await getLiveCollection('groups')
+const membersEntries = await getLiveCollection('teamMembers')
+const eventsEntries = await getLiveCollection('events')
+
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsEntries)
+  ? (groupsEntries as LiveDataEntry<Group>[])
+  : (groupsEntries?.entries ?? [])
+const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersEntries)
+  ? (membersEntries as LiveDataEntry<TeamMember>[])
+  : (membersEntries?.entries ?? [])
+const eventsArr: LiveDataEntry<CalendarEvent>[] = Array.isArray(eventsEntries)
+  ? (eventsEntries as LiveDataEntry<CalendarEvent>[])
+  : (eventsEntries?.entries ?? [])
+
+const groupsData: Group[] = groupsArr.map((e) => e.data)
+const membersData: TeamMember[] = membersArr.map((e) => e.data)
+const eventsData: CalendarEvent[] = eventsArr.map((e) => e.data)
+
+if (groupsStore.get().length === 0) {
+  groupsStore.set(groupsData)
+}
+if (teamMembersStore.get().length === 0) {
+  teamMembersStore.set(membersData)
 }
 
-// モックデータを読み込む
-loadMockData()
+// 動的ルートのために必要な関数
+export async function getStaticPaths() {
+  const coll = await (await import('astro:content')).getLiveCollection('groups')
+  const arr = Array.isArray(coll) ? coll : (coll?.entries ?? [])
+  return arr.map((group: { id: string }) => ({ params: { groupId: group.id } }))
+}
 
 // パラメータからグループIDを取得
 const { groupId } = Astro.params
@@ -53,8 +76,8 @@ const groupWithMembers: GroupWithMembers = {
 // 選択されたグループIDを設定
 selectedGroupIdStore.set(groupId || null)
 
-// 週間スケジュールを取得（モックデータを使用）
-const weeklySchedule = getWeeklySchedule(group.id, mockCalendarEvents)
+// 週間スケジュールを取得
+const weeklySchedule = getWeeklySchedule(group.id, eventsData)
 
 // 週の開始日と終了日を計算
 const weekStart = displayWeekStart

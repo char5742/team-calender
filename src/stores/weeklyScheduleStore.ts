@@ -1,6 +1,6 @@
 import { atom, computed } from 'nanostores'
-import { mockCalendarEvents } from '../lib/mockData'
 import type { CalendarEvent, WeeklySchedule } from '../lib/schema'
+import { calendarEventsStore } from './calendarEventsStore'
 import { groupsStore, selectedGroupIdStore } from './groupStore'
 
 // 現在の週の開始日（月曜日）を管理するストア
@@ -100,15 +100,12 @@ export function getWeeklySchedule(
 
 // 選択されたグループの週間スケジュールを返すcomputed store
 export const weeklyScheduleStore = computed(
-  [selectedGroupIdStore, currentWeekStartStore],
-  (selectedGroupId, _weekStart) => {
+  [selectedGroupIdStore, currentWeekStartStore, calendarEventsStore],
+  (selectedGroupId, _weekStart, events) => {
     if (!selectedGroupId) {
       return null
     }
 
-    // 実際の実装では、ここでAPIからデータを取得するか、
-    // 別のストアからカレンダーイベントを取得する
-    // 現時点ではモックデータを使用
-    return getWeeklySchedule(selectedGroupId, mockCalendarEvents)
+    return getWeeklySchedule(selectedGroupId, events)
   },
 )

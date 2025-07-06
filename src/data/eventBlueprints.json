@@ -1,0 +1,182 @@
+[
+  {
+    "ownerId": "member-1",
+    "dayOffset": 0,
+    "startHour": 9,
+    "startMinute": 0,
+    "durationMinutes": 90,
+    "title": "Sprint Planning",
+    "description": "Sprint kickoff meeting",
+    "label": "Meeting",
+    "color": "#1976D2"
+  },
+  {
+    "ownerId": "member-1",
+    "dayOffset": 3,
+    "allDay": true,
+    "title": "Vacation",
+    "description": "Annual leave",
+    "label": "Vacation",
+    "color": "#F44336",
+    "highlightStyle": {
+      "color": "#F44336",
+      "icon": "beach_access"
+    }
+  },
+  {
+    "ownerId": "member-2",
+    "dayOffset": 0,
+    "startHour": 9,
+    "startMinute": 0,
+    "durationMinutes": 90,
+    "title": "Sprint Planning",
+    "label": "Meeting",
+    "color": "#1976D2"
+  },
+  {
+    "ownerId": "member-2",
+    "dayOffset": 2,
+    "startHour": 13,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Weekly Sync",
+    "label": "Meeting",
+    "color": "#F57C00"
+  },
+  {
+    "ownerId": "member-2",
+    "dayOffset": 4,
+    "startHour": 10,
+    "startMinute": 0,
+    "durationMinutes": 120,
+    "title": "Field Visit",
+    "description": "Client site inspection",
+    "label": "OutOfOffice",
+    "color": "#388E3C"
+  },
+  {
+    "ownerId": "member-3",
+    "dayOffset": 1,
+    "startHour": 10,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Design Review",
+    "label": "Meeting",
+    "color": "#9C27B0"
+  },
+  {
+    "ownerId": "member-3",
+    "dayOffset": 2,
+    "startHour": 16,
+    "startMinute": 0,
+    "durationMinutes": 90,
+    "title": "Client Meeting",
+    "label": "Meeting",
+    "color": "#1976D2",
+    "highlightStyle": {
+      "color": "#1976D2",
+      "icon": "handshake"
+    }
+  },
+  {
+    "ownerId": "member-3",
+    "dayOffset": 6,
+    "allDay": true,
+    "title": "Documentation Sprint",
+    "description": "Prepare release notes",
+    "label": "DocumentWork",
+    "color": "#3F51B5"
+  },
+  {
+    "ownerId": "member-4",
+    "dayOffset": 0,
+    "startHour": 11,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Sales Call",
+    "label": "Meeting",
+    "color": "#FF9800"
+  },
+  {
+    "ownerId": "member-4",
+    "dayOffset": 4,
+    "startHour": 14,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Report Prep",
+    "label": "DocumentWork",
+    "color": "#795548"
+  },
+  {
+    "ownerId": "member-4",
+    "dayOffset": 5,
+    "startHour": 9,
+    "startMinute": 0,
+    "durationMinutes": 180,
+    "title": "Marketing Workshop",
+    "label": "Other",
+    "color": "#009688"
+  },
+  {
+    "ownerId": "member-5",
+    "dayOffset": 2,
+    "startHour": 9,
+    "startMinute": 30,
+    "durationMinutes": 90,
+    "title": "Research",
+    "label": "DocumentWork",
+    "color": "#2196F3"
+  },
+  {
+    "ownerId": "member-5",
+    "dayOffset": 3,
+    "startHour": 14,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Team Update",
+    "label": "Meeting",
+    "color": "#8BC34A"
+  },
+  {
+    "ownerId": "member-5",
+    "dayOffset": 1,
+    "allDay": true,
+    "title": "Vacation",
+    "label": "Vacation",
+    "color": "#F44336",
+    "highlightStyle": {
+      "color": "#F44336",
+      "icon": "flight"
+    }
+  },
+  {
+    "ownerId": "member-6",
+    "dayOffset": 0,
+    "startHour": 14,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Strategy Meeting",
+    "label": "Meeting",
+    "color": "#607D8B"
+  },
+  {
+    "ownerId": "member-6",
+    "dayOffset": 4,
+    "startHour": 9,
+    "startMinute": 0,
+    "durationMinutes": 60,
+    "title": "Wrap-up",
+    "label": "Meeting",
+    "color": "#1976D2"
+  },
+  {
+    "ownerId": "member-6",
+    "dayOffset": 2,
+    "startHour": 12,
+    "startMinute": 0,
+    "durationMinutes": 30,
+    "title": "Quick Sync",
+    "label": "Other",
+    "color": "#E91E63"
+  }
+]

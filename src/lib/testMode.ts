@@ -25,9 +25,6 @@ export const isTestMode = () => {
   )
 }
 
-// テストモードでのみモックデータを使用するためのネームスペース
-export const TEST_NAMESPACE = 'e2eTestStore' as const
-
 // テスト用のストアを初期化
 export function initTestStore() {
   if (typeof window === 'undefined') {

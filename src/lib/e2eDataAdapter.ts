@@ -1,28 +1,25 @@
 import { groupsData } from '../mock/groupsData'
 import { teamMembersData } from '../mock/teamMembersData'
-import { groupsStore, teamMembersStore } from '../stores/groupStore'
 import { generateGroupId } from '../utils/id'
 import type { Group, TeamMember } from './schema'
 import { initTestStore, isTestMode } from './testMode'
 
-// E2Eテスト用のデータアダプター
+/**
+ * E2Eテスト専用のデータアダプター
+ * テスト環境では window.e2eTestStore を使用し、
+ * 本番環境では実際のストアを使用する
+ */
 export class E2EDataAdapter {
-  private static instance: E2EDataAdapter
-
-  private constructor() {
-    if (isTestMode() && typeof window !== 'undefined') {
+  constructor() {
+    if (isTestMode()) {
       initTestStore()
       this.initializeMockData()
     }
   }
 
-  static getInstance(): E2EDataAdapter {
-    if (!E2EDataAdapter.instance) {
-      E2EDataAdapter.instance = new E2EDataAdapter()
-    }
-    return E2EDataAdapter.instance
-  }
-
+  /**
+   * テスト環境用のモックデータを初期化
+   */
   private initializeMockData(): void {
     if (typeof window === 'undefined' || !window.e2eTestStore) {
       return
@@ -40,7 +37,8 @@ export class E2EDataAdapter {
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       return window.e2eTestStore.groups || []
     }
-    return groupsStore.get()
+    // 本番環境では空配列を返す（Live Collectionを使用するため）
+    return []
   }
 
   // チームメンバー取得
@@ -48,7 +46,8 @@ export class E2EDataAdapter {
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       return window.e2eTestStore.teamMembers || []
     }
-    return teamMembersStore.get()
+    // 本番環境では空配列を返す（Live Collectionを使用するため）
+    return []
   }
 
   // グループ作成
@@ -61,10 +60,6 @@ export class E2EDataAdapter {
 
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       window.e2eTestStore.groups = [...window.e2eTestStore.groups, newGroup]
-    } else {
-      // 本番環境では実際のストアを使用
-      const currentGroups = groupsStore.get()
-      groupsStore.set([...currentGroups, newGroup])
     }
 
     return newGroup
@@ -76,10 +71,6 @@ export class E2EDataAdapter {
       window.e2eTestStore.groups = window.e2eTestStore.groups.map((g) =>
         g.id === id ? { ...g, ...data } : g,
       )
-    } else {
-      // 本番環境では実際のストアを使用
-      const currentGroups = groupsStore.get()
-      groupsStore.set(currentGroups.map((g) => (g.id === id ? { ...g, ...data } : g)))
     }
   }
 
@@ -87,13 +78,9 @@ export class E2EDataAdapter {
   deleteGroup(id: string): void {
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       window.e2eTestStore.groups = window.e2eTestStore.groups.filter((g) => g.id !== id)
-    } else {
-      // 本番環境では実際のストアを使用
-      const currentGroups = groupsStore.get()
-      groupsStore.set(currentGroups.filter((g) => g.id !== id))
     }
   }
 }
 
-// シングルトンインスタンスをエクスポート
-export const dataAdapter = E2EDataAdapter.getInstance()
+// シングルトンインスタンス
+export const dataAdapter = new E2EDataAdapter()

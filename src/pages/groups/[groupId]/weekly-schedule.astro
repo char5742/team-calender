@@ -3,10 +3,13 @@ import { getLiveCollection } from 'astro:content'
 import type { LiveDataEntry } from 'astro'
 import Header from '../../../components/Header.astro'
 import WeeklyCalendarView from '../../../components/WeeklyCalendarView.astro'
+import {
+  getCurrentWeekStart,
+  getGroupWithMembers,
+  getWeeklySchedule,
+} from '../../../lib/dataAccess'
+import type { GroupWithMembers } from '../../../lib/dataAccess'
 import type { CalendarEvent, Group, TeamMember } from '../../../lib/schema'
-import { groupsStore, selectedGroupIdStore, teamMembersStore } from '../../../stores/groupStore'
-import type { GroupWithMembers } from '../../../stores/groupStore'
-import { currentWeekStartStore, getWeeklySchedule } from '../../../stores/weeklyScheduleStore'
 import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils'
 
 // Live コレクションを取得
@@ -28,13 +31,6 @@ const groupsData: Group[] = groupsArr.map((e) => e.data)
 const membersData: TeamMember[] = membersArr.map((e) => e.data)
 const eventsData: CalendarEvent[] = eventsArr.map((e) => e.data)
 
-if (groupsStore.get().length === 0) {
-  groupsStore.set(groupsData)
-}
-if (teamMembersStore.get().length === 0) {
-  teamMembersStore.set(membersData)
-}
-
 // 動的ルートのために必要な関数
 export async function getStaticPaths() {
   const coll = await (await import('astro:content')).getLiveCollection('groups')
@@ -45,44 +41,36 @@ export async function getStaticPaths() {
 // パラメータからグループIDを取得
 const { groupId } = Astro.params
 
-// URLパラメータから週のオフセットを取得
-const url = new URL(Astro.request.url)
-const weekOffset = Number.parseInt(url.searchParams.get('week') || '0')
+// URLパラメータから週の開始日を取得（デフォルトは現在週）
+const urlParams = new URL(Astro.request.url).searchParams
+const weekParam = urlParams.get('week')
+const displayWeekStart = weekParam || getCurrentWeekStart()
 
-// 表示する週の開始日を計算
-const baseWeekStart = getWeekStart(new Date())
-const displayWeekStart = addWeeks(baseWeekStart, weekOffset)
-
-// 一時的に現在の週を設定
-currentWeekStartStore.set(displayWeekStart.toISOString())
-
-// グループデータを取得
-const groups = groupsStore.get()
-const teamMembers = teamMembersStore.get()
-const group = groups.find((g) => g.id === groupId)
-
+// グループが存在しない場合の処理
+const group = groupsData.find((g) => g.id === groupId)
 if (!group) {
-  return Astro.redirect('/404')
+  return Astro.redirect('/')
 }
 
-// グループのメンバー情報を取得
-const groupWithMembers: GroupWithMembers = {
-  ...group,
-  members: group.memberIds
-    .map((id) => teamMembers.find((m) => m.id === id))
-    .filter((m) => m !== undefined),
-}
-
-// 選択されたグループIDを設定
-selectedGroupIdStore.set(groupId || null)
+// グループとメンバー情報を結合
+const groupWithMembers: GroupWithMembers = getGroupWithMembers(group, membersData)
 
 // 週間スケジュールを取得
-const weeklySchedule = getWeeklySchedule(group.id, eventsData)
+const weeklySchedule = getWeeklySchedule(
+  group.id,
+  groupsData,
+  membersData,
+  eventsData,
+  displayWeekStart,
+)
 
 // 週の開始日と終了日を計算
 const weekStart = displayWeekStart
-const weekEnd = new Date(weekStart)
-weekEnd.setDate(weekEnd.getDate() + 6)
+const weekEnd = addWeeks(new Date(weekStart), 1)
+
+// ページタイトル用の日付フォーマット
+const weekStartFormatted = formatDate(new Date(weekStart), 'YYYY年M月D日')
+const weekEndFormatted = formatDate(new Date(weekEnd), 'YYYY年M月D日')
 ---
 
 <!DOCTYPE html>
@@ -104,7 +92,7 @@ weekEnd.setDate(weekEnd.getDate() + 6)
             {group.name}の週間スケジュール
           </h1>
           <div class="week-info visual-secondary">
-            {formatDate(weekStart, 'YYYY年M月D日')} - {formatDate(weekEnd, 'YYYY年M月D日')}
+            {weekStartFormatted} - {weekEndFormatted}
           </div>
         </div>
 

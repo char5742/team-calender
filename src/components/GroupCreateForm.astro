@@ -6,14 +6,12 @@ export interface Props {
   existingGroups?: Group[]
 }
 
-import { groupsStore, teamMembersStore } from '../stores/groupStore'
-
 const propsMembers = Astro.props.members || []
 const propsExistingGroups = Astro.props.existingGroups || []
 
-// ストアからデータを取得してプロップスと結合
-const members = propsMembers.length > 0 ? propsMembers : teamMembersStore.get()
-const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : groupsStore.get()
+// サーバーサイドで渡されたデータを使用
+const teamMembers = propsMembers
+const existingGroups = propsExistingGroups
 ---
 
 <div class="group-create-form glass-adaptive">
@@ -41,7 +39,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
         メンバーを選択 <span class="required">*</span>
       </label>
       <div class="member-selection glass-subtle">
-        {members.map((member) => (
+        {teamMembers.map((member) => (
           <label class="member-checkbox">
             <input
               type="checkbox"
@@ -61,7 +59,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
           </label>
         ))}
       </div>
-      {members.length === 0 && (
+      {teamMembers.length === 0 && (
         <p class="no-members">
           メンバーが登録されていません。先にメンバーを追加してください。
         </p>
@@ -69,7 +67,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
     </div>
 
     <div class="form-actions">
-      <button type="submit" disabled={members.length === 0} class="btn btn-primary ripple-container button-hover focus-glow">
+      <button type="submit" disabled={teamMembers.length === 0} class="btn btn-primary ripple-container button-hover focus-glow">
         <span class="btn-text">グループを作成</span>
       </button>
       <button type="button" id="cancel-btn" class="btn btn-secondary ripple-container button-hover focus-glow">

@@ -1,38 +1,28 @@
 ---
 import { getLiveCollection } from 'astro:content'
 import type { LiveDataEntry } from 'astro'
+import { getAllGroupsWithMembers } from '../lib/dataAccess'
 import type { Group, TeamMember } from '../lib/schema'
-import { getAllGroupsWithMembers, groupsStore, teamMembersStore } from '../stores/groupStore'
 import GroupDeleteModal from './GroupDeleteModal.astro'
 import GroupForm from './GroupForm.astro'
 import GroupList from './GroupList.astro'
 import LoadingSpinner from './LoadingSpinner.astro'
 
-// サーバーサイドでライブコレクションからデータを取得してストアを初期化
-if (import.meta.env.SSR) {
-  const groupsRes = await getLiveCollection('groups')
-  const membersRes = await getLiveCollection('teamMembers')
+// サーバーサイドでライブコレクションからデータを取得
+const groupsRes = await getLiveCollection('groups')
+const membersRes = await getLiveCollection('teamMembers')
 
-  const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsRes)
-    ? (groupsRes as LiveDataEntry<Group>[])
-    : (groupsRes?.entries ?? [])
-  const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersRes)
-    ? (membersRes as LiveDataEntry<TeamMember>[])
-    : (membersRes?.entries ?? [])
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsRes)
+  ? (groupsRes as LiveDataEntry<Group>[])
+  : (groupsRes?.entries ?? [])
+const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersRes)
+  ? (membersRes as LiveDataEntry<TeamMember>[])
+  : (membersRes?.entries ?? [])
 
-  const groupsData: Group[] = groupsArr.map((entry) => entry.data)
-  const membersData: TeamMember[] = membersArr.map((entry) => entry.data)
+const groupsData: Group[] = groupsArr.map((entry) => entry.data)
+const membersData: TeamMember[] = membersArr.map((entry) => entry.data)
 
-  if (groupsStore.get().length === 0) {
-    groupsStore.set(groupsData)
-  }
-  if (teamMembersStore.get().length === 0) {
-    teamMembersStore.set(membersData)
-  }
-}
-
-const groups = getAllGroupsWithMembers()
-const teamMembers = teamMembersStore.get()
+const groups = getAllGroupsWithMembers(groupsData, membersData)
 ---
 
 <div class="group-management">
@@ -59,7 +49,7 @@ const teamMembers = teamMembersStore.get()
   <!-- グループ作成フォーム -->
   <div id="create-form-container" class="form-container hidden">
     <GroupForm 
-      teamMembers={teamMembers}
+      teamMembers={membersData}
       mode="create"
       existingGroups={groups.map(g => ({ id: g.id, name: g.name, memberIds: g.memberIds }))}
     />

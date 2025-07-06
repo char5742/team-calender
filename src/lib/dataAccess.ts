@@ -1,5 +1,5 @@
-import { addWeeks, getWeekStart } from '../utils/dateUtils'
-import type { CalendarEvent, Group, MemberId, TeamMember, WeeklySchedule } from './schema'
+import { addWeeks, getWeekStart } from '../utils/dateUtils.ts'
+import type { CalendarEvent, Group, MemberId, TeamMember, WeeklySchedule } from './schema.ts'
 
 /**
  * グループとメンバー情報を結合した型

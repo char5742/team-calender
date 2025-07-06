@@ -7,10 +7,10 @@ import {
   getCurrentWeekStart,
   getGroupWithMembers,
   getWeeklySchedule,
-} from '../../../lib/dataAccess'
-import type { GroupWithMembers } from '../../../lib/dataAccess'
-import type { CalendarEvent, Group, TeamMember } from '../../../lib/schema'
-import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils'
+} from '../../../lib/dataAccess.ts'
+import type { GroupWithMembers } from '../../../lib/dataAccess.ts'
+import type { CalendarEvent, Group, TeamMember } from '../../../lib/schema.ts'
+import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils.ts'
 
 // Live コレクションを取得
 const groupsEntries = await getLiveCollection('groups')

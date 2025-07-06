@@ -1,7 +1,7 @@
 import eventBlueprints from '../data/eventBlueprints.json'
-import { type CalendarEvent, CalendarEventSchema } from '../lib/schema'
-import { getWeekStart } from '../utils/dateUtils'
-import { teamMembersData as teamMembers } from './teamMembersData'
+import { type CalendarEvent, CalendarEventSchema } from '../lib/schema.ts'
+import { getWeekStart } from '../utils/dateUtils.ts'
+import { teamMembersData as teamMembers } from './teamMembersData.ts'
 
 /**
  * Generate CalendarEvents for the given week (Monday–Sunday).
@@ -52,7 +52,9 @@ export function generateWeeklyEvents(weekStartDate?: Date): CalendarEvent[] {
   for (const blueprint of fixedEventBlueprints) {
     // Verify owner exists — fallback skip if not found to keep integrity.
     const member = teamMembers.find((m) => m.id === blueprint.ownerId)
-    if (!member) continue
+    if (!member) {
+      continue
+    }
 
     const start = new Date(resolvedWeekStart)
     start.setDate(start.getDate() + blueprint.dayOffset)

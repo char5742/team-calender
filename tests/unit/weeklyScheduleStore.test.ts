@@ -5,10 +5,10 @@ import {
   getPreviousWeekStart,
   getWeeklySchedule,
   normalizeToWeekStart,
-} from '../../src/lib/dataAccess'
-import { generateWeeklyEvents } from '../../src/mock/dynamicEvents'
-import { groupsData } from '../../src/mock/groupsData'
-import { teamMembersData } from '../../src/mock/teamMembersData'
+} from '../../src/lib/dataAccess.ts'
+import { generateWeeklyEvents } from '../../src/mock/dynamicEvents.ts'
+import { groupsData } from '../../src/mock/groupsData.ts'
+import { teamMembersData } from '../../src/mock/teamMembersData.ts'
 
 const groups = groupsData
 const teamMembers = teamMembersData

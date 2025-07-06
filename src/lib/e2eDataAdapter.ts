@@ -1,8 +1,8 @@
-import { groupsData } from '../mock/groupsData'
-import { teamMembersData } from '../mock/teamMembersData'
-import { generateGroupId } from '../utils/id'
-import type { Group, TeamMember } from './schema'
-import { initTestStore, isTestMode } from './testMode'
+import { groupsData } from '../mock/groupsData.ts'
+import { teamMembersData } from '../mock/teamMembersData.ts'
+import { generateGroupId } from '../utils/id.ts'
+import type { Group, TeamMember } from './schema.ts'
+import { initTestStore, isTestMode } from './testMode.ts'
 
 /**
  * E2Eテスト専用のデータアダプター

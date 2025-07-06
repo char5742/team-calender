@@ -1,42 +1,19 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "complexity": {
-        "recommended": true,
-        "noBannedTypes": "off"
-      },
-      "correctness": {
-        "recommended": true,
-        "noNodejsModules": "off",
-        "useImportExtensions": "off"
-      },
-      "performance": {
-        "recommended": true
-      },
+      "all": true,
       "style": {
-        "recommended": true,
         "noDefaultExport": "off",
-        "noParameterProperties": "off",
-        "useNodejsImportProtocol": "off",
-        "useFilenamingConvention": {
-          "level": "warn",
-          "options": {
-            "requireAscii": true,
-            "filenameCases": ["camelCase", "kebab-case", "PascalCase"]
-          }
-        },
         "useNamingConvention": {
           "options": {
             "strictCase": false
           }
         }
-      },
-      "suspicious": {
-        "recommended": true,
-        "noExplicitAny": "error"
       }
     }
   },
@@ -66,7 +43,6 @@
       "test-results/**"
     ]
   },
-
   "overrides": [
     {
       "include": ["**/*.astro"],
@@ -74,7 +50,14 @@
         "rules": {
           "style": {
             "useConst": "off",
-            "useImportType": "off"
+            "useImportType": "off",
+            "useFilenamingConvention": {
+              "level": "warn",
+              "options": {
+                "requireAscii": true,
+                "filenameCases": ["camelCase", "kebab-case", "PascalCase"]
+              }
+            }
           },
           "correctness": {
             "noUnusedVariables": "off",

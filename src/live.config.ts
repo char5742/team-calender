@@ -2,9 +2,9 @@ import { defineLiveCollection } from 'astro:content'
 import type { LiveDataCollection, LiveDataEntry } from 'astro'
 import type { LiveLoader, LoadCollectionContext } from 'astro/loaders'
 import groupsJson from './data/groups.json'
-import type { CalendarEvent, Group, TeamMember } from './lib/schema'
-import { generateWeeklyEvents } from './mock/dynamicEvents'
-import { teamMembersData } from './mock/teamMembersData'
+import type { CalendarEvent, Group, TeamMember } from './lib/schema.ts'
+import { generateWeeklyEvents } from './mock/dynamicEvents.ts'
+import { teamMembersData } from './mock/teamMembersData.ts'
 
 // 週次で変化するイベントを生成
 function loadEventsDynamic() {

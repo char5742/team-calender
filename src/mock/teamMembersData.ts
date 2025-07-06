@@ -1,4 +1,4 @@
-import type { TeamMember } from '../lib/schema'
+import type { TeamMember } from '../lib/schema.ts'
 
 export const teamMembersData: TeamMember[] = [
   { id: 'member-1', name: '山田太郎', email: 'yamada@example.com' },

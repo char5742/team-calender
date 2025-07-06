@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { formatDate, getWeekStart } from '../../src/utils/dateUtils'
+import { formatDate, getWeekStart } from '../../src/utils/dateUtils.ts'
 
 test.describe('週間カレンダービュー', () => {
   test.beforeEach(async ({ page }) => {

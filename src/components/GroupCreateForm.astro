@@ -6,22 +6,12 @@ export interface Props {
   existingGroups?: Group[]
 }
 
-import { loadMockData } from '../lib/mockData'
-import { groupsStore, teamMembersStore } from '../stores/groupStore'
-
-// サーバーサイドでモックデータを初期化
-if (import.meta.env.DEV || import.meta.env.MODE === 'production') {
-  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
-    loadMockData()
-  }
-}
-
 const propsMembers = Astro.props.members || []
 const propsExistingGroups = Astro.props.existingGroups || []
 
-// ストアからデータを取得してプロップスと結合
-const members = propsMembers.length > 0 ? propsMembers : teamMembersStore.get()
-const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : groupsStore.get()
+// サーバーサイドで渡されたデータを使用
+const teamMembers = propsMembers
+const existingGroups = propsExistingGroups
 ---
 
 <div class="group-create-form glass-adaptive">
@@ -49,7 +39,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
         メンバーを選択 <span class="required">*</span>
       </label>
       <div class="member-selection glass-subtle">
-        {members.map((member) => (
+        {teamMembers.map((member) => (
           <label class="member-checkbox">
             <input
               type="checkbox"
@@ -69,7 +59,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
           </label>
         ))}
       </div>
-      {members.length === 0 && (
+      {teamMembers.length === 0 && (
         <p class="no-members">
           メンバーが登録されていません。先にメンバーを追加してください。
         </p>
@@ -77,7 +67,7 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
     </div>
 
     <div class="form-actions">
-      <button type="submit" disabled={members.length === 0} class="btn btn-primary ripple-container button-hover focus-glow">
+      <button type="submit" disabled={teamMembers.length === 0} class="btn btn-primary ripple-container button-hover focus-glow">
         <span class="btn-text">グループを作成</span>
       </button>
       <button type="button" id="cancel-btn" class="btn btn-secondary ripple-container button-hover focus-glow">
@@ -468,15 +458,15 @@ const existingGroups = propsExistingGroups.length > 0 ? propsExistingGroups : gr
   const groupNameInput = document.getElementById('group-name');
   
   // E2Eテスト環境の確認
-  const isE2E = window.__E2E_TEST_MODE__ === true;
+  const isE2E = window.e2eTestMode === true;
   
   // 初期データの設定
   let currentGroups = existingGroups || [];
   let dataAdapter = null;
   
   // E2Eテスト環境の場合、モックデータを即座に設定
-  if (isE2E && window.__E2E_MOCK_DATA__ && currentGroups.length === 0) {
-    currentGroups = [...window.__E2E_MOCK_DATA__.groups];
+  if (isE2E && window.e2eMockData && currentGroups.length === 0) {
+    currentGroups = [...window.e2eMockData.groups];
   }
   
   // 非同期でデータアダプターを初期化（本番環境用）

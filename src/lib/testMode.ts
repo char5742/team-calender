@@ -10,7 +10,7 @@ interface TestStore {
 // グローバルオブジェクトの型拡張
 declare global {
   interface Window {
-    __E2E_TEST_STORE__?: TestStore
+    e2eTestStore?: TestStore
   }
 }
 
@@ -25,17 +25,14 @@ export const isTestMode = () => {
   )
 }
 
-// テストモードでのみモックデータを使用するためのネームスペース
-export const TEST_NAMESPACE = '__E2E_TEST_STORE__' as const
-
 // テスト用のストアを初期化
-export const initTestStore = () => {
+export function initTestStore() {
   if (typeof window === 'undefined') {
     return
   }
 
-  if (!window.__E2E_TEST_STORE__) {
-    window.__E2E_TEST_STORE__ = {
+  if (!window.e2eTestStore) {
+    window.e2eTestStore = {
       groups: [],
       teamMembers: [],
       initialized: false,
@@ -44,8 +41,8 @@ export const initTestStore = () => {
 }
 
 // テストストアのクリーンアップ
-export const cleanupTestStore = () => {
-  if (typeof window !== 'undefined' && window.__E2E_TEST_STORE__) {
-    window.__E2E_TEST_STORE__ = undefined
+export function clearTestStore() {
+  if (typeof window !== 'undefined' && window.e2eTestStore) {
+    window.e2eTestStore = undefined
   }
 }

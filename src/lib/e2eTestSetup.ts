@@ -1,12 +1,13 @@
-import { mockGroups, mockTeamMembers } from './mockData'
+import { groupsData } from '../mock/groupsData'
+import { teamMembersData } from '../mock/teamMembersData'
 
 // E2Eテスト用のグローバル設定
 declare global {
   interface Window {
-    __E2E_TEST_MODE__: boolean
-    __E2E_MOCK_DATA__: {
-      groups: typeof mockGroups
-      teamMembers: typeof mockTeamMembers
+    e2eTestMode: boolean
+    e2eMockData: {
+      groups: typeof groupsData
+      teamMembers: typeof teamMembersData
     }
   }
 }
@@ -22,25 +23,25 @@ export function initE2ETestEnvironment(): void {
   const isTestMode = import.meta.env.VITE_TEST_MODE === 'true'
 
   if (isPlaywright || isTestMode) {
-    window.__E2E_TEST_MODE__ = true
-    window.__E2E_MOCK_DATA__ = {
-      groups: [...mockGroups],
-      teamMembers: [...mockTeamMembers],
+    window.e2eTestMode = true
+    window.e2eMockData = {
+      groups: [...groupsData],
+      teamMembers: [...teamMembersData],
     }
   }
 }
 
 // E2Eテスト環境かどうかを判定
 export function isE2ETestMode(): boolean {
-  return typeof window !== 'undefined' && window.__E2E_TEST_MODE__ === true
+  return typeof window !== 'undefined' && window.e2eTestMode === true
 }
 
 // E2Eテスト用のモックデータを取得
 export function getE2EMockData() {
-  if (isE2ETestMode() && window.__E2E_MOCK_DATA__) {
+  if (isE2ETestMode() && window.e2eMockData) {
     return {
-      groups: [...window.__E2E_MOCK_DATA__.groups],
-      teamMembers: [...window.__E2E_MOCK_DATA__.teamMembers],
+      groups: [...window.e2eMockData.groups],
+      teamMembers: [...window.e2eMockData.teamMembers],
     }
   }
   return null

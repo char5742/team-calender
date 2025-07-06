@@ -1,3 +1,4 @@
+import node from '@astrojs/node'
 import { defineConfig } from 'astro/config'
 
 // E2Eテストモードの検出
@@ -5,7 +6,6 @@ const isE2E = process.env.NODE_ENV === 'test' || process.env.VITE_TEST_MODE === 
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
   experimental: {
     liveContentCollections: true,
   },
@@ -14,4 +14,7 @@ export default defineConfig({
       'import.meta.env.VITE_TEST_MODE': JSON.stringify(isE2E ? 'true' : 'false'),
     },
   },
+  adapter: node({
+    mode: 'standalone',
+  }),
 })

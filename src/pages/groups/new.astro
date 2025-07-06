@@ -1,16 +1,26 @@
 ---
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
 import GroupCreateForm from '../../components/GroupCreateForm.astro'
 import Header from '../../components/Header.astro'
-import { loadMockData } from '../../lib/mockData'
-import { groupsStore, teamMembersStore } from '../../stores/groupStore'
+import type { Group, TeamMember } from '../../lib/schema'
 
-// 開発時とテスト時のモックデータ読み込み
-if (import.meta.env.DEV || import.meta.env.MODE === 'production') {
-  loadMockData()
-}
+// Live コレクションからデータを取得
+const groupsEntries = await getLiveCollection('groups')
+const membersEntries = await getLiveCollection('teamMembers')
 
-const members = teamMembersStore.get()
-const existingGroups = groupsStore.get()
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsEntries)
+  ? (groupsEntries as LiveDataEntry<Group>[])
+  : (groupsEntries?.entries ?? [])
+const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersEntries)
+  ? (membersEntries as LiveDataEntry<TeamMember>[])
+  : (membersEntries?.entries ?? [])
+
+const existingGroupsData: Group[] = groupsArr.map((entry) => entry.data)
+const membersData: TeamMember[] = membersArr.map((entry) => entry.data)
+
+const members = membersData
+const existingGroups = existingGroupsData
 ---
 
 <!DOCTYPE html>
@@ -18,60 +28,52 @@ const existingGroups = groupsStore.get()
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>新しいグループを作成 - Team Calendar</title>
+    <title>新規グループ作成 - チームカレンダー</title>
     <link rel="stylesheet" href="/src/styles/design-system.css" />
     <link rel="stylesheet" href="/src/styles/animations.css" />
   </head>
   <body>
     <Header />
-    
-    <main>
-      <div class="container">
-        <GroupCreateForm members={members} existingGroups={existingGroups} />
-      </div>
+    <main class="main-content page-transition">
+      <GroupCreateForm 
+        members={members}
+        existingGroups={existingGroups}
+      />
     </main>
   </body>
 </html>
 
 <style>
+  /* デザインシステムのインポート */
+  @import '/src/styles/design-system.css';
+  @import '/src/styles/animations.css';
+
   body {
     margin: 0;
-    padding: 0;
-    min-height: 100vh;
+    font-family: var(--font-family-sans);
     background-color: var(--color-background);
+    color: var(--color-text-primary);
+    min-height: 100vh;
   }
 
-  main {
-    min-height: calc(100vh - 48px);
-    background-color: var(--color-background-secondary);
-    padding: 2rem 1rem;
-  }
-
-  .container {
-    max-width: 800px;
+  .main-content {
+    max-width: 600px;
     margin: 0 auto;
+    padding: var(--spacing-8);
   }
 </style>
 
-<script>
-  import { loadMockData } from '../../lib/mockData'
-  import { teamMembersStore, groupsStore } from '../../stores/groupStore'
-  
-  // クライアントサイドでもモックデータを初期化
-  if (teamMembersStore.get().length === 0 || groupsStore.get().length === 0) {
-    loadMockData()
-  }
-
+<script lang="ts" define:vars={{ members, existingGroups }}>
   // グループ作成成功時の処理をカスタマイズ
   document.addEventListener('groupCreated', (event) => {
-    const customEvent = event as CustomEvent
-    const { group } = customEvent.detail
+    const { group } = (event).detail || {}
     
     // トースト通知を表示（実装によって異なる）
     console.log('グループが作成されました:', group)
     
-    // 他の開発者の実装に合わせて、グループ一覧ページやダッシュボードへ遷移
-    // event.preventDefault(); // デフォルトの遷移を防ぐ場合
-    // window.location.href = `/groups/${group.id}`;
+    // 作成したグループのカレンダー画面へ遷移
+    if (group && group.id) {
+      window.location.href = `/groups/${group.id}/weekly-schedule`
+    }
   })
 </script> 

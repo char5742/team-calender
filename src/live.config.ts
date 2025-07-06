@@ -1,10 +1,10 @@
 import { defineLiveCollection } from 'astro:content'
 import type { LiveDataCollection, LiveDataEntry } from 'astro'
 import type { LiveLoader, LoadCollectionContext } from 'astro/loaders'
-import type { CalendarEvent, Group, TeamMember } from './lib/schema'
-import { generateWeeklyEvents } from './mock/dynamicEvents'
-import { groupsData } from './mock/groupsData'
-import { teamMembersData } from './mock/teamMembersData'
+import groupsJson from './data/groups.json'
+import type { CalendarEvent, Group, TeamMember } from './lib/schema.ts'
+import { generateWeeklyEvents } from './mock/dynamicEvents.ts'
+import { teamMembersData } from './mock/teamMembersData.ts'
 
 // 週次で変化するイベントを生成
 function loadEventsDynamic() {
@@ -44,13 +44,13 @@ const eventsLoader: LiveLoader<CalendarEvent> = {
 const groupsLoader: LiveLoader<Group> = {
   name: 'groups',
   loadCollection: async (): Promise<LiveDataCollection<Group>> => {
-    const groups = groupsData
+    const groups: Group[] = groupsJson as unknown as Group[]
     return {
       entries: groups.map((g) => ({ id: g.id, data: g })),
     }
   },
   loadEntry: async (context): Promise<LiveDataEntry<Group>> => {
-    const groups = groupsData
+    const groups: Group[] = groupsJson as unknown as Group[]
     const ctx = context as { id?: string; slug?: string }
     const id = ctx.id ?? ctx.slug ?? ''
     const group = groups.find((g) => g.id === id)

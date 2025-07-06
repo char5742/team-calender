@@ -25,6 +25,10 @@ commit-msg:
     check-commit-msg:
       run: |
         commit_regex='^(feat|fix|docs|style|refactor|test|chore|perf|build|ci)(\(.+\))?: .{1,100}$'
+        # Skip validation for merge commits
+        if grep -qE '^Merge ' {1}; then
+          exit 0
+        fi
         if ! grep -qE "$commit_regex" {1}; then
           echo "❌ コミットメッセージが規約に従っていません"
           echo "📝 形式: <type>(<scope>): <subject>"

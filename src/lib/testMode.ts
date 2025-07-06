@@ -1,4 +1,4 @@
-import type { Group, TeamMember } from './schema'
+import type { Group, TeamMember } from './schema.ts'
 
 // テスト用のストアの型定義
 interface TestStore {

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "group-1",
+    "name": "開発チーム",
+    "members": [
+      { "id": "member-1", "name": "山田太郎", "email": "yamada@example.com" },
+      { "id": "member-2", "name": "佐藤花子", "email": "sato@example.com" },
+      { "id": "member-3", "name": "鈴木一郎", "email": "suzuki@example.com" }
+    ]
+  },
+  {
+    "id": "group-2",
+    "name": "営業チーム",
+    "members": [
+      { "id": "member-4", "name": "田中美咲", "email": "tanaka@example.com" },
+      { "id": "member-5", "name": "高橋健太", "email": "takahashi@example.com" }
+    ]
+  },
+  {
+    "id": "group-3",
+    "name": "マーケティングチーム",
+    "members": [
+      { "id": "member-4", "name": "田中美咲", "email": "tanaka@example.com" },
+      { "id": "member-5", "name": "高橋健太", "email": "takahashi@example.com" },
+      { "id": "member-6", "name": "渡辺 由美", "email": "watanabe@example.com" }
+    ]
+  },
+  {
+    "id": "group-4",
+    "name": "プロジェクトA",
+    "members": [
+      { "id": "member-1", "name": "山田太郎", "email": "yamada@example.com" },
+      { "id": "member-4", "name": "田中美咲", "email": "tanaka@example.com" },
+      { "id": "member-5", "name": "高橋健太", "email": "takahashi@example.com" }
+    ]
+  }
+]

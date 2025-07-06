@@ -21,37 +21,11 @@ test.describe('VRT - Desktop (1280x720)', () => {
     // アニメーションを無効化
     await page.addStyleTag({ content: disableAnimationsStyle })
 
-    // グループリストまたは空状態が表示されるまで待つ
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
+    // リダイレクト後のカレンダーが表示されるまで待つ
+    await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     // スクリーンショットを撮影
     await expect(page).toHaveScreenshot('index-desktop.png')
-  })
-
-  test('グループ作成ページ', async ({ page }) => {
-    await page.goto('/groups/new')
-    await page.addStyleTag({ content: disableAnimationsStyle })
-
-    // フォームが表示されるまで待つ
-    await page.locator('form').waitFor({ state: 'visible', timeout: 5000 })
-
-    // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('group-new-desktop.png')
-  })
-
-  test('グループ作成ページ - メンバー選択UI展開', async ({ page }) => {
-    await page.goto('/groups/new')
-    await page.addStyleTag({ content: disableAnimationsStyle })
-
-    // メンバー選択エリアが表示されるまで待つ
-    await page.locator('.member-selection').waitFor({ state: 'visible', timeout: 5000 })
-
-    // チェックボックスを選択
-    await page.check('input[type="checkbox"][value="member-1"]')
-    await page.check('input[type="checkbox"][value="member-2"]')
-
-    // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('group-new-with-selection-desktop.png')
   })
 
   test('週間スケジュールページ - 開発チーム', async ({ page }) => {
@@ -104,48 +78,6 @@ test.describe('VRT - Desktop (1280x720)', () => {
     // スクリーンショットを撮影
     await expect(page).toHaveScreenshot('weekly-schedule-invalid-desktop.png')
   })
-
-  test('トップページ - グループ削除モーダル', async ({ page }) => {
-    await page.goto('/')
-    await page.addStyleTag({ content: disableAnimationsStyle })
-
-    // グループリストが表示されるまで待つ
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
-
-    // 削除ボタンを探す
-    const deleteButton = page.locator('button[data-action="delete"]').first()
-
-    // 削除ボタンが存在する場合のみモーダルテストを実行
-    if ((await deleteButton.count()) > 0) {
-      await deleteButton.click()
-
-      // モーダルが表示されるまで待つ
-      await page.locator('.modal-overlay.open').waitFor({ state: 'visible', timeout: 2000 })
-
-      // スクリーンショットを撮影
-      await expect(page).toHaveScreenshot('index-delete-modal-desktop.png')
-    } else {
-      // グループがない場合は空の状態をスクリーンショット
-      await expect(page).toHaveScreenshot('index-empty-desktop.png')
-    }
-  })
-
-  test('グループ作成ページ - バリデーションエラー', async ({ page }) => {
-    await page.goto('/groups/new')
-    await page.addStyleTag({ content: disableAnimationsStyle })
-
-    // フォームが表示されるまで待つ
-    await page.locator('form').waitFor({ state: 'visible', timeout: 5000 })
-
-    // 送信ボタンをクリック
-    await page.locator('button[type="submit"]').click()
-
-    // エラーメッセージが表示されるのを待つ（短時間）
-    await page.waitForTimeout(200)
-
-    // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('group-new-validation-error-desktop.png')
-  })
 })
 
 // ダークモードのテスト
@@ -156,7 +88,7 @@ test.describe('VRT - ダークモード', () => {
     await page.goto('/')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
+    await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     await expect(page).toHaveScreenshot('index-dark.png')
   })

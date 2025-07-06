@@ -1,5 +1,5 @@
-import { groupsData } from '../mock/groupsData'
-import { teamMembersData } from '../mock/teamMembersData'
+import { groupsData } from '../mock/groupsData.ts'
+import { teamMembersData } from '../mock/teamMembersData.ts'
 
 // E2Eテスト用のグローバル設定
 declare global {

@@ -1,12 +1,47 @@
 ---
-import GroupManagement from '../components/GroupManagement.astro'
+import { getLiveCollection } from 'astro:content'
+import type { LiveDataEntry } from 'astro'
 import Layout from '../layouts/Layout.astro'
+import type { Group } from '../lib/schema.ts'
 
 const title = 'チームカレンダー'
+
+// 取得したグループが存在する場合、最初のグループへリダイレクト
+const groupsRes = await getLiveCollection('groups')
+const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsRes)
+  ? (groupsRes as LiveDataEntry<Group>[])
+  : (groupsRes?.entries ?? [])
+
+const groups: Group[] = groupsArr.map((e) => e.data)
+
+if (groups.length > 0) {
+  return Astro.redirect(`/groups/${groups[0].id}/weekly-schedule`)
+}
 ---
 
 <Layout title={title}>
-  <main>
-    <GroupManagement />
+  <main class="home">
+    <section class="hero">
+      <h1 class="hero-title">Team Calendar</h1>
+      <p class="hero-subtitle">Please select a group schedule via direct URL.</p>
+    </section>
   </main>
-</Layout> 
+</Layout>
+
+<style>
+  .home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-16) 0;
+  }
+  .hero-title {
+    font-size: var(--font-size-3xl);
+    text-align: center;
+    margin-bottom: var(--spacing-4);
+  }
+  .hero-subtitle {
+    text-align: center;
+    color: var(--color-text-secondary);
+  }
+</style> 

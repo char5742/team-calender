@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test'
-import { addWeeks, formatDate, getWeekEnd, getWeekStart } from '../../src/utils/dateUtils'
+import { addWeeks, formatDate, getWeekEnd, getWeekStart } from '../../src/utils/dateUtils.ts'
 
 describe('dateUtils', () => {
   describe('getWeekStart', () => {

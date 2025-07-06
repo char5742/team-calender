@@ -50,13 +50,13 @@ export class E2EDataAdapter {
     return []
   }
 
-  // グループ作成
-  createGroup(name: string, memberIds: string[]): Group {
+  // グループ作成 (members)
+  createGroup(name: string, members: TeamMember[]): Group {
     const newGroup: Group = {
       id: generateGroupId(),
       name,
-      memberIds,
-    }
+      members,
+    } as unknown as Group
 
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       window.e2eTestStore.groups = [...window.e2eTestStore.groups, newGroup]
@@ -66,7 +66,7 @@ export class E2EDataAdapter {
   }
 
   // グループ更新
-  updateGroup(id: string, data: { name: string; memberIds: string[] }): void {
+  updateGroup(id: string, data: { name: string; members: TeamMember[] }): void {
     if (isTestMode() && typeof window !== 'undefined' && window.e2eTestStore) {
       window.e2eTestStore.groups = window.e2eTestStore.groups.map((g) =>
         g.id === id ? { ...g, ...data } : g,

@@ -21,14 +21,15 @@ test.describe('VRT - Desktop (1280x720)', () => {
     // アニメーションを無効化
     await page.addStyleTag({ content: disableAnimationsStyle })
 
-    // グループリストまたは空状態が表示されるまで待つ
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
+    // リダイレクト後のカレンダーが表示されるまで待つ
+    await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     // スクリーンショットを撮影
     await expect(page).toHaveScreenshot('index-desktop.png')
   })
 
-  test('グループ作成ページ', async ({ page }) => {
+  // biome-ignore lint/suspicious/noSkippedTests: intentionally disabled obsolete scenario
+  test.skip('グループ作成ページ (管理機能削除のため無効化)', async ({ page }) => {
     await page.goto('/groups/new')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
@@ -39,7 +40,8 @@ test.describe('VRT - Desktop (1280x720)', () => {
     await expect(page).toHaveScreenshot('group-new-desktop.png')
   })
 
-  test('グループ作成ページ - メンバー選択UI展開', async ({ page }) => {
+  // biome-ignore lint/suspicious/noSkippedTests: obsolete
+  test.skip('グループ作成ページ - メンバー選択UI展開 (無効化)', async ({ page }) => {
     await page.goto('/groups/new')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
@@ -105,12 +107,13 @@ test.describe('VRT - Desktop (1280x720)', () => {
     await expect(page).toHaveScreenshot('weekly-schedule-invalid-desktop.png')
   })
 
-  test('トップページ - グループ削除モーダル', async ({ page }) => {
+  // biome-ignore lint/suspicious/noSkippedTests: obsolete
+  test.skip('トップページ - グループ削除モーダル (無効化)', async ({ page }) => {
     await page.goto('/')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
-    // グループリストが表示されるまで待つ
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
+    // リダイレクト後のカレンダーが表示されるまで待つ
+    await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     // 削除ボタンを探す
     const deleteButton = page.locator('button[data-action="delete"]').first()
@@ -130,7 +133,8 @@ test.describe('VRT - Desktop (1280x720)', () => {
     }
   })
 
-  test('グループ作成ページ - バリデーションエラー', async ({ page }) => {
+  // biome-ignore lint/suspicious/noSkippedTests: obsolete
+  test.skip('グループ作成ページ - バリデーションエラー (無効化)', async ({ page }) => {
     await page.goto('/groups/new')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
@@ -156,7 +160,7 @@ test.describe('VRT - ダークモード', () => {
     await page.goto('/')
     await page.addStyleTag({ content: disableAnimationsStyle })
 
-    await page.locator('.groups-container').waitFor({ state: 'visible', timeout: 5000 })
+    await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     await expect(page).toHaveScreenshot('index-dark.png')
   })

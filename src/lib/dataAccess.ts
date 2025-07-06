@@ -25,25 +25,15 @@ export function findMemberById(members: TeamMember[], memberId: string): TeamMem
 /**
  * グループとメンバー情報を結合して返す
  */
-export function getGroupWithMembers(group: Group, teamMembers: TeamMember[]): GroupWithMembers {
-  const members = group.memberIds
-    .map((memberId) => findMemberById(teamMembers, memberId))
-    .filter((member): member is TeamMember => member !== undefined)
-
-  return {
-    ...group,
-    members,
-  }
+export function getGroupWithMembers(group: Group): GroupWithMembers {
+  return group as unknown as GroupWithMembers
 }
 
 /**
  * すべてのグループにメンバー情報を結合して返す
  */
-export function getAllGroupsWithMembers(
-  groups: Group[],
-  teamMembers: TeamMember[],
-): GroupWithMembers[] {
-  return groups.map((group) => getGroupWithMembers(group, teamMembers))
+export function getAllGroupsWithMembers(groups: Group[]): GroupWithMembers[] {
+  return groups.map((group) => getGroupWithMembers(group))
 }
 
 /**
@@ -93,7 +83,7 @@ export function getWeeklySchedule(
   const memberEvents = calendarEvents.filter((event) => {
     const eventStart = new Date(event.start)
     return (
-      group.memberIds.includes(event.ownerId) &&
+      group.members.some((m) => m.id === event.ownerId) &&
       eventStart >= weekStartDate &&
       eventStart < weekEndDate
     )
@@ -101,9 +91,9 @@ export function getWeeklySchedule(
 
   // メンバーごとにイベントをグループ化
   const eventsByMember: Record<MemberId, CalendarEvent[]> = {}
-  for (const memberId of group.memberIds) {
-    eventsByMember[memberId] = memberEvents
-      .filter((event) => event.ownerId === memberId)
+  for (const member of group.members) {
+    eventsByMember[member.id] = memberEvents
+      .filter((event) => event.ownerId === member.id)
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
   }
 

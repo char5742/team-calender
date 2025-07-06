@@ -129,8 +129,9 @@ describe('dataAccess utilities', () => {
       if (schedule) {
         const memberIds = Object.keys(schedule.eventsByMember)
         // グループのメンバーIDのみが含まれること
+        const groupMemberIds = group.members.map((m) => m.id)
         for (const memberId of memberIds) {
-          expect(group.memberIds).toContain(memberId)
+          expect(groupMemberIds).toContain(memberId)
         }
       }
     })

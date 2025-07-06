@@ -36,8 +36,8 @@ export const GroupSchema = z.object({
   id: GroupIdSchema,
   /** 任意のグループ名 */
   name: z.string(),
-  /** 所属メンバー (TeamMember.id の配列) */
-  memberIds: z.array(MemberIdSchema),
+  /** 所属メンバー */
+  members: z.array(TeamMemberSchema),
 })
 export type Group = z.infer<typeof GroupSchema>
 

@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "team-calender",
+      "name": "team-calendar",
       "dependencies": {
         "@astrojs/node": "^9.3.0",
         "astro": "^5.11.0",

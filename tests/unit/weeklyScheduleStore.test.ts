@@ -11,7 +11,7 @@ import {
 } from '../../src/stores/weeklyScheduleStore'
 
 const groups = groupsData
-const calendarEvents = generateWeeklyEvents()
+let calendarEvents = generateWeeklyEvents(new Date(currentWeekStartStore.get()))
 
 describe('weeklyScheduleStore', () => {
   beforeEach(() => {
@@ -22,6 +22,10 @@ describe('weeklyScheduleStore', () => {
     currentWeekStartStore.set(monday.toISOString())
     selectedGroupIdStore.set(null)
     groupsStore.set([])
+
+    // 週開始日に合わせたイベントを再生成
+    const mondayStart = new Date(currentWeekStartStore.get())
+    calendarEvents = generateWeeklyEvents(mondayStart)
   })
 
   describe('currentWeekStartStore', () => {

@@ -6,9 +6,11 @@ import { teamMembersData as teamMembers } from './teamMembersData'
  * Generate CalendarEvents for the current week (Monday-Sunday) for demo purposes.
  * Each team member gets 2 random events between 09:00-17:00.
  */
-export function generateWeeklyEvents(): CalendarEvent[] {
-  const now = new Date()
-  const weekStart = getWeekStart(now) // Monday 00:00
+export function generateWeeklyEvents(weekStartDate?: Date): CalendarEvent[] {
+  // Resolve the week start date. If a date is provided we normalise it to the start of that week (Monday).
+  // Otherwise, we fall back to the current date.
+  const resolvedWeekStart = weekStartDate ?? new Date()
+  const weekStart = getWeekStart(resolvedWeekStart) // Monday 00:00
 
   const events: CalendarEvent[] = []
   let seq = 0

@@ -34,13 +34,13 @@ test.describe('週間カレンダービュー', () => {
 
   test('メンバー名が正しく表示される', async ({ page }) => {
     const calendar = page.locator('.weekly-calendar')
-    const memberRows = calendar.locator('.member-row')
+    const memberRows = calendar.locator('.row')
 
     // 開発チームのメンバー数（3人）を確認
     await expect(memberRows).toHaveCount(3)
 
-    // メンバー名の確認（.member-name-textセレクターを使用）
-    const memberNames = calendar.locator('.member-name-text')
+    // メンバー名の確認（.name-textセレクターを使用）
+    const memberNames = calendar.locator('.name-text')
     const names = await memberNames.allTextContents()
     expect(names).toContain('山田太郎')
     expect(names).toContain('佐藤花子')
@@ -62,7 +62,7 @@ test.describe('週間カレンダービュー', () => {
     await expect(firstEvent).toBeVisible()
 
     // タイトルが表示されていることを確認
-    const title = firstEvent.locator('.event-title')
+    const title = firstEvent.locator('.title')
     await expect(title).toBeVisible()
     const titleText = await title.textContent()
     expect(titleText).toBeTruthy()
@@ -109,15 +109,15 @@ test.describe('週間カレンダービュー', () => {
     const eventCount = await eventBlocks.count()
 
     if (eventCount >= 2) {
-      const firstEventStyle = await eventBlocks.first().getAttribute('style')
-      const secondEventStyle = await eventBlocks.nth(1).getAttribute('style')
+      const firstBox = await eventBlocks.first().boundingBox()
+      const secondBox = await eventBlocks.nth(1).boundingBox()
 
-      // スタイルが異なることを確認（位置が異なる）
-      expect(firstEventStyle).toBeTruthy()
-      expect(secondEventStyle).toBeTruthy()
-
-      // 少なくともtopかleftの値が異なることを期待
-      // （同じ時間帯の予定でない限り）
+      // 異なる位置にレンダリングされていることを確認
+      expect(firstBox).toBeTruthy()
+      expect(secondBox).toBeTruthy()
+      expect(
+        firstBox && secondBox && (firstBox.x !== secondBox.x || firstBox.y !== secondBox.y),
+      ).toBeTruthy()
     }
   })
 })

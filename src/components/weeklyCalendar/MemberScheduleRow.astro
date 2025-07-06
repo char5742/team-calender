@@ -1,0 +1,112 @@
+---
+import type { CalendarEvent, TeamMember } from '../../lib/schema.ts'
+import { organizeEventsByDay } from '../../utils/calendarUtils.ts'
+import EventBlock from './EventBlock.astro'
+
+export interface Props {
+  member: TeamMember
+  memberEvents: CalendarEvent[]
+  weekStartDate: Date
+  memberIndex: number
+}
+
+const { member, memberEvents, weekStartDate, memberIndex } = Astro.props
+
+const eventsByDay = organizeEventsByDay(memberEvents, weekStartDate)
+---
+
+<div class={`row content-appear-delay-${Math.min(memberIndex + 1, 3)}`} role="row">
+  <div class="name" role="rowheader">
+    <span class="avatar">{member.name.charAt(0)}</span>
+    <span class="name-text visual-primary">{member.name}</span>
+  </div>
+  <div class="schedule">
+    {eventsByDay.map((dayEvents, dayIndex) => (
+      <div class="cell" data-day={dayIndex} role="gridcell">
+        <div class="events">
+          {dayEvents.map((evt) => (
+            <EventBlock event={evt} />
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    border-bottom: 1px solid var(--color-border);
+    min-height: 120px;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .name {
+    padding: var(--spacing-3);
+    background: var(--color-background-secondary);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    position: sticky;
+    left: 0;
+    z-index: 5;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--color-primary-500);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+  }
+
+  .name-text {
+    flex: 1;
+    font-size: var(--font-size-sm);
+  }
+
+  .schedule {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+  }
+
+  .cell {
+    border-right: 1px solid var(--color-border);
+    padding: var(--spacing-4);
+
+    &[data-day="5"],
+    &[data-day="6"] {
+      background-color: rgba(0, 0, 0, 0.01);
+    }
+
+    &:last-child {
+      border-right: none;
+    }
+
+    .events {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-1);
+    }
+  }
+
+  /* Dark-mode weekend cell */
+  @media (prefers-color-scheme: dark) {
+    .cell[data-day="5"],
+    .cell[data-day="6"] {
+      background-color: rgba(239, 68, 68, 0.01);
+    }
+  }
+</style> 

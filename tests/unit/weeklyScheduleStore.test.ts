@@ -8,10 +8,8 @@ import {
 } from '../../src/lib/dataAccess.ts'
 import { generateWeeklyEvents } from '../../src/mock/dynamicEvents.ts'
 import { groupsData } from '../../src/mock/groupsData.ts'
-import { teamMembersData } from '../../src/mock/teamMembersData.ts'
 
 const groups = groupsData
-const teamMembers = teamMembersData
 let calendarEvents = generateWeeklyEvents(new Date(getCurrentWeekStart()))
 
 describe('dataAccess utilities', () => {
@@ -71,7 +69,7 @@ describe('dataAccess utilities', () => {
       const groupId = groups[0].id
       const weekStart = '2025-06-30T00:00:00.000Z'
 
-      const schedule = getWeeklySchedule(groupId, groups, teamMembers, calendarEvents, weekStart)
+      const schedule = getWeeklySchedule(groupId, groups, calendarEvents, weekStart)
 
       expect(schedule).toBeDefined()
       expect(schedule?.groupId).toBe(groupId)
@@ -83,7 +81,6 @@ describe('dataAccess utilities', () => {
       const schedule = getWeeklySchedule(
         'non-existent-id',
         groups,
-        teamMembers,
         calendarEvents,
         '2025-06-30T00:00:00.000Z',
       )
@@ -92,10 +89,9 @@ describe('dataAccess utilities', () => {
 
     it('メンバーごとに予定が正しくグループ化されること', () => {
       const groupId = groups[0].id
-      const _group = groups[0]
       const weekStart = '2025-06-30T00:00:00.000Z'
 
-      const schedule = getWeeklySchedule(groupId, groups, teamMembers, calendarEvents, weekStart)
+      const schedule = getWeeklySchedule(groupId, groups, calendarEvents, weekStart)
 
       expect(schedule).toBeDefined()
       if (schedule) {
@@ -120,16 +116,15 @@ describe('dataAccess utilities', () => {
 
     it('グループに所属しないメンバーの予定は含まれないこと', () => {
       const groupId = groups[0].id
-      const group = groups[0]
       const weekStart = '2025-06-30T00:00:00.000Z'
 
-      const schedule = getWeeklySchedule(groupId, groups, teamMembers, calendarEvents, weekStart)
+      const schedule = getWeeklySchedule(groupId, groups, calendarEvents, weekStart)
 
       expect(schedule).toBeDefined()
       if (schedule) {
         const memberIds = Object.keys(schedule.eventsByMember)
         // グループのメンバーIDのみが含まれること
-        const groupMemberIds = group.members.map((m) => m.id)
+        const groupMemberIds = groups[0].members.map((m) => m.id)
         for (const memberId of memberIds) {
           expect(groupMemberIds).toContain(memberId)
         }

@@ -3,32 +3,22 @@ import { getLiveCollection } from 'astro:content'
 import type { LiveDataEntry } from 'astro'
 import Header from '../../../components/Header.astro'
 import WeeklyCalendarView from '../../../components/WeeklyCalendarView.astro'
-import {
-  getCurrentWeekStart,
-  getGroupWithMembers,
-  getWeeklySchedule,
-} from '../../../lib/dataAccess.ts'
-import type { GroupWithMembers } from '../../../lib/dataAccess.ts'
-import type { CalendarEvent, Group, TeamMember } from '../../../lib/schema.ts'
-import { addWeeks, formatDate, getWeekStart } from '../../../utils/dateUtils.ts'
+import { getCurrentWeekStart, getWeeklySchedule } from '../../../lib/dataAccess.ts'
+import type { CalendarEvent, Group } from '../../../lib/schema.ts'
+import { addWeeks, formatDate } from '../../../utils/dateUtils.ts'
 
 // Live コレクションを取得
 const groupsEntries = await getLiveCollection('groups')
-const membersEntries = await getLiveCollection('teamMembers')
 const eventsEntries = await getLiveCollection('events')
 
 const groupsArr: LiveDataEntry<Group>[] = Array.isArray(groupsEntries)
   ? (groupsEntries as LiveDataEntry<Group>[])
   : (groupsEntries?.entries ?? [])
-const membersArr: LiveDataEntry<TeamMember>[] = Array.isArray(membersEntries)
-  ? (membersEntries as LiveDataEntry<TeamMember>[])
-  : (membersEntries?.entries ?? [])
 const eventsArr: LiveDataEntry<CalendarEvent>[] = Array.isArray(eventsEntries)
   ? (eventsEntries as LiveDataEntry<CalendarEvent>[])
   : (eventsEntries?.entries ?? [])
 
 const groupsData: Group[] = groupsArr.map((e) => e.data)
-const membersData: TeamMember[] = membersArr.map((e) => e.data)
 const eventsData: CalendarEvent[] = eventsArr.map((e) => e.data)
 
 // 動的ルートのために必要な関数
@@ -52,17 +42,8 @@ if (!group) {
   return Astro.redirect('/')
 }
 
-// グループとメンバー情報を結合
-const groupWithMembers: GroupWithMembers = getGroupWithMembers(group)
-
 // 週間スケジュールを取得
-const weeklySchedule = getWeeklySchedule(
-  group.id,
-  groupsData,
-  membersData,
-  eventsData,
-  displayWeekStart,
-)
+const weeklySchedule = getWeeklySchedule(group.id, groupsData, eventsData, displayWeekStart)
 
 // 週の開始日と終了日を計算
 const weekStart = displayWeekStart
@@ -100,7 +81,7 @@ const weekEndFormatted = formatDate(new Date(weekEnd), 'YYYY年M月D日')
           {weeklySchedule ? (
             <WeeklyCalendarView 
               weeklySchedule={weeklySchedule} 
-              members={groupWithMembers.members}
+              members={group.members}
             />
           ) : (
             <p class="visual-secondary">スケジュールデータがありません</p>

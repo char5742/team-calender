@@ -1,40 +1,5 @@
 import { addWeeks, getWeekStart } from '../utils/dateUtils.ts'
-import type { CalendarEvent, Group, MemberId, TeamMember, WeeklySchedule } from './schema.ts'
-
-/**
- * グループとメンバー情報を結合した型
- */
-export interface GroupWithMembers extends Group {
-  members: TeamMember[]
-}
-
-/**
- * グループIDから該当するグループを取得
- */
-export function findGroupById(groups: Group[], groupId: string): Group | undefined {
-  return groups.find((g) => g.id === groupId)
-}
-
-/**
- * チームメンバーIDから該当するメンバーを取得
- */
-export function findMemberById(members: TeamMember[], memberId: string): TeamMember | undefined {
-  return members.find((m) => m.id === memberId)
-}
-
-/**
- * グループとメンバー情報を結合して返す
- */
-export function getGroupWithMembers(group: Group): GroupWithMembers {
-  return group as unknown as GroupWithMembers
-}
-
-/**
- * すべてのグループにメンバー情報を結合して返す
- */
-export function getAllGroupsWithMembers(groups: Group[]): GroupWithMembers[] {
-  return groups.map((group) => getGroupWithMembers(group))
-}
+import type { CalendarEvent, Group, MemberId, WeeklySchedule } from './schema.ts'
 
 /**
  * 現在の週の開始日（月曜日）を計算
@@ -67,7 +32,6 @@ export function getPreviousWeekStart(currentWeekStart: string): string {
 export function getWeeklySchedule(
   groupId: string,
   groups: Group[],
-  _teamMembers: TeamMember[],
   calendarEvents: CalendarEvent[],
   weekStart: string,
 ): WeeklySchedule | null {
@@ -119,4 +83,11 @@ export function getWeekDateRange(weekStart: string): { start: Date; end: Date } 
 export function normalizeToWeekStart(date: Date | string): string {
   const d = typeof date === 'string' ? new Date(date) : date
   return getWeekStart(d).toISOString()
+}
+
+/**
+ * グループIDから該当するグループを取得
+ */
+export function findGroupById(groups: Group[], groupId: string): Group | undefined {
+  return groups.find((g) => g.id === groupId)
 }

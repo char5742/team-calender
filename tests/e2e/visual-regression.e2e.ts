@@ -25,7 +25,7 @@ test.describe('VRT - Desktop (1280x720)', () => {
     await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
     // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('index-desktop')
+    await expect(page).toHaveScreenshot('index-desktop.png')
   })
 
   test('週間スケジュールページ - 開発チーム', async ({ page }) => {
@@ -45,7 +45,7 @@ test.describe('VRT - Desktop (1280x720)', () => {
       })
 
     // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('weekly-schedule-group1-desktop')
+    await expect(page).toHaveScreenshot('weekly-schedule-group1-desktop.png')
   })
 
   test('週間スケジュールページ - 営業チーム', async ({ page }) => {
@@ -65,7 +65,7 @@ test.describe('VRT - Desktop (1280x720)', () => {
       })
 
     // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('weekly-schedule-group2-desktop')
+    await expect(page).toHaveScreenshot('weekly-schedule-group2-desktop.png')
   })
 
   test('週間スケジュールページ - 空のグループ', async ({ page }) => {
@@ -76,7 +76,7 @@ test.describe('VRT - Desktop (1280x720)', () => {
     await page.waitForLoadState('domcontentloaded')
 
     // スクリーンショットを撮影
-    await expect(page).toHaveScreenshot('weekly-schedule-invalid-desktop')
+    await expect(page).toHaveScreenshot('weekly-schedule-invalid-desktop.png')
   })
 })
 
@@ -90,6 +90,6 @@ test.describe('VRT - ダークモード', () => {
 
     await page.locator('.weekly-calendar').waitFor({ state: 'visible', timeout: 5000 })
 
-    await expect(page).toHaveScreenshot('index-dark')
+    await expect(page).toHaveScreenshot('index-dark.png')
   })
 })
